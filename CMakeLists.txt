@@ -7,12 +7,16 @@ project(CPlayground)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(PROJECT_SOURCE_DIR, src)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY build)
+
 
 # include_directories(${PROJECT_SOURCE_DIR})
 
 file(GLOB sources
      "src/*.h"
      "src/*.cpp"
+     "src/**/*.h"
+     "src/**/*.cpp"
 )
 
 # add the executable

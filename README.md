@@ -3,13 +3,5 @@
 Learning CPP playground repository
 
 ```
-cmake ./
-cmake --build .
-./CPlayground 
-```
-
-or 
-
-```
-sh all.sh
+sh scripts/all.sh
 ```
