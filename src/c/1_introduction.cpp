@@ -63,15 +63,46 @@ void print_input() {
     putchar(c);
 }
 
+void print_array_sum(int array[], int length) {
+    int sum = 0;
+    for (int i = 0; i < length; i++) {
+        sum += array[i];
+    }
+    printf("Sum: %d\n", sum);
+}
 
-int c_main() {
+void print_sum_of_squares() {
+    int length = 10;
+    int numberArray[length];
+    for (int i = 0; i < length; i++) {
+        // Without this line the number array is full of junk data
+        numberArray[i] = i * i;
+        printf("%d, %d\n", i, numberArray[i]);
+    }
+    print_array_sum(numberArray, length);
+}
+
+void print_raw_string() {
+    // This becomes ['H', 'e', 'l', 'l', 'o', '\0']
+    // \0 denotes end of string
+    char characterArray[] = "Hello\n";
+    char c; 
+    for (int i = 0; (c = characterArray[i]) != '\0'; i++) {
+        putchar(c);
+    }
+
+}
+
+int c1_main() {
     // \n is the newline character
     printf("hello, world\n");
 
     print_basic_farenheight();
     print_float_farenheight();
     print_types();
-    print_input();
+    // print_input();
+    print_sum_of_squares();
+    print_raw_string();
 }
 
 

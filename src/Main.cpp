@@ -4,6 +4,6 @@
 #include "c/cprogramming.h"
 
 int main() {
-    c_main();
+    c2_main();
 }
 
