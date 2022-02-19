@@ -19,7 +19,14 @@ file(GLOB sources
      "src/**/*.cpp"
 )
 
+# Add SDL2 library
+find_package(SDL2 REQUIRED)
+include_directories(CPlayground ${SDL2_INCLUDE_DIRS})
+
 # add the executable
 add_executable(CPlayground 
     ${sources}
 )
+
+# Add SDL2 lib
+target_link_libraries(CPlayground ${SDL2_LIBRARIES})

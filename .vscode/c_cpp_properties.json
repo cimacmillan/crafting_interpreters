@@ -11,7 +11,8 @@
                 "/usr/local/Cellar/gcc/11.2.0_3/lib/gcc/11/gcc/x86_64-apple-darwin21/11/include-fixed",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
-                "/usr/local/Cellar/gcc/11.2.0_3/include/c++/11/tr1"
+                "/usr/local/Cellar/gcc/11.2.0_3/include/c++/11/tr1",
+                "/usr/local/Cellar/sdl2/2.0.20/include/SDL2"
             ],
             "defines": [],
             "macFrameworkPath": [],
