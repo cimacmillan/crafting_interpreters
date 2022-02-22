@@ -15,7 +15,9 @@
                 "/usr/local/Cellar/sdl2/2.0.20/include/SDL2"
             ],
             "defines": [],
-            "macFrameworkPath": [],
+            "macFrameworkPath": [
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/System/Library/Frameworks"
+            ],
             "compilerPath": "/usr/local/bin/g++-11",
             "cStandard": "gnu17",
             "cppStandard": "gnu++17",

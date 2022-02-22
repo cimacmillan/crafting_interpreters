@@ -23,6 +23,10 @@ file(GLOB sources
 find_package(SDL2 REQUIRED)
 include_directories(CPlayground ${SDL2_INCLUDE_DIRS})
 
+# Add OpenCL library
+find_package(OpenCL REQUIRED)
+include_directories( ${OPENCL_INCLUDE_DIR})     
+
 # add the executable
 add_executable(CPlayground 
     ${sources}
@@ -30,3 +34,6 @@ add_executable(CPlayground
 
 # Add SDL2 lib
 target_link_libraries(CPlayground ${SDL2_LIBRARIES})
+
+# Add OpenCL lib
+target_link_libraries(CPlayground "-framework OpenCL" )
