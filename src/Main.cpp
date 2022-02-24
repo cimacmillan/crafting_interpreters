@@ -7,7 +7,7 @@
 #include "ocl/ocl.h"
 
 int main() {
-    cpp1_main();
+    cpp2_main();
     // ocl_main();
     // helloWorldWindow();
 }
