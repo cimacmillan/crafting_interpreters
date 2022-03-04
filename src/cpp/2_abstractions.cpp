@@ -59,7 +59,22 @@ public:
     int size() const { return sz; }
 };
 
+class Printable {
+public:
+    virtual void print() = 0;
+};
 
+class RandomObject: public Printable { 
+private:
+    int* val;
+public:
+    RandomObject(int s) :val(new int(s)) {}
+    ~RandomObject() { delete val; }
+
+    void print() {
+        std::cout << "Value is: " << *val << std::endl;
+    }
+};
 
 complex& complex::operator*=(complex z) {
     this->re *= z.re;
@@ -75,6 +90,21 @@ std::vector<string> readLines() {
     return v;
 }
 
+Printable* createPrintable() {
+    RandomObject* randomObject = new RandomObject(10);
+    return randomObject;
+}
+
+std::unique_ptr<Printable> createBetterPrintable() {
+    return unique_ptr<Printable>(new RandomObject(10));
+} 
+
+void print(std::unique_ptr<Printable>& p) {
+    p->print();
+}
+
+
+
 void cpp2_main() {
     complex c1(1, 2);
     complex c2(3, 4);
@@ -83,14 +113,22 @@ void cpp2_main() {
 
     cout << c1.toString() << endl; 
 
-    cout << "Input a line and press enter" << endl;
-    auto v = readLines();
+    // cout << "Input a line and press enter" << endl;
+    // auto v = readLines();
 
-    for (auto line : v) {
-        cout << "You inputted" << endl;
-        cout << line << endl;
-    }
+    // for (auto line : v) {
+    //     cout << "You inputted" << endl;
+    //     cout << line << endl;
+    // }
 
     CrapVector crap(10);
     use(crap);
+
+    // This is a problem because people need to remember to deallocate the printable
+    // Printable* printable = createPrintable();
+
+    // This is better because the printable is destroyed when uniqueptr goes out of scope
+    std::unique_ptr<Printable> printable = createBetterPrintable();
+    print(printable);
+
 }
