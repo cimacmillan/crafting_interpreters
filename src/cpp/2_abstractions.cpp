@@ -103,6 +103,25 @@ void print(std::unique_ptr<Printable>& p) {
     p->print();
 }
 
+template<typename T> class TypedVector {
+private:
+    T* elem;
+    int sz;
+public: 
+    TypedVector(int s): elem{new T[s]} {}
+    ~TypedVector() {}
+
+    T& operator[](int i) { return elem[i]; }
+    int size() const { return sz; }
+};
+
+// Template functions can also be used, which allows mixed type values
+template<typename Container, typename Value> Value sum(const Container& c, Value v)
+{
+    for (auto x : c) v+=x;
+    return v; 
+}
+
 
 
 void cpp2_main() {
@@ -130,5 +149,9 @@ void cpp2_main() {
     // This is better because the printable is destroyed when uniqueptr goes out of scope
     std::unique_ptr<Printable> printable = createBetterPrintable();
     print(printable);
+
+    TypedVector<double> typedVectorDoubles(10);
+    typedVectorDoubles[0] = 0.3;
+    cout << "Value is " << typedVectorDoubles[0] << endl;
 
 }
