@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <stdlib.h>
 
 #include "vector/Vector.h"
 #include "c/cprogramming.h"
@@ -6,9 +8,11 @@
 #include "window/Window.h"
 #include "ocl/ocl.h"
 
+using namespace std;
+
+
 int main() {
-    cpp4_main();
-    // ocl_main();
-    // helloWorldWindow();
+
+
 }
 
