@@ -93,7 +93,7 @@ public:
 };
 
 
-int main() {
+int trie_main() {
 
     TrieNode dictionary(false);
     dictionary.addWord("camel hand");

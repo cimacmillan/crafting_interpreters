@@ -79,7 +79,9 @@
         "list": "cpp",
         "map": "cpp",
         "__tree": "cpp",
-        "__memory": "cpp"
+        "__memory": "cpp",
+        "stack": "cpp",
+        "set": "cpp"
     },
     "cmake.configureOnOpen": false
 }
