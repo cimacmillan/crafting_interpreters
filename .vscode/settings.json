@@ -81,7 +81,8 @@
         "__tree": "cpp",
         "__memory": "cpp",
         "stack": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "unordered_set": "cpp"
     },
     "cmake.configureOnOpen": false
 }

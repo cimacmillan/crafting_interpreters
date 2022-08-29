@@ -7,79 +7,155 @@
 #include <deque>
 #include <map>
 #include <set>
+#include <unordered_map>
+#include <unordered_set>
+#include <assert.h>
 
 using namespace std;
 
+bool is_character_valid(char character) {
+    auto alphabet_index = character - 'A';
+    return alphabet_index >= 0 && alphabet_index < 26;
+}
+
+bool are_options_valid(unordered_map<char, int> options) {
+    for (auto &entry : options) {
+        if (!is_character_valid(entry.first)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool can_create_sentence(string sentence, unordered_map<char, int> options) {
+    if (!are_options_valid(options)) 
+        throw runtime_error("Options are invalid. Only capitalised letters are supported");
+
+    for (auto &character_in_sentence : sentence) {
+        auto uppercase_character = toupper(character_in_sentence);
+        if (!is_character_valid(uppercase_character)) {
+            continue;
+        }
+
+        auto character_count = options[uppercase_character];
+
+        if (character_count <= 0) {
+            return false;
+        }
+
+        options[uppercase_character] = character_count - 1;
+    }
+
+    return true;
+}
+
+void test_basic_text() {
+    string target_result = "DOG";
+    unordered_map<char, int> options = {
+        {'D', 1},
+        {'O', 1},
+        {'G', 1},
+    };
+
+    assert(can_create_sentence(target_result, options) == true);
+}
+
+void test_missing_letters() {
+    string target_result = "DOG";
+    unordered_map<char, int> options = {
+        {'D', 1},
+        {'O', 1},
+    };
+
+    assert(can_create_sentence(target_result, options) == false);
+}
+
+void test_multiple_letters() {
+    string target_result = "DDOG";
+    unordered_map<char, int> options = {
+        {'D', 2},
+        {'O', 1},
+        {'G', 1},
+    };
+
+    assert(can_create_sentence(target_result, options) == true);
+}
+
+void test_text_with_space() {
+    string target_result = "HE LLO";
+    unordered_map<char, int> options = {
+        {'H', 1},
+        {'E', 1},
+        {'L', 2},
+        {'O', 1},
+    };
+
+    assert(can_create_sentence(target_result, options) == true);
+}
+
+void test_text_with_punctuation() {
+    string target_result = "HELO.";
+    unordered_map<char, int> options = {
+        {'H', 1},
+        {'E', 1},
+        {'L', 2},
+        {'O', 1},
+    };
+
+    assert(can_create_sentence(target_result, options) == true);
+}
+
+void test_text_with_upper_lower_case_mix() {
+    string target_result = "dog";
+    unordered_map<char, int> options = {
+        {'D', 1},
+        {'O', 1},
+        {'G', 1},
+    };
+
+    assert(can_create_sentence(target_result, options) == true);    
+}
+
+void test_throws_error_when_given_lowercase_options() {
+    string target_result = "dog";
+    unordered_map<char, int> options = {
+        {'d', 1},
+        {'o', 1},
+        {'g', 1},
+    };
+
+    try {
+        can_create_sentence(target_result, options);
+        assert(0); // This should never be reached
+    } catch(runtime_error e) {}
+}
+
+void test_throws_error_when_given_punctuation_options() {
+    string target_result = "dog";
+    unordered_map<char, int> options = {
+        {'d', 1},
+        {'o', 1},
+        {'g', 1},
+        {'.', 1},
+    };
+
+    try {
+        can_create_sentence(target_result, options);
+        assert(0); // This should never be reached
+    } catch(runtime_error e) {}
+}
+
 int main() {
 
-    stack<int> stack_numbers;
-    stack_numbers.push(1);
-    stack_numbers.push(2);
-    stack_numbers.push(3);
-    for (int i = 0; i < 3; i++) {
-        cout << stack_numbers.top() << endl;
-        stack_numbers.pop();
-    }
+    test_basic_text();
+    test_missing_letters();
+    test_multiple_letters();
+    test_text_with_space();
+    test_text_with_punctuation();
+    test_text_with_upper_lower_case_mix();
+    test_throws_error_when_given_lowercase_options();
+    test_throws_error_when_given_punctuation_options();
 
-    queue<int> queue_numbers;
-    queue_numbers.push(1);
-    queue_numbers.push(2);
-    queue_numbers.push(3);
-    for (int i = 0; i < 3; i++) {
-        cout << queue_numbers.front() << endl;
-        queue_numbers.pop();
-    }
-
-    deque<int> deque_numbers;
-    deque_numbers.push_front(1);
-    deque_numbers.push_front(2);
-    deque_numbers.push_back(3);
-    cout << deque_numbers.front() << " " << deque_numbers.back() << endl;
-
-    map<string, int> map_counts;
-    map_counts["value"] = 0;
-    if (map_counts.find("value") != map_counts.end()) {
-        cout << "value found" << endl;
-    }
-    map_counts.erase("value");
-    if (map_counts.find("value") == map_counts.end()) {
-        cout << "value is missing" << endl;
-    }
-    map_counts["value"] = 0;
-    map_counts["dog"] = 1;
-    map_counts["cat"] = 2;
-    map_counts["koalla"] = 0;
-    for (auto &entry: map_counts) {
-        cout << entry.first << " " << entry.second << endl;
-    }
-    cout << (*map_counts.begin()).first << " " << (*(--map_counts.end())).first << endl;
-
-    // Min priority queue. Greater means smallest out first?
-    priority_queue<int, vector<int>, greater<int>> priority;
-    priority.push(10);
-    priority.push(12);
-    priority.push(14);
-    cout << priority.top() << endl;
-
-    //set for binary tree? less means smallest first
-    set<int, less<int>> binary_tree;
-    binary_tree.insert(4);
-    binary_tree.insert(8);
-    binary_tree.insert(12);
-    for (auto &entry: binary_tree) {
-        cout << entry << endl;
-    }
-
-    set<string, less<string>> alphabetical_sort;
-    alphabetical_sort.insert("callum");
-    alphabetical_sort.insert("ace");
-    alphabetical_sort.insert("ballum");
-    alphabetical_sort.insert("allum");
-    alphabetical_sort.insert("acronymum");
-   for (auto &entry: alphabetical_sort) {
-        cout << entry << endl;
-    }
-
-
+    cout << "Tests succeeded" << endl;
 }
 
