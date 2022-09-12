@@ -13,148 +13,109 @@
 
 using namespace std;
 
-bool is_character_valid(char character) {
-    auto alphabet_index = character - 'A';
-    return alphabet_index >= 0 && alphabet_index < 26;
-}
+class Item {
+private:
+    int cost;
+    string unique_id;
 
-bool are_options_valid(unordered_map<char, int> options) {
-    for (auto &entry : options) {
-        if (!is_character_valid(entry.first)) {
-            return false;
-        }
-    }
-    return true;
-}
+public:
+    Item() {}
 
-bool can_create_sentence(string sentence, unordered_map<char, int> options) {
-    if (!are_options_valid(options)) 
-        throw runtime_error("Options are invalid. Only capitalised letters are supported");
+    Item(string unique_id, int cost): unique_id(unique_id), cost(cost) {
 
-    for (auto &character_in_sentence : sentence) {
-        auto uppercase_character = toupper(character_in_sentence);
-        if (!is_character_valid(uppercase_character)) {
-            continue;
-        }
-
-        auto character_count = options[uppercase_character];
-
-        if (character_count <= 0) {
-            return false;
-        }
-
-        options[uppercase_character] = character_count - 1;
     }
 
-    return true;
+    string getUniqueId() {
+        return this->unique_id;
+    }
+
+    int getCost() {
+        return this->cost;
+    }
+};
+
+unordered_map<string, Item> ITEM_MAP = {
+    {"apple", Item("apple", 10)},
+    {"banana", Item("banana", 5)}
+};
+
+class Offer {
+public:
+    virtual int getDiscount(unordered_map<string, int> contents) = 0;
+};
+
+
+class ShoppingCart {
+private:
+    unordered_map<string, int> contents;
+    vector<Offer*> offers;
+
+public:
+    void addItem(string item_id) {
+        contents[item_id]++;
+    } 
+
+    void addOffer(Offer *offer) {
+        this->offers.push_back(offer);
+    }
+
+    int getTotal() {
+        int total = 0;
+        for (auto &entry: this->contents) {
+            total += (ITEM_MAP[entry.first].getCost() * entry.second);
+        }
+        for (auto &offer: this->offers) {
+            total -= offer->getDiscount(this->contents);
+        }
+        return total;
+    }
+};
+
+class Offer_BuyOneGetOneFree : public Offer {
+private:
+    string item_id;
+public:
+    Offer_BuyOneGetOneFree(string item_id): item_id(item_id) {}
+
+    int getDiscount(unordered_map<string, int> contents) {
+        int number_of_pairs = contents[this->item_id] / 2;
+        return ITEM_MAP[this->item_id].getCost() * number_of_pairs;
+    }
+};
+
+
+void test_add_apples() {
+    ShoppingCart cart;
+    cart.addItem("apple");
+    cart.addItem("apple");
+
+    assert(cart.getTotal() == 20);
 }
 
-void test_basic_text() {
-    string target_result = "DOG";
-    unordered_map<char, int> options = {
-        {'D', 1},
-        {'O', 1},
-        {'G', 1},
-    };
+void test_add_bananas() {
+    ShoppingCart cart;
+    cart.addItem("apple");
+    cart.addItem("banana");
 
-    assert(can_create_sentence(target_result, options) == true);
+    assert(cart.getTotal() == 15);
 }
 
-void test_missing_letters() {
-    string target_result = "DOG";
-    unordered_map<char, int> options = {
-        {'D', 1},
-        {'O', 1},
-    };
+void test_add_offers() {
+    ShoppingCart cart;
+    Offer_BuyOneGetOneFree* offer = new Offer_BuyOneGetOneFree("apple");
+    cart.addItem("apple");
+    cart.addItem("apple");
+    cart.addOffer(offer);
 
-    assert(can_create_sentence(target_result, options) == false);
+    assert(cart.getTotal() == 10);
 }
 
-void test_multiple_letters() {
-    string target_result = "DDOG";
-    unordered_map<char, int> options = {
-        {'D', 2},
-        {'O', 1},
-        {'G', 1},
-    };
-
-    assert(can_create_sentence(target_result, options) == true);
-}
-
-void test_text_with_space() {
-    string target_result = "HE LLO";
-    unordered_map<char, int> options = {
-        {'H', 1},
-        {'E', 1},
-        {'L', 2},
-        {'O', 1},
-    };
-
-    assert(can_create_sentence(target_result, options) == true);
-}
-
-void test_text_with_punctuation() {
-    string target_result = "HELO.";
-    unordered_map<char, int> options = {
-        {'H', 1},
-        {'E', 1},
-        {'L', 2},
-        {'O', 1},
-    };
-
-    assert(can_create_sentence(target_result, options) == true);
-}
-
-void test_text_with_upper_lower_case_mix() {
-    string target_result = "dog";
-    unordered_map<char, int> options = {
-        {'D', 1},
-        {'O', 1},
-        {'G', 1},
-    };
-
-    assert(can_create_sentence(target_result, options) == true);    
-}
-
-void test_throws_error_when_given_lowercase_options() {
-    string target_result = "dog";
-    unordered_map<char, int> options = {
-        {'d', 1},
-        {'o', 1},
-        {'g', 1},
-    };
-
-    try {
-        can_create_sentence(target_result, options);
-        assert(0); // This should never be reached
-    } catch(runtime_error e) {}
-}
-
-void test_throws_error_when_given_punctuation_options() {
-    string target_result = "dog";
-    unordered_map<char, int> options = {
-        {'d', 1},
-        {'o', 1},
-        {'g', 1},
-        {'.', 1},
-    };
-
-    try {
-        can_create_sentence(target_result, options);
-        assert(0); // This should never be reached
-    } catch(runtime_error e) {}
-}
 
 int main() {
 
-    test_basic_text();
-    test_missing_letters();
-    test_multiple_letters();
-    test_text_with_space();
-    test_text_with_punctuation();
-    test_text_with_upper_lower_case_mix();
-    test_throws_error_when_given_lowercase_options();
-    test_throws_error_when_given_punctuation_options();
+    test_add_apples(); 
+    test_add_bananas(); 
+    test_add_offers(); 
 
     cout << "Tests succeeded" << endl;
 }
