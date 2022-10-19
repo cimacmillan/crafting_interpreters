@@ -1,3 +1,0 @@
-
-void ocl_main();
-
