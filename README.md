@@ -1,7 +1,3 @@
-# CPlayground
+# Lox C++ Interpreter
 
-Learning CPP playground repository
-
-```
-sh scripts/all.sh
-```
+# Lox C Compiler

@@ -1,1 +1,1 @@
-source scripts/rebuild_all.sh && ./build/CPlayground 
+source scripts/rebuild_all.sh && ./build/lox $1 $2 $3 $4
