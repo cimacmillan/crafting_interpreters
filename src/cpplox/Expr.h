@@ -17,10 +17,7 @@ struct GroupingExpression {
 struct UnaryExpression {
     UnaryType type;
     struct Expression *expression;
-    union value {
-        Token *subtract;
-        Token *NOT;
-    };
+    Token *unary;
 };
 
 struct BinaryExpression {
@@ -31,13 +28,7 @@ struct BinaryExpression {
 
 struct LiteralExpression {
     LiteralType type;
-    union {
-        Token *number;
-        Token *string;
-        Token *TRUE;
-        Token *FALSE;
-        Token *nill;
-    };
+    Token *literal;
 };
 
 struct Expression {
@@ -48,6 +39,10 @@ struct Expression {
         UnaryExpression *unary;
         GroupingExpression *group;
     };
+
+    // Expression(Expression *left, Token *op, Expression *right) {
+         
+    // }
 };
 
 
