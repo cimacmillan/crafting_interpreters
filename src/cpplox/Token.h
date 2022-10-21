@@ -1,8 +1,8 @@
 #include <string>
 #include <iostream>
+#include <enum.h>
 
-enum class TokenType {
-    // Single-character tokens.
+BETTER_ENUM(TokenType, char, 
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
     COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
 
@@ -20,12 +20,12 @@ enum class TokenType {
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
 
     FILE_END
-};
+)
 
 struct Token {
     std::string lexeme;
     TokenType type;
-    int line;
+    unsigned int line;
 };
 
 std::ostream & operator<<(std::ostream & os, const Token & token);

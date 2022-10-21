@@ -5,6 +5,7 @@
 
 #include "FileUtils.h"
 #include "cpplox/CPPLox.h"
+#include "cpplox/TokenScanner.h"
 
 using namespace std;
 
@@ -22,7 +23,8 @@ enum class RunLineResponse {
 int run(string source) {
     cout << source << endl;
     
-    vector<Token> tokens = CPPLox::scanTokens(source);
+    CPPLox::TokenScanner tokenScanner(source);
+    vector<Token> tokens = tokenScanner.scanTokens();
     for (auto token : tokens) {
         cout << token << endl;
     }

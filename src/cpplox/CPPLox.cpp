@@ -5,12 +5,11 @@
 
 using namespace std;
 
-namespace CPPLox {
-
-    void report(int line, string message) {
-        cout << "[line " << line << "] Error: " << message << endl;
-    }
-
+void CPPLox::report(int line, string message) {
+    cout << "[line " << line << "] Error: " << message << endl;
 }
 
-
+void CPPLox::fatal(int line, string message) {
+    CPPLox::report(line, message);
+    exit(1);
+}

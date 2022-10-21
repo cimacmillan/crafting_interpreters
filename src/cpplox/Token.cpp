@@ -10,15 +10,7 @@ std::ostream & operator<<(std::ostream & os, const Token & token)
 }
 
 std::ostream & operator<<(std::ostream & os, const TokenType & token) {
-    switch(token) {
-        case TokenType::LEFT_PAREN:
-            os << "LEFT PARENTHESIS";
-            break;
-        default:
-            os << "UNKNOWN";
-            break;
-    }
-
+    os << token._to_string();
     return os;
 }
 

@@ -29,6 +29,9 @@ include_directories(${EXEC_NAME} ${SDL2_INCLUDE_DIRS})
 find_package(OpenCL REQUIRED)
 include_directories( ${OPENCL_INCLUDE_DIR})     
 
+#Add better enums
+include_directories("libs/better-enums")
+
 # add the executable
 add_executable(${EXEC_NAME} 
     ${sources}
