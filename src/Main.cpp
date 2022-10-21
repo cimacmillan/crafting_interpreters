@@ -31,23 +31,26 @@ int run(string source) {
         cout << token << endl;
     }
 
-    Token other = { "bye", TokenType::STRING, 0 };
-    Token tok = {  "hello", TokenType::STRING, 0};
-    Token add = {  "+", TokenType::PLUS, 0};
-    Expression exprA = { 
-        .type = ExpressionType::LITERAL,
-        .literal = new LiteralExpression({ LiteralType::STRING, &tok })
-    };
-    Expression exprB = { 
-        .type = ExpressionType::LITERAL,
-        .literal = new LiteralExpression({ LiteralType::STRING, &other })
-    };
-    Expression addition = { 
-        .type = ExpressionType::BINARY,
-        .binary = new BinaryExpression({ &exprA, &add, &exprB })
-    };
-
-    cout << print_expression(&addition) << endl;
+    cout << print_expression(
+        Expression::asBinary(
+            Expression::asBinary(
+                Expression::asLiteral(
+                    LiteralType::STRING,
+                    new Token({ "hello", TokenType::STRING, 0 })
+                ),
+                new Token({ "-", TokenType::PLUS, 0 }),
+                Expression::asLiteral(
+                    LiteralType::STRING,
+                    new Token({ "whassup", TokenType::STRING, 0 })
+                )
+            ),
+            new Token({ "+", TokenType::PLUS, 0 }),
+            Expression::asLiteral(
+                LiteralType::STRING,
+                new Token({ "bye", TokenType::STRING, 0 })
+            )
+        )
+    ) << endl;
 
     return SUCCESS;
 }

@@ -40,9 +40,48 @@ struct Expression {
         GroupingExpression *group;
     };
 
-    // Expression(Expression *left, Token *op, Expression *right) {
-         
-    // }
+    static Expression* asUnary(
+        UnaryType type,
+        Expression *expression,
+        Token *unary
+    ) {
+        return new Expression({
+            .type = ExpressionType::UNARY,
+            .unary = new UnaryExpression({ type, expression, unary })
+        });
+    }
+
+    static Expression* asLiteral(
+        LiteralType type,
+        Token *literal
+    ) {
+        return new Expression({
+            .type = ExpressionType::LITERAL,
+            .literal = new LiteralExpression({ type, literal })
+        });
+    }
+
+    static Expression* asBinary(
+        Expression *left,
+        Token *literal,
+        Expression *right
+    ) {
+        return new Expression({
+            .type = ExpressionType::BINARY,
+            .binary = new BinaryExpression({ left, literal, right })
+        });
+    }
+
+    static Expression* asGrouping(
+        Token *left,
+        Expression *grouped,
+        Token *right
+    ) {
+        return new Expression({
+            .type = ExpressionType::GROUPING,
+            .group = new GroupingExpression({ left, grouped, right })
+        });
+    }
 };
 
 
