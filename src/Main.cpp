@@ -28,8 +28,7 @@ int run(string source) {
     for (auto token : tokens) {
         cout << token << endl;
     }
-
-    CPPLox::report(1, "Hello");
+    return SUCCESS;
 }
 
 int runPrompt() {

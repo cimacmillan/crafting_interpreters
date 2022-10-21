@@ -1,11 +1,13 @@
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 #include "Token.h"
 
 namespace CPPLox {
 
-class TokenScanner {
+class TokenScanner {   
+
 public:
     TokenScanner(std::string source): source(source) {}
     std::vector<Token> scanTokens();  
@@ -26,6 +28,25 @@ private:
     // Move the read to the next character, return the current character
     // |AB -> A|B
     char advance();
+
+    // Conditional advance, which only advances if the next symbol is c
+    // Returns true if that happened, false otherwise
+    bool match(char c);
+
+    // Return the value of the next character, don't advance
+    char peek();
+
+    // Peek the following symbol
+    char peekNext();
+
+    // String has started, keep advancing until meeting quotes
+    void advanceString();
+
+    // Number has started, keep advancing until end of number
+    void advanceNumber();
+
+    // Advance identifier or keyword 
+    void advanceIdentifier();
 };  
 
 }
