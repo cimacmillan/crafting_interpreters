@@ -6,6 +6,8 @@
 #include "FileUtils.h"
 #include "cpplox/CPPLox.h"
 #include "cpplox/TokenScanner.h"
+#include "cpplox/Expr.h"
+#include "cpplox/ExprPrint.h"
 
 using namespace std;
 
@@ -28,6 +30,13 @@ int run(string source) {
     for (auto token : tokens) {
         cout << token << endl;
     }
+
+    Token tok = {  "hello", TokenType::STRING, 0};
+    LiteralExpression literal = { LiteralType::STRING, &tok };
+    Expression expr = { ExpressionType::LITERAL };
+    expr.literal = &literal;
+    print_expression(expr);
+
     return SUCCESS;
 }
 

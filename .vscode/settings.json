@@ -85,7 +85,8 @@
         "unordered_set": "cpp",
         "fstream": "cpp",
         "iomanip": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "filesystem": "cpp"
     },
     "cmake.configureOnOpen": false
 }
