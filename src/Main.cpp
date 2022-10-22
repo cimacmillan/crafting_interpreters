@@ -8,6 +8,8 @@
 #include "cpplox/TokenScanner.h"
 #include "cpplox/Expr.h"
 #include "cpplox/ExprPrint.h"
+#include "cpplox/LoxParser.h"
+#include "cpplox/Interpreter.h"
 
 using namespace std;
 
@@ -31,26 +33,13 @@ int run(string source) {
         cout << token << endl;
     }
 
-    cout << print_expression(
-        Expression::asBinary(
-            Expression::asBinary(
-                Expression::asLiteral(
-                    LiteralType::STRING,
-                    new Token({ "hello", TokenType::STRING, 0 })
-                ),
-                new Token({ "-", TokenType::PLUS, 0 }),
-                Expression::asLiteral(
-                    LiteralType::STRING,
-                    new Token({ "whassup", TokenType::STRING, 0 })
-                )
-            ),
-            new Token({ "+", TokenType::PLUS, 0 }),
-            Expression::asLiteral(
-                LiteralType::STRING,
-                new Token({ "bye", TokenType::STRING, 0 })
-            )
-        )
-    ) << endl;
+    CPPLox::LoxParser parser(tokens);
+    Expression *ast = parser.parse();
+
+    cout << print_expression(ast) << endl;
+
+    CPPLox::Interpreter interpreter(ast);
+    interpreter.run();
 
     return SUCCESS;
 }

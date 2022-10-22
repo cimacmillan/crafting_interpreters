@@ -109,6 +109,10 @@ std::vector<Token> CPPLox::TokenScanner::scanTokens() {
 
 void CPPLox::TokenScanner::lockToken(TokenType type) {
     std::string lexeme = this->source.substr(this->start, this->current - this->start);
+    // Get rid of brackets from string
+    if (type == +TokenType::STRING) {
+        lexeme = lexeme.substr(1, lexeme.size() - 2);
+    }
     this->tokens.push_back((Token){ lexeme, type, this->line});
 }
 

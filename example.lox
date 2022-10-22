@@ -1,15 +1,1 @@
-"hello"
-"
-multiline string
-again
-"
-for x else hello
-function
-123
-123.4
-123./
-.134
-!=!()();+ // This is a comment
-/var x = 10;
-print x;
-"
+"hello lily " + "hello callum"

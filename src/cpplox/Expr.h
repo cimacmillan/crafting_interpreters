@@ -15,7 +15,6 @@ struct GroupingExpression {
 };
 
 struct UnaryExpression {
-    UnaryType type;
     struct Expression *expression;
     Token *unary;
 };
@@ -27,7 +26,6 @@ struct BinaryExpression {
 };
 
 struct LiteralExpression {
-    LiteralType type;
     Token *literal;
 };
 
@@ -41,23 +39,21 @@ struct Expression {
     };
 
     static Expression* asUnary(
-        UnaryType type,
         Expression *expression,
         Token *unary
     ) {
         return new Expression({
             .type = ExpressionType::UNARY,
-            .unary = new UnaryExpression({ type, expression, unary })
+            .unary = new UnaryExpression({ expression, unary })
         });
     }
 
     static Expression* asLiteral(
-        LiteralType type,
         Token *literal
     ) {
         return new Expression({
             .type = ExpressionType::LITERAL,
-            .literal = new LiteralExpression({ type, literal })
+            .literal = new LiteralExpression({ literal })
         });
     }
 

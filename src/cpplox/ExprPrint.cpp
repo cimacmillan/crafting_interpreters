@@ -25,8 +25,8 @@ string quotize(string name) {
 }
 
 string print_expression(LiteralExpression *expression) {
-    switch (expression->type) {
-        case LiteralType::STRING:
+    switch (expression->literal->type) {
+        case TokenType::STRING:
             return quotize(expression->literal->lexeme);
         default:
             return expression->literal->lexeme;
