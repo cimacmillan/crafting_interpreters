@@ -80,4 +80,46 @@ struct Expression {
     }
 };
 
+BETTER_ENUM(StatementType, char, EXPRESSION_STATEMENT, PRINT_STATEMENT);
 
+struct ExpressionStatement {
+    Expression* expr;
+    Token* semicolon;
+};
+
+struct PrintStatement {
+    Token* print;
+    Expression* expr;
+    Token* semicolon;
+};
+
+
+struct Statement {
+    StatementType type;
+    union {
+        ExpressionStatement *expr;
+        PrintStatement *print;
+    };
+
+    static Statement* asExpressionStatement(
+        Expression* expr,
+        Token* semicolon
+    ) {
+        return new Statement({
+            .type = StatementType::EXPRESSION_STATEMENT,
+            .expr = new ExpressionStatement({ expr, semicolon })
+        });
+    }
+
+    static Statement* asPrintStatement(
+        Token* print,
+        Expression* expr,
+        Token* semicolon
+    ) {
+        return new Statement({
+            .type = StatementType::PRINT_STATEMENT,
+            .print = new PrintStatement({ print, expr, semicolon })
+        });
+    }   
+
+};

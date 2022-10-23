@@ -34,12 +34,14 @@ int run(string source) {
     }
 
     CPPLox::LoxParser parser(tokens);
-    Expression *ast = parser.parse();
+    vector<Statement*> statements = parser.parse();
 
-    cout << print_expression(ast) << endl;
-
-    CPPLox::Interpreter interpreter(ast);
-    interpreter.run();
+    try {
+        CPPLox::Interpreter interpreter(statements);
+        interpreter.run();
+    } catch (LoxRuntimeError error) {
+        cout << error << endl;
+    }
 
     return SUCCESS;
 }
@@ -48,7 +50,7 @@ int runPrompt() {
     while (true) {
         string line;
         cout << "\n" << "> ";
-        cin >> line;
+        getline(cin, line);
         if (line == "quit" || line == "exit") {
             break;
         }

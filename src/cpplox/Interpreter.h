@@ -1,6 +1,9 @@
+#pragma once
+
 #include "Expr.h"
 #include <enum.h>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -32,6 +35,12 @@ struct LoxValue {
     }
 };
 
+struct LoxRuntimeError {
+    std::string message;
+};
+
+std::ostream & operator<<(std::ostream & os, const LoxRuntimeError & error);
+
 LoxValue evaluate(LiteralExpression* expr);
 LoxValue evaluate(GroupingExpression* expr);
 LoxValue evaluate(UnaryExpression* expr);
@@ -41,10 +50,10 @@ LoxValue evaluate(Expression* expr);
 namespace CPPLox {
 class Interpreter {
 private:
-    Expression* expr;
+    vector<Statement*> statements;
 
 public:
-    Interpreter(Expression* expr): expr(expr) {}
+    Interpreter(vector<Statement*> statements): statements(statements) {}
     void run();
 
 };

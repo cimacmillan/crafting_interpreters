@@ -6,6 +6,15 @@
 
 using namespace std;
 
+void runtimeError(std::string message) {
+    throw LoxRuntimeError({ .message=message });
+}
+
+std::ostream & operator<<(std::ostream & os, const LoxRuntimeError & error) {
+    os << "LoxRuntimeError: " << error.message;
+    return os;
+}
+
 double parseNumber(std::string lexeme) {
     return atof(lexeme.c_str());
 }
@@ -22,8 +31,10 @@ LoxValue evaluate(LiteralExpression* expr) {
             return { .type=LoxValueType::BOOLEAN, .boolean=false };
         case +TokenType::NIL:
             return { .type=LoxValueType::NIL };
+        default:
+            runtimeError("Invalid literal type");
+            break;
     }
-    CPPLox::fatal_token(*(expr->literal), "Invalid literal, parsing error");
 }
 
 LoxValue evaluate(GroupingExpression* expr) {
@@ -49,9 +60,7 @@ LoxValue evaluate(UnaryExpression* expr) {
             return {LoxValueType::BOOLEAN, .boolean=!isTruthy(value)};
     }
 
-    string message = "Invalid unary operation for value type ";
-    message.append(value.type._to_string());
-    CPPLox::fatal_token(*(expr->unary), message);
+    runtimeError("Invalid unary operation for value type ");
 }
 
 bool isDualType(LoxValue a, LoxValue b, LoxValueType type) {
@@ -130,11 +139,7 @@ LoxValue evaluate(BinaryExpression* expr) {
 
     }
 
-    string message = "Invalid binary operation for value type left ";
-    message.append(left.type._to_string());
-    message.append(" and right ");
-    message.append(right.type._to_string());
-    CPPLox::fatal_token(*(expr->op), message);
+    runtimeError("Invalid binary operation for value type");
 }
 
 LoxValue evaluate(Expression* expr) {
@@ -148,12 +153,23 @@ LoxValue evaluate(Expression* expr) {
         case ExpressionType::UNARY:
             return evaluate(expr->unary);
     }
+    runtimeError("Unknown expression type");
 }
+
 
 void CPPLox::Interpreter::run() {
     cout << "Running..." << endl;
-    LoxValue value = evaluate(this->expr);
-    value.print();
+
+    for (Statement* statement : this->statements) {
+        switch (statement->type) {
+            case StatementType::EXPRESSION_STATEMENT:
+                evaluate(statement->expr->expr);
+            break;
+            case StatementType::PRINT_STATEMENT:
+                evaluate(statement->print->expr).print();
+            break;
+        }
+    }
 }
 
 

@@ -24,6 +24,9 @@ private:
     vector<Token> tokens;
     int current;
 
+    Statement* statement();
+    Statement* printExpression();
+    Statement* statementExpression();
     Expression* expression();
     Expression* equality();
     Expression* comparison();
@@ -44,7 +47,7 @@ public:
 
     }
 
-    Expression* parse();
+    vector<Statement*> parse();
 
 };
 };

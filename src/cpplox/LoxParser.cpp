@@ -109,13 +109,38 @@ Expression* CPPLox::LoxParser::expression() {
     return this->equality();
 }
 
-Expression* CPPLox::LoxParser::parse() {
-    Expression* result = this->expression();
-    if (this->isAtEnd()) {
-        return result;
+Statement* CPPLox::LoxParser::printExpression() {
+    Token* print = new Token(this->previous());
+    Expression* expr = this->expression();
+    if (!this->match(TokenType::SEMICOLON)) {
+        CPPLox::fatal_token(this->peek(), "Expected semicolon");
     }
+    Token* semi = new Token(this->previous());
+    return Statement::asPrintStatement(print, expr, semi);
+}
 
-    CPPLox::fatal_token(this->peek(), "parsing failed, invalid syntax and left over tokens");
+Statement* CPPLox::LoxParser::statementExpression() {
+    Expression* expr = this->expression();
+    if (!this->match(TokenType::SEMICOLON)) {
+        CPPLox::fatal_token(this->peek(), "Expected semicolon");
+    }
+    Token* semi = new Token(this->previous());
+    return Statement::asExpressionStatement(expr, semi);
+}
+
+Statement* CPPLox::LoxParser::statement() {
+    if (this->match(TokenType::PRINT)) {
+        return this->printExpression();
+    }
+    return this->statementExpression();
+}
+
+vector<Statement*> CPPLox::LoxParser::parse() {
+    vector<Statement*> statements;
+    while (!this->isAtEnd()) {
+        statements.push_back(this->statement());
+    }
+    return statements;
 }
 
 

@@ -1,1 +1,3 @@
-"hello lily " + "hello callum"
+print "hello" + "goodbye";
+print 1 + 23;
+print 40 / 2;
