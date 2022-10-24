@@ -50,10 +50,10 @@ LoxValue evaluate(Expression* expr);
 namespace CPPLox {
 class Interpreter {
 private:
-    vector<Statement*> statements;
+    LoxProgram program;
 
 public:
-    Interpreter(vector<Statement*> statements): statements(statements) {}
+    Interpreter(LoxProgram program): program(program) {}
     void run();
 
 };

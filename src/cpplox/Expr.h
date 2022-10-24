@@ -1,6 +1,7 @@
 #pragma once
 
 #include <enum.h>
+#include <vector>
 #include "Token.h"
 
 BETTER_ENUM(UnaryType, char, SUBTRACT, NOT);
@@ -123,3 +124,29 @@ struct Statement {
     }   
 
 };
+
+BETTER_ENUM(DeclarationType, char, VAR_DECLARATION, STATEMENT_DECLARATION);
+
+struct VarDeclaration {
+    Token* var;
+    Token* identifier;
+    Token* equals;
+    Expression* expr;
+};
+
+struct StatementDeclaration {
+    
+};
+
+struct Declaration {
+    DeclarationType type;
+    union {
+        VarDeclaration *var;
+        StatementDeclaration *statement;
+    };
+};
+
+struct LoxProgram {
+    std::vector<Declaration*> declarations;
+};
+

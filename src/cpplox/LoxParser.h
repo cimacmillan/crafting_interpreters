@@ -34,6 +34,9 @@ private:
     Expression* factor();
     Expression* unary();
     Expression* primary();
+    Declaration* var_declaration();
+    Declaration* statement_declaration();
+    Declaration* declaration();
 
     bool match(TokenType type);
     bool check(TokenType type);
@@ -47,7 +50,7 @@ public:
 
     }
 
-    vector<Statement*> parse();
+    LoxProgram parse();
 
 };
 };

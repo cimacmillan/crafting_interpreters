@@ -8,15 +8,42 @@
 
 using namespace std;
 
-/**
- * expression -> equality
- * equalty => comparison ( != | == comparison ) *
- * comparison -> term ( > | >= | < | <= term)*
- * term -> factor ( - | + factor) *
- * factor -> unary ( / | * unary)*
- * unary -> (( ! | - ) unary) | primary
- * primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" + expression + ")"
-*/
+bool CPPLox::LoxParser::match(TokenType type) {
+    if (this->check(type)) {
+        this->advance();
+        return true;
+    }
+    return false;
+}
+
+bool CPPLox::LoxParser::check(TokenType type) {
+    return this->peek().type == type;
+}
+
+Token CPPLox::LoxParser::advance() {
+    Token eaten = this->peek();
+    if (this->isAtEnd()) return eaten;
+    this->current++;
+    return eaten;
+}
+
+bool CPPLox::LoxParser::isAtEnd() {
+    switch (this->peek().type) {
+        case TokenType::FILE_END:
+            return true;
+        default: 
+            return false;
+    }
+}
+
+Token CPPLox::LoxParser::peek() {
+    return this->tokens[this->current];
+}
+
+Token CPPLox::LoxParser::previous() {
+    return this->tokens[this->current - 1];
+}
+
 Expression* CPPLox::LoxParser::primary() {
     if (this->match(TokenType::NUMBER)) {
         Token* previous = new Token(this->previous());
@@ -135,48 +162,22 @@ Statement* CPPLox::LoxParser::statement() {
     return this->statementExpression();
 }
 
-vector<Statement*> CPPLox::LoxParser::parse() {
-    vector<Statement*> statements;
+Declaration* CPPLox::LoxParser::var_declaration() {
+
+}
+
+Declaration* CPPLox::LoxParser::statement_declaration() {
+
+}
+
+Declaration* CPPLox::LoxParser::declaration() {
+
+}
+
+LoxProgram CPPLox::LoxParser::parse() {
+    LoxProgram program;
     while (!this->isAtEnd()) {
-        statements.push_back(this->statement());
+        program.declarations.push_back(this->declaration());
     }
-    return statements;
+    return program;
 }
-
-
-bool CPPLox::LoxParser::match(TokenType type) {
-    if (this->check(type)) {
-        this->advance();
-        return true;
-    }
-    return false;
-}
-
-bool CPPLox::LoxParser::check(TokenType type) {
-    return this->peek().type == type;
-}
-
-Token CPPLox::LoxParser::advance() {
-    Token eaten = this->peek();
-    if (this->isAtEnd()) return eaten;
-    this->current++;
-    return eaten;
-}
-
-bool CPPLox::LoxParser::isAtEnd() {
-    switch (this->peek().type) {
-        case TokenType::FILE_END:
-            return true;
-        default: 
-            return false;
-    }
-}
-
-Token CPPLox::LoxParser::peek() {
-    return this->tokens[this->current];
-}
-
-Token CPPLox::LoxParser::previous() {
-    return this->tokens[this->current - 1];
-}
-
