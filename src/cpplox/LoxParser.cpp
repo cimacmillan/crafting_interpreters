@@ -163,15 +163,40 @@ Statement* CPPLox::LoxParser::statement() {
 }
 
 Declaration* CPPLox::LoxParser::var_declaration() {
+    Token* var = new Token(this->previous());
+    
+    if (!this->match(TokenType::IDENTIFIER)) {
+        CPPLox::fatal_token(this->peek(), "Expected identifier");
+    }
 
+    Token* identifier = new Token(this->previous());
+
+    if (this->match(TokenType::EQUAL)) {
+        Token* equal = new Token(this->previous());
+        Expression* expr = this->expression();
+        if (!this->match(TokenType::SEMICOLON)) {
+            CPPLox::fatal_token(this->peek(), "Expected semicolon");
+        }
+        Token* semi = new Token(this->previous());
+        return Declaration::asVarDeclaration(var, identifier, equal, expr, semi);
+    } else {
+        if (!this->match(TokenType::SEMICOLON)) {
+            CPPLox::fatal_token(this->peek(), "Expected semicolon");
+        }
+        Token* semi = new Token(this->previous());
+        return Declaration::asVarDeclaration(var, identifier, nullptr, nullptr, semi);
+    }
 }
 
 Declaration* CPPLox::LoxParser::statement_declaration() {
-
+    return Declaration::asStatementDeclaration(this->statement());
 }
 
 Declaration* CPPLox::LoxParser::declaration() {
-
+    if (match(TokenType::VAR)) {
+        return this->var_declaration();
+    }
+    return this->statement_declaration();
 }
 
 LoxProgram CPPLox::LoxParser::parse() {

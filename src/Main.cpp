@@ -34,10 +34,10 @@ int run(string source) {
     }
 
     CPPLox::LoxParser parser(tokens);
-    vector<Statement*> statements = parser.parse();
+    LoxProgram program = parser.parse();
 
     try {
-        CPPLox::Interpreter interpreter(statements);
+        CPPLox::Interpreter interpreter(program);
         interpreter.run();
     } catch (LoxRuntimeError error) {
         cout << error << endl;

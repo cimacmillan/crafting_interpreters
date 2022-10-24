@@ -16,24 +16,9 @@ struct LoxValue {
         std::string *str;
         bool boolean;
     };
-
-    void print() {
-        switch (type) {
-            case LoxValueType::NUMBER:
-                cout << number << endl;
-                break;
-            case LoxValueType::STRING:
-                cout << "\"" << *str << "\"" << endl;
-                break;
-            case LoxValueType::BOOLEAN:
-                cout << (boolean ? "true" : "false") << endl;
-                break;
-            case LoxValueType::NIL:
-                cout << "nil" << endl;
-                break;
-        }
-    }
 };
+
+std::ostream & operator<<(std::ostream & os, const LoxValue & error);
 
 struct LoxRuntimeError {
     std::string message;

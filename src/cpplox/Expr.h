@@ -132,10 +132,11 @@ struct VarDeclaration {
     Token* identifier;
     Token* equals;
     Expression* expr;
+    Token* semi;
 };
 
 struct StatementDeclaration {
-    
+    Statement* statement;
 };
 
 struct Declaration {
@@ -144,6 +145,28 @@ struct Declaration {
         VarDeclaration *var;
         StatementDeclaration *statement;
     };
+
+    static Declaration* asVarDeclaration(
+        Token* var,
+        Token* identifier,
+        Token* equals,
+        Expression* expr,
+        Token* semi
+    ) {
+        return new Declaration({
+            .type = DeclarationType::VAR_DECLARATION,
+            .var = new VarDeclaration({ var, identifier, equals, expr, semi })
+        });
+    }
+
+    static Declaration* asStatementDeclaration(
+        Statement* statement
+    ) {
+        return new Declaration({
+            .type = DeclarationType::STATEMENT_DECLARATION,
+            .statement = new StatementDeclaration({ statement })
+        });
+    }  
 };
 
 struct LoxProgram {

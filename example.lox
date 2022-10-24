@@ -1,3 +1,5 @@
 print "hello" + "goodbye";
 print 1 + 23;
 print 40 / 2;
+var x = 1 + 2 + 3;
+var y = 1 + x;

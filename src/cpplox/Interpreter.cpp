@@ -15,6 +15,25 @@ std::ostream & operator<<(std::ostream & os, const LoxRuntimeError & error) {
     return os;
 }
 
+std::ostream & operator<<(std::ostream & os, const LoxValue & value) {
+    switch (value.type) {
+        case LoxValueType::NUMBER:
+            cout << value.number;
+            break;
+        case LoxValueType::STRING:
+            cout << "\"" << *(value.str) << "\"";
+            break;
+        case LoxValueType::BOOLEAN:
+            cout << (value.boolean ? "true" : "false");
+            break;
+        case LoxValueType::NIL:
+            cout << "nil";
+            break;
+    }
+    return os;
+}
+
+
 double parseNumber(std::string lexeme) {
     return atof(lexeme.c_str());
 }
@@ -156,19 +175,42 @@ LoxValue evaluate(Expression* expr) {
     runtimeError("Unknown expression type");
 }
 
+void evaluate(Statement* statement) {
+    switch (statement->type) {
+        case StatementType::EXPRESSION_STATEMENT:
+            evaluate(statement->expr->expr);
+        break;
+        case StatementType::PRINT_STATEMENT:
+            cout << evaluate(statement->print->expr) << endl;
+        break;
+    }
+}
+
+void evaluate(VarDeclaration* varDeclaration) {
+    LoxValue evaluated = evaluate(varDeclaration->expr);
+    cout << varDeclaration->identifier->lexeme << " = " << evaluated << endl;
+}
+
+void evaluate(StatementDeclaration* statementDeclaration) {
+    evaluate(statementDeclaration->statement);
+}
+
+void evaluate(Declaration* declaration) {
+    switch (declaration->type) {
+        case DeclarationType::VAR_DECLARATION:
+            evaluate(declaration->var);
+        break;
+        case DeclarationType::STATEMENT_DECLARATION:
+            evaluate(declaration->statement);
+        break;
+    }
+}
 
 void CPPLox::Interpreter::run() {
     cout << "Running..." << endl;
 
-    for (Statement* statement : this->statements) {
-        switch (statement->type) {
-            case StatementType::EXPRESSION_STATEMENT:
-                evaluate(statement->expr->expr);
-            break;
-            case StatementType::PRINT_STATEMENT:
-                evaluate(statement->print->expr).print();
-            break;
-        }
+    for (Declaration* declaration : this->program.declarations) {
+        evaluate(declaration);
     }
 }
 
