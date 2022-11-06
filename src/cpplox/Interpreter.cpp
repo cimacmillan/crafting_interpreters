@@ -182,6 +182,12 @@ void evaluate(Statement* statement, Environment *environment) {
 
 void evaluate(VarDeclaration* varDeclaration, Environment *environment) {
     LoxValue evaluated = evaluate(varDeclaration->expr, environment);
+    auto defineResult = environment->defineVariable(*(varDeclaration->identifier));
+    if (!defineResult) {
+        std::stringstream error;
+        error << "Variable " << varDeclaration->identifier->lexeme << " is already defined";
+        runtimeError(error.str());
+    }
     environment->setVariable(*(varDeclaration->identifier), evaluated);
 }
 

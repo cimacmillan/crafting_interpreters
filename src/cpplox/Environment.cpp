@@ -9,8 +9,22 @@ void Environment::print() {
     }
 }
 
-void Environment::setVariable(Token token, LoxValue value) {
-    this->variables.emplace(token.lexeme, value);
+bool Environment::defineVariable(Token token) {
+    // Variable is already defined, error
+    if (this->variables.find(token.lexeme) != this->variables.end()) {
+        return false;
+    }
+    this->variables.emplace(token.lexeme, (LoxValue){ .type=LoxValueType::NIL });
+    return true;
+}
+
+bool Environment::setVariable(Token token, LoxValue value) {
+    // Variable is not defined
+    if (this->variables.find(token.lexeme) == this->variables.end()) {
+        return false;
+    }
+    this->variables.find(token.lexeme)->second = value;
+    return true;
 }
 
 std::optional<LoxValue> Environment::getVariable(Token token) {

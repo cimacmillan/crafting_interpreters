@@ -10,7 +10,8 @@ private:
     std::unordered_map<std::string, LoxValue> variables;
 
 public:
-    void setVariable(Token token, LoxValue value);
+    bool defineVariable(Token token);
+    bool setVariable(Token token, LoxValue value);
     std::optional<LoxValue> getVariable(Token token);
     void print();
 
