@@ -8,5 +8,5 @@ var world = "world";
 print y;
 print hello + world;
 x = 10;
-x = 11;
+x = y = x = 12;
 print x;

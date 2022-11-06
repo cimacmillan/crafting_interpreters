@@ -21,6 +21,9 @@ bool Environment::defineVariable(Token token) {
 bool Environment::setVariable(Token token, LoxValue value) {
     // Variable is not defined
     if (this->variables.find(token.lexeme) == this->variables.end()) {
+        if (this->parent) {
+            return this->parent->setVariable(token, value);
+        }
         return false;
     }
     this->variables.find(token.lexeme)->second = value;
@@ -29,6 +32,9 @@ bool Environment::setVariable(Token token, LoxValue value) {
 
 std::optional<LoxValue> Environment::getVariable(Token token) {
     if (this->variables.find(token.lexeme) == this->variables.end()) {
+        if (this->parent) {
+            return this->parent->getVariable(token);
+        }
         return std::nullopt;
     }
     return this->variables.at(token.lexeme);

@@ -30,7 +30,7 @@ private:
     Environment environment;
 
 public:
-    Interpreter(LoxProgram program): program(program) {}
+    Interpreter(LoxProgram program): program(program), environment(Environment(nullptr)) {}
     void run();
 
 };
