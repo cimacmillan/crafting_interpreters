@@ -25,14 +25,8 @@ enum class RunLineResponse {
 };
 
 int run(string source) {
-    cout << source << endl;
-    
     CPPLox::TokenScanner tokenScanner(source);
     vector<Token> tokens = tokenScanner.scanTokens();
-    for (auto token : tokens) {
-        cout << token << endl;
-    }
-
     CPPLox::LoxParser parser(tokens);
     LoxProgram program = parser.parse();
 

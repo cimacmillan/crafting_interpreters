@@ -65,6 +65,10 @@ Expression* CPPLox::LoxParser::primary() {
         Token* previous = new Token(this->previous());
         return Expression::asLiteral(previous);
     }
+    if (this->match(TokenType::IDENTIFIER)) {
+        Token* previous = new Token(this->previous());
+        return Expression::asVariable(previous);
+    }
 
     if (this->match(TokenType::LEFT_PAREN)) {
         Token* left = new Token(this->previous());

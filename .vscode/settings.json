@@ -86,7 +86,8 @@
         "fstream": "cpp",
         "iomanip": "cpp",
         "variant": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "version": "cpp"
     },
     "cmake.configureOnOpen": false
 }

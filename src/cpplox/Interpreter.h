@@ -1,24 +1,14 @@
 #pragma once
 
 #include "Expr.h"
+#include "LoxValue.h"
+#include "Environment.h"
+
 #include <enum.h>
 #include <iostream>
 #include <vector>
 
 using namespace std;
-
-BETTER_ENUM(LoxValueType, char, NUMBER, STRING, BOOLEAN, NIL);
-
-struct LoxValue {
-    LoxValueType type;
-    union {
-        double number;
-        std::string *str;
-        bool boolean;
-    };
-};
-
-std::ostream & operator<<(std::ostream & os, const LoxValue & error);
 
 struct LoxRuntimeError {
     std::string message;
@@ -26,16 +16,18 @@ struct LoxRuntimeError {
 
 std::ostream & operator<<(std::ostream & os, const LoxRuntimeError & error);
 
-LoxValue evaluate(LiteralExpression* expr);
-LoxValue evaluate(GroupingExpression* expr);
-LoxValue evaluate(UnaryExpression* expr);
-LoxValue evaluate(BinaryExpression* expr);
-LoxValue evaluate(Expression* expr);
+LoxValue evaluate(LiteralExpression* expr, Environment *env);
+LoxValue evaluate(GroupingExpression* expr, Environment *env);
+LoxValue evaluate(UnaryExpression* expr, Environment *env);
+LoxValue evaluate(BinaryExpression* expr, Environment *env);
+LoxValue evaluate(VariableExpression* expr, Environment *env);
+LoxValue evaluate(Expression* expr, Environment *env);
 
 namespace CPPLox {
 class Interpreter {
 private:
     LoxProgram program;
+    Environment environment;
 
 public:
     Interpreter(LoxProgram program): program(program) {}

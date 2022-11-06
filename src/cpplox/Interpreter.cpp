@@ -1,6 +1,7 @@
 #include "Interpreter.h"
 #include "CPPLox.h"
 #include <string>
+#include <sstream>
 #include <stdlib.h>
 #include <iostream>
 
@@ -15,30 +16,21 @@ std::ostream & operator<<(std::ostream & os, const LoxRuntimeError & error) {
     return os;
 }
 
-std::ostream & operator<<(std::ostream & os, const LoxValue & value) {
-    switch (value.type) {
-        case LoxValueType::NUMBER:
-            cout << value.number;
-            break;
-        case LoxValueType::STRING:
-            cout << "\"" << *(value.str) << "\"";
-            break;
-        case LoxValueType::BOOLEAN:
-            cout << (value.boolean ? "true" : "false");
-            break;
-        case LoxValueType::NIL:
-            cout << "nil";
-            break;
-    }
-    return os;
-}
-
-
 double parseNumber(std::string lexeme) {
     return atof(lexeme.c_str());
 }
 
-LoxValue evaluate(LiteralExpression* expr) {
+LoxValue evaluate(VariableExpression* expr, Environment *env) {
+    auto value = env->getVariable(*(expr->variable));
+    if (!value.has_value()) {
+        std::stringstream ss;
+        ss << "Variable " << expr->variable->lexeme << " is not defined";
+        runtimeError(ss.str());
+    }
+    return value.value();
+}
+
+LoxValue evaluate(LiteralExpression* expr, Environment *env) {
     switch(expr->literal->type) {
         case +TokenType::NUMBER:
             return { .type=LoxValueType::NUMBER, .number=parseNumber(expr->literal->lexeme)};
@@ -56,8 +48,8 @@ LoxValue evaluate(LiteralExpression* expr) {
     }
 }
 
-LoxValue evaluate(GroupingExpression* expr) {
-    return evaluate(expr->grouped);
+LoxValue evaluate(GroupingExpression* expr, Environment *environment) {
+    return evaluate(expr->grouped, environment);
 }
 
 bool isTruthy(LoxValue value) {
@@ -66,8 +58,8 @@ bool isTruthy(LoxValue value) {
     return true;
 }
 
-LoxValue evaluate(UnaryExpression* expr) {
-    LoxValue value = evaluate(expr->expression);
+LoxValue evaluate(UnaryExpression* expr, Environment *environment) {
+    LoxValue value = evaluate(expr->expression, environment);
     switch (expr->unary->type) {
         case TokenType::MINUS:
             if (value.type == +LoxValueType::NUMBER) {
@@ -100,9 +92,9 @@ bool isEqual(LoxValue a, LoxValue b) {
     }
 }
 
-LoxValue evaluate(BinaryExpression* expr) {
-    LoxValue left = evaluate(expr->left);
-    LoxValue right = evaluate(expr->right);
+LoxValue evaluate(BinaryExpression* expr, Environment *environment) {
+    LoxValue left = evaluate(expr->left, environment);
+    LoxValue right = evaluate(expr->right, environment);
     switch (expr->op->type) {
         case TokenType::MINUS:
             if (isDualType(left, right, LoxValueType::NUMBER)) {
@@ -161,56 +153,56 @@ LoxValue evaluate(BinaryExpression* expr) {
     runtimeError("Invalid binary operation for value type");
 }
 
-LoxValue evaluate(Expression* expr) {
+LoxValue evaluate(Expression* expr, Environment *environment) {
     switch (expr->type) {
         case ExpressionType::LITERAL:
-            return evaluate(expr->literal);
+            return evaluate(expr->literal, environment);
         case ExpressionType::GROUPING:
-            return evaluate(expr->group);
+            return evaluate(expr->group, environment);
         case ExpressionType::BINARY:
-            return evaluate(expr->binary);
+            return evaluate(expr->binary, environment);
         case ExpressionType::UNARY:
-            return evaluate(expr->unary);
+            return evaluate(expr->unary, environment);
+        case ExpressionType::VAR:
+            return evaluate(expr->variable, environment);
     }
     runtimeError("Unknown expression type");
 }
 
-void evaluate(Statement* statement) {
+void evaluate(Statement* statement, Environment *environment) {
     switch (statement->type) {
         case StatementType::EXPRESSION_STATEMENT:
-            evaluate(statement->expr->expr);
+            evaluate(statement->expr->expr, environment);
         break;
         case StatementType::PRINT_STATEMENT:
-            cout << evaluate(statement->print->expr) << endl;
+            cout << evaluate(statement->print->expr, environment) << endl;
         break;
     }
 }
 
-void evaluate(VarDeclaration* varDeclaration) {
-    LoxValue evaluated = evaluate(varDeclaration->expr);
-    cout << varDeclaration->identifier->lexeme << " = " << evaluated << endl;
+void evaluate(VarDeclaration* varDeclaration, Environment *environment) {
+    LoxValue evaluated = evaluate(varDeclaration->expr, environment);
+    environment->setVariable(*(varDeclaration->identifier), evaluated);
 }
 
-void evaluate(StatementDeclaration* statementDeclaration) {
-    evaluate(statementDeclaration->statement);
+void evaluate(StatementDeclaration* statementDeclaration, Environment *environment) {
+    evaluate(statementDeclaration->statement, environment);
 }
 
-void evaluate(Declaration* declaration) {
+void evaluate(Declaration* declaration, Environment *environment) {
     switch (declaration->type) {
         case DeclarationType::VAR_DECLARATION:
-            evaluate(declaration->var);
+            evaluate(declaration->var, environment);
         break;
         case DeclarationType::STATEMENT_DECLARATION:
-            evaluate(declaration->statement);
+            evaluate(declaration->statement, environment);
         break;
     }
 }
 
 void CPPLox::Interpreter::run() {
-    cout << "Running..." << endl;
-
     for (Declaration* declaration : this->program.declarations) {
-        evaluate(declaration);
+        evaluate(declaration, &(this->environment));
     }
 }
 

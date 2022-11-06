@@ -7,7 +7,7 @@
 BETTER_ENUM(UnaryType, char, SUBTRACT, NOT);
 BETTER_ENUM(OperatorType, char, EQUAL_TO, NOT_EQUAL_TO, LESS_THAN, LESS_THAN_OR_EQUAL_TO, GREATER_THAN, GREATER_THAN_OR_EQUAL_TO, ADD, SUBTRACT, MULTIPLY, DIVIDE);
 BETTER_ENUM(LiteralType, char, NUMBER, STRING, TRUE, FALSE, NIL);
-BETTER_ENUM(ExpressionType, char, LITERAL, UNARY, BINARY, GROUPING);
+BETTER_ENUM(ExpressionType, char, LITERAL, UNARY, BINARY, GROUPING, VAR);
 
 struct GroupingExpression {
     Token *open;
@@ -30,6 +30,10 @@ struct LiteralExpression {
     Token *literal;
 };
 
+struct VariableExpression {
+    Token *variable;
+};
+
 struct Expression {
     ExpressionType type;
     union {
@@ -37,6 +41,7 @@ struct Expression {
         LiteralExpression *literal;
         UnaryExpression *unary;
         GroupingExpression *group;
+        VariableExpression *variable;
     };
 
     static Expression* asUnary(
@@ -77,6 +82,15 @@ struct Expression {
         return new Expression({
             .type = ExpressionType::GROUPING,
             .group = new GroupingExpression({ left, grouped, right })
+        });
+    }
+
+    static Expression* asVariable(
+        Token *variable
+    ) {
+        return new Expression({
+            .type = ExpressionType::VAR,
+            .variable = new VariableExpression({ variable })
         });
     }
 };
