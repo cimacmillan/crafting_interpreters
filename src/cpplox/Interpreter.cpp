@@ -153,6 +153,16 @@ LoxValue evaluate(BinaryExpression* expr, Environment *environment) {
     runtimeError("Invalid binary operation for value type");
 }
 
+LoxValue evaluate(AssignExpression* expr, Environment *env) {
+    LoxValue value = evaluate(expr->value, env);
+    if(!env->setVariable(*(expr->variable), value)) {
+        stringstream ss;
+        ss << "Variable " << (expr->variable->lexeme) << " is undefined";
+        runtimeError(ss.str());
+    }
+    return value;
+}
+
 LoxValue evaluate(Expression* expr, Environment *environment) {
     switch (expr->type) {
         case ExpressionType::LITERAL:
@@ -165,6 +175,8 @@ LoxValue evaluate(Expression* expr, Environment *environment) {
             return evaluate(expr->unary, environment);
         case ExpressionType::VAR:
             return evaluate(expr->variable, environment);
+        case ExpressionType::ASSIGN:
+            return evaluate(expr->assign, environment);
     }
     runtimeError("Unknown expression type");
 }

@@ -136,8 +136,20 @@ Expression* CPPLox::LoxParser::equality() {
     return left;
 }
 
+Expression* CPPLox::LoxParser::assignment() {
+    Expression* lvalue = equality();
+    if (this->match(TokenType::EQUAL)) {
+        if (lvalue->type != +ExpressionType::VAR) {
+            CPPLox::fatal_token(this->peek(), "Expected variable for left of assignemnt =");
+        }
+        Expression* rvalue = assignment();
+        return Expression::asAssignment(lvalue->variable->variable, rvalue);
+    }
+    return lvalue;
+}
+
 Expression* CPPLox::LoxParser::expression() {
-    return this->equality();
+    return this->assignment();
 }
 
 Statement* CPPLox::LoxParser::printExpression() {

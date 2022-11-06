@@ -7,4 +7,6 @@ var hello = "hello";
 var world = "world";
 print y;
 print hello + world;
-
+x = 10;
+x = 11;
+print x;
