@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ast/ast.h"
+
 #include <enum.h>
 #include <vector>
 #include "Token.h"
@@ -8,36 +10,6 @@ BETTER_ENUM(UnaryType, char, SUBTRACT, NOT);
 BETTER_ENUM(OperatorType, char, EQUAL_TO, NOT_EQUAL_TO, LESS_THAN, LESS_THAN_OR_EQUAL_TO, GREATER_THAN, GREATER_THAN_OR_EQUAL_TO, ADD, SUBTRACT, MULTIPLY, DIVIDE);
 BETTER_ENUM(LiteralType, char, NUMBER, STRING, TRUE, FALSE, NIL);
 BETTER_ENUM(ExpressionType, char, LITERAL, UNARY, BINARY, GROUPING, VAR, ASSIGN);
-
-struct GroupingExpression {
-    Token *open;
-    struct Expression *grouped;
-    Token *close;
-};
-
-struct UnaryExpression {
-    struct Expression *expression;
-    Token *unary;
-};
-
-struct BinaryExpression {
-    struct Expression *left;
-    Token *op;
-    struct Expression *right;
-};
-
-struct LiteralExpression {
-    Token *literal;
-};
-
-struct VariableExpression {
-    Token *variable;
-};
-
-struct AssignExpression {
-    Token *variable;
-    struct Expression *value;
-};
 
 struct Expression {
     ExpressionType type;
@@ -116,18 +88,6 @@ struct Expression {
 
 BETTER_ENUM(StatementType, char, EXPRESSION_STATEMENT, PRINT_STATEMENT);
 
-struct ExpressionStatement {
-    Expression* expr;
-    Token* semicolon;
-};
-
-struct PrintStatement {
-    Token* print;
-    Expression* expr;
-    Token* semicolon;
-};
-
-
 struct Statement {
     StatementType type;
     union {
@@ -160,17 +120,6 @@ struct Statement {
 
 BETTER_ENUM(DeclarationType, char, VAR_DECLARATION, STATEMENT_DECLARATION);
 
-struct VarDeclaration {
-    Token* var;
-    Token* identifier;
-    Token* equals;
-    Expression* expr;
-    Token* semi;
-};
-
-struct StatementDeclaration {
-    Statement* statement;
-};
 
 struct Declaration {
     DeclarationType type;
