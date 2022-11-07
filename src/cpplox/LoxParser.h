@@ -27,6 +27,7 @@ private:
     Statement* statement();
     Statement* printExpression();
     Statement* statementExpression();
+    Statement* blockStatement();
     Expression* assignment();
     Expression* expression();
     Expression* equality();

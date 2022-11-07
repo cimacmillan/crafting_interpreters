@@ -213,9 +213,29 @@ Statement* CPPLox::LoxParser::statementExpression() {
     });
 }
 
+Statement* CPPLox::LoxParser::blockStatement() {
+    vector<struct Declaration*> *declarations = new vector<Declaration*>;
+
+    while(!this->check(TokenType::RIGHT_BRACE) && !this->isAtEnd()) {
+        declarations->push_back(this->declaration());
+    }
+
+    if (!this->match(TokenType::RIGHT_BRACE)) {
+        CPPLox::fatal_token(this->peek(), "Expected closing brace");
+    }
+
+    return new Statement({
+        .type = +StatementType::BlockStatement,
+        .blockstatement = new BlockStatement({ declarations })
+    });
+}
+
 Statement* CPPLox::LoxParser::statement() {
     if (this->match(TokenType::PRINT)) {
         return this->printExpression();
+    }
+    if (this->match(TokenType::LEFT_BRACE)) {
+        return this->blockStatement();
     }
     return this->statementExpression();
 }

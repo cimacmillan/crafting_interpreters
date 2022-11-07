@@ -9,4 +9,13 @@ print y;
 print hello + world;
 x = 10;
 x = y = x = 12;
+{
+    var x = 1;
+    print x;  
+    {
+        x = 2;
+        print x;
+    }
+    print x;
+}
 print x;

@@ -181,6 +181,13 @@ LoxValue evaluate(Expression* expr, Environment *environment) {
     runtimeError("Unknown expression type");
 }
 
+void evaluate(BlockStatement *block, Environment *environment) {
+    Environment child(environment);
+    for (auto statement : *(block->block)) {
+        evaluate(statement, &child);
+    }
+}
+
 void evaluate(Statement* statement, Environment *environment) {
     switch (statement->type) {
         case StatementType::ExpressionStatement:
@@ -188,6 +195,9 @@ void evaluate(Statement* statement, Environment *environment) {
         break;
         case StatementType::PrintStatement:
             cout << evaluate(statement->printstatement->expr, environment) << endl;
+        break;
+        case StatementType::BlockStatement:
+            evaluate(statement->blockstatement, environment);
         break;
     }
 }

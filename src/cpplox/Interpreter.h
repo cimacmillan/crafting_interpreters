@@ -22,6 +22,7 @@ LoxValue evaluate(UnaryExpression* expr, Environment *env);
 LoxValue evaluate(BinaryExpression* expr, Environment *env);
 LoxValue evaluate(VariableExpression* expr, Environment *env);
 LoxValue evaluate(Expression* expr, Environment *env);
+void evaluate(Declaration* declaration, Environment *environment);
 
 namespace CPPLox {
 class Interpreter {
