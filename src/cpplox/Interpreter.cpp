@@ -165,29 +165,29 @@ LoxValue evaluate(AssignExpression* expr, Environment *env) {
 
 LoxValue evaluate(Expression* expr, Environment *environment) {
     switch (expr->type) {
-        case ExpressionType::LITERAL:
-            return evaluate(expr->literal, environment);
-        case ExpressionType::GROUPING:
-            return evaluate(expr->group, environment);
-        case ExpressionType::BINARY:
-            return evaluate(expr->binary, environment);
-        case ExpressionType::UNARY:
-            return evaluate(expr->unary, environment);
-        case ExpressionType::VAR:
-            return evaluate(expr->variable, environment);
-        case ExpressionType::ASSIGN:
-            return evaluate(expr->assign, environment);
+        case ExpressionType::LiteralExpression:
+            return evaluate(expr->literalexpression, environment);
+        case ExpressionType::GroupingExpression:
+            return evaluate(expr->groupingexpression, environment);
+        case ExpressionType::BinaryExpression:
+            return evaluate(expr->binaryexpression, environment);
+        case ExpressionType::UnaryExpression:
+            return evaluate(expr->unaryexpression, environment);
+        case ExpressionType::VariableExpression:
+            return evaluate(expr->variableexpression, environment);
+        case ExpressionType::AssignExpression:
+            return evaluate(expr->assignexpression, environment);
     }
     runtimeError("Unknown expression type");
 }
 
 void evaluate(Statement* statement, Environment *environment) {
     switch (statement->type) {
-        case StatementType::EXPRESSION_STATEMENT:
-            evaluate(statement->expr->expr, environment);
+        case StatementType::ExpressionStatement:
+            evaluate(statement->expressionstatement->expr, environment);
         break;
-        case StatementType::PRINT_STATEMENT:
-            cout << evaluate(statement->print->expr, environment) << endl;
+        case StatementType::PrintStatement:
+            cout << evaluate(statement->printstatement->expr, environment) << endl;
         break;
     }
 }
@@ -209,11 +209,11 @@ void evaluate(StatementDeclaration* statementDeclaration, Environment *environme
 
 void evaluate(Declaration* declaration, Environment *environment) {
     switch (declaration->type) {
-        case DeclarationType::VAR_DECLARATION:
-            evaluate(declaration->var, environment);
+        case DeclarationType::VarDeclaration:
+            evaluate(declaration->vardeclaration, environment);
         break;
-        case DeclarationType::STATEMENT_DECLARATION:
-            evaluate(declaration->statement, environment);
+        case DeclarationType::StatementDeclaration:
+            evaluate(declaration->statementdeclaration, environment);
         break;
     }
 }

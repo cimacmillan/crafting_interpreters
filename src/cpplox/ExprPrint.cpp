@@ -51,13 +51,13 @@ string print_expression(BinaryExpression *expression) {
 
 string print_expression(Expression *expression) {
     switch (expression->type) {
-        case ExpressionType::LITERAL:
-            return print_expression(expression->literal);
-        case ExpressionType::GROUPING:
-            return print_expression(expression->group);
-        case ExpressionType::UNARY:
-            return print_expression(expression->unary);
-        case ExpressionType::BINARY:
-            return print_expression(expression->binary);
+        case ExpressionType::LiteralExpression:
+            return print_expression(expression->literalexpression);
+        case ExpressionType::GroupingExpression:
+            return print_expression(expression->groupingexpression);
+        case ExpressionType::UnaryExpression:
+            return print_expression(expression->unaryexpression);
+        case ExpressionType::BinaryExpression:
+            return print_expression(expression->binaryexpression);
     }
 }

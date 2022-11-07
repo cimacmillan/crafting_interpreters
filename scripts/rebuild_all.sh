@@ -1,1 +1,1 @@
-cmake ./ && cmake --build .
+sh scripts/generate_ast.sh && cmake ./ && cmake --build .

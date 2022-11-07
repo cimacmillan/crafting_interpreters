@@ -47,27 +47,45 @@ Token CPPLox::LoxParser::previous() {
 Expression* CPPLox::LoxParser::primary() {
     if (this->match(TokenType::NUMBER)) {
         Token* previous = new Token(this->previous());
-        return Expression::asLiteral(previous);
+        return new Expression({
+            .type = +ExpressionType::LiteralExpression,
+            .literalexpression = new LiteralExpression({ previous })
+        });
     }
     if (this->match(TokenType::STRING)) {
         Token* previous = new Token(this->previous());
-        return Expression::asLiteral(previous);
+        return new Expression({
+            .type = +ExpressionType::LiteralExpression,
+            .literalexpression = new LiteralExpression({ previous })
+        });
     }
     if (this->match(TokenType::TRUE)) {
         Token* previous = new Token(this->previous());
-        return Expression::asLiteral(previous);
+        return new Expression({
+            .type = +ExpressionType::LiteralExpression,
+            .literalexpression = new LiteralExpression({ previous })
+        });
     }
     if (this->match(TokenType::FALSE)) {
         Token* previous = new Token(this->previous());
-        return Expression::asLiteral(previous);
+        return new Expression({
+            .type = +ExpressionType::LiteralExpression,
+            .literalexpression = new LiteralExpression({ previous })
+        });
     }
     if (this->match(TokenType::NIL)) {
         Token* previous = new Token(this->previous());
-        return Expression::asLiteral(previous);
+        return new Expression({
+            .type = +ExpressionType::LiteralExpression,
+            .literalexpression = new LiteralExpression({ previous })
+        });
     }
     if (this->match(TokenType::IDENTIFIER)) {
         Token* previous = new Token(this->previous());
-        return Expression::asVariable(previous);
+        return new Expression({
+            .type = +ExpressionType::VariableExpression,
+            .variableexpression = new VariableExpression({ previous })
+        });
     }
 
     if (this->match(TokenType::LEFT_PAREN)) {
@@ -75,7 +93,10 @@ Expression* CPPLox::LoxParser::primary() {
         Expression* expr = this->expression();
         if (this->match(TokenType::RIGHT_PAREN)) {
             Token* right = new Token(this->previous());
-            return Expression::asGrouping(left, expr, right);
+            return new Expression({
+                .type = +ExpressionType::GroupingExpression,
+                .groupingexpression = new GroupingExpression({ left, expr, right })
+            });
         }
         CPPLox::fatal_token(this->peek(), "expected right parenthesis");
     }
@@ -88,10 +109,10 @@ Expression* CPPLox::LoxParser::unary() {
     if (this->match(TokenType::BANG) || this->match(TokenType::MINUS)) {
         Token *previous = new Token(this->previous());
         Expression* again = this->unary();
-        return Expression::asUnary(
-            again,
-            previous
-        );
+        return new Expression({
+            .type = +ExpressionType::UnaryExpression,
+            .unaryexpression = new UnaryExpression({ again, previous })
+        });
     }
     return this->primary();
 }
@@ -101,7 +122,10 @@ Expression* CPPLox::LoxParser::factor() {
     while (this->match(TokenType::SLASH) || this->match(TokenType::STAR)) {
         Token* previous = new Token(this->previous());
         Expression* right = this->unary();
-        left = Expression::asBinary(left, previous, right);
+        left = new Expression({
+            .type = +ExpressionType::BinaryExpression,
+            .binaryexpression = new BinaryExpression({ left, previous, right })
+        });
     }
     return left;
 }
@@ -111,7 +135,10 @@ Expression* CPPLox::LoxParser::term() {
     while (this->match(TokenType::MINUS) || this->match(TokenType::PLUS)) {
         Token* previous = new Token(this->previous());
         Expression* right = this->factor();
-        left = Expression::asBinary(left, previous, right);
+        left = new Expression({
+            .type = +ExpressionType::BinaryExpression,
+            .binaryexpression = new BinaryExpression({ left, previous, right })
+        });
     }
     return left;
 }
@@ -121,7 +148,10 @@ Expression* CPPLox::LoxParser::comparison() {
     while (this->match(TokenType::GREATER) || this->match(TokenType::GREATER_EQUAL) || this->match(TokenType::LESS) || this->match(TokenType::LESS_EQUAL)) {
         Token* previous = new Token(this->previous());
         Expression* right = this->term();
-        left = Expression::asBinary(left, previous, right);
+        left = new Expression({
+            .type = +ExpressionType::BinaryExpression,
+            .binaryexpression = new BinaryExpression({ left, previous, right })
+        });
     }
     return left;
 }
@@ -131,7 +161,10 @@ Expression* CPPLox::LoxParser::equality() {
     while (this->match(TokenType::BANG_EQUAL) || this->match(TokenType::EQUAL_EQUAL)) {
         Token* previous = new Token(this->previous());
         Expression* right = this->comparison();
-        left = Expression::asBinary(left, previous, right);
+        left = new Expression({
+            .type = +ExpressionType::BinaryExpression,
+            .binaryexpression = new BinaryExpression({ left, previous, right })
+        });
     }
     return left;
 }
@@ -139,11 +172,14 @@ Expression* CPPLox::LoxParser::equality() {
 Expression* CPPLox::LoxParser::assignment() {
     Expression* lvalue = equality();
     if (this->match(TokenType::EQUAL)) {
-        if (lvalue->type != +ExpressionType::VAR) {
+        if (lvalue->type != +ExpressionType::VariableExpression) {
             CPPLox::fatal_token(this->peek(), "Expected variable for left of assignemnt =");
         }
         Expression* rvalue = assignment();
-        return Expression::asAssignment(lvalue->variable->variable, rvalue);
+        return new Expression({
+            .type = +ExpressionType::AssignExpression,
+            .assignexpression = new AssignExpression({ lvalue->variableexpression->variable, rvalue })
+        });
     }
     return lvalue;
 }
@@ -159,7 +195,10 @@ Statement* CPPLox::LoxParser::printExpression() {
         CPPLox::fatal_token(this->peek(), "Expected semicolon");
     }
     Token* semi = new Token(this->previous());
-    return Statement::asPrintStatement(print, expr, semi);
+    return new Statement({
+        .type = +StatementType::PrintStatement,
+        .printstatement = new PrintStatement({print, expr, semi})
+    });
 }
 
 Statement* CPPLox::LoxParser::statementExpression() {
@@ -168,7 +207,10 @@ Statement* CPPLox::LoxParser::statementExpression() {
         CPPLox::fatal_token(this->peek(), "Expected semicolon");
     }
     Token* semi = new Token(this->previous());
-    return Statement::asExpressionStatement(expr, semi);
+    return new Statement({
+        .type = +StatementType::ExpressionStatement,
+        .expressionstatement = new ExpressionStatement({expr, semi})
+    });
 }
 
 Statement* CPPLox::LoxParser::statement() {
@@ -194,18 +236,31 @@ Declaration* CPPLox::LoxParser::var_declaration() {
             CPPLox::fatal_token(this->peek(), "Expected semicolon");
         }
         Token* semi = new Token(this->previous());
-        return Declaration::asVarDeclaration(var, identifier, equal, expr, semi);
+        return new Declaration({
+            .type = +DeclarationType::VarDeclaration,
+            .vardeclaration = new VarDeclaration({
+                var, identifier, equal, expr, semi
+            })
+        });
     } else {
         if (!this->match(TokenType::SEMICOLON)) {
             CPPLox::fatal_token(this->peek(), "Expected semicolon");
         }
         Token* semi = new Token(this->previous());
-        return Declaration::asVarDeclaration(var, identifier, nullptr, nullptr, semi);
+         return new Declaration({
+            .type = +DeclarationType::VarDeclaration,
+            .vardeclaration = new VarDeclaration({
+                var, identifier, nullptr, nullptr, semi
+            })
+        });
     }
 }
 
 Declaration* CPPLox::LoxParser::statement_declaration() {
-    return Declaration::asStatementDeclaration(this->statement());
+    return new Declaration({
+        .type = +DeclarationType::StatementDeclaration,
+        .statementdeclaration = new StatementDeclaration({this->statement()})
+    });
 }
 
 Declaration* CPPLox::LoxParser::declaration() {
