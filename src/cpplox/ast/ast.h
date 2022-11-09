@@ -23,11 +23,16 @@ struct LiteralExpression {
 struct VariableExpression {
 	struct Token *variable;
 };
+struct LogicalExpression {
+	struct Expression *left;
+	struct Token *op;
+	struct Expression *right;
+};
 struct AssignExpression {
 	struct Token *variable;
 	struct Expression *value;
 };
-BETTER_ENUM(ExpressionType, char, BinaryExpression,GroupingExpression,UnaryExpression,LiteralExpression,VariableExpression,AssignExpression);
+BETTER_ENUM(ExpressionType, char, BinaryExpression,GroupingExpression,UnaryExpression,LiteralExpression,VariableExpression,AssignExpression,LogicalExpression);
 struct Expression {
 	ExpressionType type;
 	union {
@@ -37,6 +42,7 @@ struct Expression {
 		LiteralExpression *literalexpression;
 		VariableExpression *variableexpression;
 		AssignExpression *assignexpression;
+		LogicalExpression *logicalexpression;
 	};
 };
 struct ExpressionStatement {

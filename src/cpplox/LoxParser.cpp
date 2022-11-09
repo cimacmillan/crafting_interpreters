@@ -179,8 +179,34 @@ Expression* CPPLox::LoxParser::equality() {
     return left;
 }
 
+Expression* CPPLox::LoxParser::logicalAnd() {
+    Expression* left = equality();
+    if (this->match(TokenType::AND)) {
+        Token* op = new Token(this->previous());
+        Expression* right = equality();
+        left = new Expression({
+            .type = +ExpressionType::LogicalExpression,
+            .logicalexpression = new LogicalExpression({ left, op, right })
+        });
+    }
+    return left;
+}
+
+Expression* CPPLox::LoxParser::logicalOr() {
+    Expression* left = logicalAnd();
+    if (this->match(TokenType::OR)) {
+        Token* op = new Token(this->previous());
+        Expression* right = logicalAnd();
+        left = new Expression({
+            .type = +ExpressionType::LogicalExpression,
+            .logicalexpression = new LogicalExpression({ left, op, right })
+        });
+    }
+    return left;
+}
+
 Expression* CPPLox::LoxParser::assignment() {
-    Expression* lvalue = equality();
+    Expression* lvalue = logicalOr();
     if (this->match(TokenType::EQUAL)) {
         if (lvalue->type != +ExpressionType::VariableExpression) {
             CPPLox::fatal_token(this->peek(), "Expected variable for left of assignemnt =");

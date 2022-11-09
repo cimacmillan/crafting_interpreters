@@ -163,6 +163,22 @@ LoxValue evaluate(AssignExpression* expr, Environment *env) {
     return value;
 }
 
+LoxValue evaluate(LogicalExpression* expr, Environment *env) {
+    LoxValue left = evaluate(expr->left, env);
+
+    if (expr->op->type == +TokenType::OR) {
+        if (isTruthy(left)) {
+            return left;
+        }
+    } else {
+        if (!isTruthy(left)) {
+            return left;
+        }
+    }
+
+    return evaluate(expr->right, env);
+}
+
 LoxValue evaluate(Expression* expr, Environment *environment) {
     switch (expr->type) {
         case ExpressionType::LiteralExpression:
@@ -177,6 +193,8 @@ LoxValue evaluate(Expression* expr, Environment *environment) {
             return evaluate(expr->variableexpression, environment);
         case ExpressionType::AssignExpression:
             return evaluate(expr->assignexpression, environment);
+        case ExpressionType::LogicalExpression:
+            return evaluate(expr->logicalexpression, environment);
     }
     runtimeError("Unknown expression type");
 }

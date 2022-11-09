@@ -73,6 +73,15 @@ const LOX_AST: AST = [
     },
     {
         type: AstEntryType.MEMBER,
+        name: "LogicalExpression",
+        members: {
+            left: "Expression",
+            op: "Token",
+            right: "Expression"
+        }
+    },
+    {
+        type: AstEntryType.MEMBER,
         name: "AssignExpression",
         members: {
             "variable": "Token",
@@ -82,7 +91,7 @@ const LOX_AST: AST = [
     {
         type: AstEntryType.UNION,
         name: "Expression",
-        union: ["BinaryExpression", "GroupingExpression", "UnaryExpression", "LiteralExpression", "VariableExpression", "AssignExpression"]
+        union: ["BinaryExpression", "GroupingExpression", "UnaryExpression", "LiteralExpression", "VariableExpression", "AssignExpression", "LogicalExpression"]
     },
     {
         type: AstEntryType.MEMBER,
