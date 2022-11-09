@@ -188,6 +188,15 @@ void evaluate(BlockStatement *block, Environment *environment) {
     }
 }
 
+void evaluate(IfStatement *ifStatement, Environment *environment) {
+    bool result = isTruthy(evaluate(ifStatement->condition, environment));
+    if (result) {
+        evaluate(ifStatement->trueBlock, environment);
+    } else {
+        evaluate(ifStatement->falseBlock, environment);
+    }
+}
+
 void evaluate(Statement* statement, Environment *environment) {
     switch (statement->type) {
         case StatementType::ExpressionStatement:
@@ -198,6 +207,9 @@ void evaluate(Statement* statement, Environment *environment) {
         break;
         case StatementType::BlockStatement:
             evaluate(statement->blockstatement, environment);
+        break;
+        case StatementType::IfStatement:
+            evaluate(statement->ifstatement, environment);
         break;
     }
 }

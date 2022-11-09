@@ -1,12 +1,22 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 #include "Token.h"
 #include "Expr.h"
 #include "LoxParser.h"
 #include "CPPLox.h"
 
 using namespace std;
+
+void CPPLox::LoxParser::consume(TokenType type) {
+    if (!this->match(type)) {
+        stringstream ss;
+        ss << "Expected token ";
+        ss << type;
+        CPPLox::fatal_token(this->peek(), ss.str());
+    }
+}
 
 bool CPPLox::LoxParser::match(TokenType type) {
     if (this->check(type)) {
@@ -230,12 +240,30 @@ Statement* CPPLox::LoxParser::blockStatement() {
     });
 }
 
+Statement* CPPLox::LoxParser::ifStatement() {
+    this->consume(TokenType::LEFT_PAREN);
+    Expression *condition = this->expression();
+    this->consume(TokenType::RIGHT_PAREN);
+    Statement *trueBlock = this->statement();
+    Statement *falseBlock = nullptr;
+    if (this->match(TokenType::ELSE)) {
+        falseBlock = this->statement();
+    }
+    return new Statement({
+        .type = +StatementType::IfStatement,
+        .ifstatement = new IfStatement({ condition, trueBlock, falseBlock })
+    });
+}
+
 Statement* CPPLox::LoxParser::statement() {
     if (this->match(TokenType::PRINT)) {
         return this->printExpression();
     }
     if (this->match(TokenType::LEFT_BRACE)) {
         return this->blockStatement();
+    }
+    if (this->match(TokenType::IF)) {
+        return this->ifStatement();
     }
     return this->statementExpression();
 }

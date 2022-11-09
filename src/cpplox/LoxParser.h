@@ -28,6 +28,7 @@ private:
     Statement* printExpression();
     Statement* statementExpression();
     Statement* blockStatement();
+    Statement* ifStatement();
     Expression* assignment();
     Expression* expression();
     Expression* equality();
@@ -46,6 +47,7 @@ private:
     bool isAtEnd();
     Token peek();
     Token previous();
+    void consume(TokenType type);
 
 public:
     LoxParser(vector<Token> tokens): tokens(tokens), current(0) {

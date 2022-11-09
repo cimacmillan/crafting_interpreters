@@ -51,13 +51,19 @@ struct PrintStatement {
 struct BlockStatement {
 	struct vector<struct Declaration*> *block;
 };
-BETTER_ENUM(StatementType, char, ExpressionStatement,PrintStatement,BlockStatement);
+struct IfStatement {
+	struct Expression *condition;
+	struct Statement *trueBlock;
+	struct Statement *falseBlock;
+};
+BETTER_ENUM(StatementType, char, ExpressionStatement,PrintStatement,BlockStatement,IfStatement);
 struct Statement {
 	StatementType type;
 	union {
 		ExpressionStatement *expressionstatement;
 		PrintStatement *printstatement;
 		BlockStatement *blockstatement;
+		IfStatement *ifstatement;
 	};
 };
 struct VarDeclaration {
