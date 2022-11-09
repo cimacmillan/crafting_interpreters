@@ -281,6 +281,17 @@ Statement* CPPLox::LoxParser::ifStatement() {
     });
 }
 
+Statement* CPPLox::LoxParser::whileStatement() {
+    this->consume(TokenType::LEFT_PAREN);
+    Expression *condition = this->expression();
+    this->consume(TokenType::RIGHT_PAREN);
+    Statement *block = this->statement();
+    return new Statement({
+        .type = +StatementType::WhileStatement,
+        .whilestatement = new WhileStatement({ condition, block })
+    });
+}
+
 Statement* CPPLox::LoxParser::statement() {
     if (this->match(TokenType::PRINT)) {
         return this->printExpression();
@@ -290,6 +301,9 @@ Statement* CPPLox::LoxParser::statement() {
     }
     if (this->match(TokenType::IF)) {
         return this->ifStatement();
+    }
+    if (this->match(TokenType::WHILE)) {
+        return this->whileStatement();
     }
     return this->statementExpression();
 }

@@ -62,7 +62,11 @@ struct IfStatement {
 	struct Statement *trueBlock;
 	struct Statement *falseBlock;
 };
-BETTER_ENUM(StatementType, char, ExpressionStatement,PrintStatement,BlockStatement,IfStatement);
+struct WhileStatement {
+	struct Expression *condition;
+	struct Statement *block;
+};
+BETTER_ENUM(StatementType, char, ExpressionStatement,PrintStatement,BlockStatement,IfStatement,WhileStatement);
 struct Statement {
 	StatementType type;
 	union {
@@ -70,6 +74,7 @@ struct Statement {
 		PrintStatement *printstatement;
 		BlockStatement *blockstatement;
 		IfStatement *ifstatement;
+		WhileStatement *whilestatement;
 	};
 };
 struct VarDeclaration {

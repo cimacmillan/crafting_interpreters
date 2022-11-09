@@ -215,6 +215,12 @@ void evaluate(IfStatement *ifStatement, Environment *environment) {
     }
 }
 
+void evaluate(WhileStatement *whileStatement, Environment *environment) {
+    while (isTruthy(evaluate(whileStatement->condition, environment))) {
+        evaluate(whileStatement->block, environment);
+    }
+}
+
 void evaluate(Statement* statement, Environment *environment) {
     switch (statement->type) {
         case StatementType::ExpressionStatement:
@@ -228,6 +234,9 @@ void evaluate(Statement* statement, Environment *environment) {
         break;
         case StatementType::IfStatement:
             evaluate(statement->ifstatement, environment);
+        break;
+        case StatementType::WhileStatement:
+            evaluate(statement->whilestatement, environment);
         break;
     }
 }

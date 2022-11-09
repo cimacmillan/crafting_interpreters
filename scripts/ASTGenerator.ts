@@ -127,9 +127,17 @@ const LOX_AST: AST = [
         }
     },
     {
+        type: AstEntryType.MEMBER,
+        name: "WhileStatement",
+        members: {
+            "condition": "Expression",
+            "block": "Statement"
+        }
+    },
+    {
         type: AstEntryType.UNION,
         name: "Statement",
-        union: ["ExpressionStatement", "PrintStatement", "BlockStatement", "IfStatement"]
+        union: ["ExpressionStatement", "PrintStatement", "BlockStatement", "IfStatement", "WhileStatement"]
     },
     {
         type: AstEntryType.MEMBER,
