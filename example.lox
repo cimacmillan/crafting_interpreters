@@ -1,12 +1,11 @@
 var x = 1;
 var y = 1;
-var z = 0;
-while (x < 1000) {
-    print x;
-    x = x + y;
-    z = y;
+var temp = 1;
+for (var i = 0; i < 20; i = i + 1) {
+    temp = x + y;
     y = x;
-    x = z;
+    x = temp;
+    print x;
 }
 
 

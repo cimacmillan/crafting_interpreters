@@ -46,6 +46,7 @@ LoxValue evaluate(LiteralExpression* expr, Environment *env) {
             runtimeError("Invalid literal type");
             break;
     }
+    return (LoxValue){ .type = LoxValueType::NIL };
 }
 
 LoxValue evaluate(GroupingExpression* expr, Environment *environment) {
@@ -60,18 +61,17 @@ bool isTruthy(LoxValue value) {
 
 LoxValue evaluate(UnaryExpression* expr, Environment *environment) {
     LoxValue value = evaluate(expr->expression, environment);
-    switch (expr->unary->type) {
-        case TokenType::MINUS:
-            if (value.type == +LoxValueType::NUMBER) {
-                value.number = -value.number;
-                return value;
-            }
-            break;
-        case TokenType::BANG:
-            return {LoxValueType::BOOLEAN, .boolean=!isTruthy(value)};
+    if (expr->unary->type == +TokenType::MINUS) {
+        if (value.type == +LoxValueType::NUMBER) {
+            value.number = -value.number;
+            return value;
+        }
+    } else if (expr->unary->type == +TokenType::BANG) {
+        return {LoxValueType::BOOLEAN, .boolean=!isTruthy(value)};
     }
 
     runtimeError("Invalid unary operation for value type ");
+    return (LoxValue){.type=LoxValueType::NIL};
 }
 
 bool isDualType(LoxValue a, LoxValue b, LoxValueType type) {
@@ -147,10 +147,10 @@ LoxValue evaluate(BinaryExpression* expr, Environment *environment) {
         case TokenType::BANG_EQUAL:
             return { .type=LoxValueType::BOOLEAN, .boolean=!isEqual(left, right)};
         break;
-
     }
 
     runtimeError("Invalid binary operation for value type");
+    return (LoxValue){.type=LoxValueType::NIL};
 }
 
 LoxValue evaluate(AssignExpression* expr, Environment *env) {
@@ -242,7 +242,7 @@ void evaluate(Statement* statement, Environment *environment) {
 }
 
 void evaluate(VarDeclaration* varDeclaration, Environment *environment) {
-    LoxValue evaluated = evaluate(varDeclaration->expr, environment);
+    LoxValue evaluated = varDeclaration->expr == nullptr ? (LoxValue){.type = LoxValueType::NIL} : evaluate(varDeclaration->expr, environment);
     auto defineResult = environment->defineVariable(*(varDeclaration->identifier));
     if (!defineResult) {
         std::stringstream error;

@@ -292,6 +292,96 @@ Statement* CPPLox::LoxParser::whileStatement() {
     });
 }
 
+Statement* CPPLox::LoxParser::forStatement() {
+    this->consume(TokenType::LEFT_PAREN);
+    auto block = new vector<Declaration*>();
+
+    if (this->match(TokenType::VAR)) {
+        block->push_back(this->var_declaration());
+    } else if (!this->match(TokenType::SEMICOLON)) {
+        block->push_back(new Declaration({
+            .type = DeclarationType::StatementDeclaration,
+            .statementdeclaration = new StatementDeclaration({
+                this->statementExpression()
+            })
+        }));
+    }
+
+    Statement* condition = nullptr;
+    if (!this->match(TokenType::SEMICOLON)) {
+        condition = this->statementExpression();
+    }
+
+    Expression* increment = nullptr;
+    if (!this->match(TokenType::RIGHT_PAREN)) {
+        increment = this->expression();
+        this->consume(TokenType::RIGHT_PAREN);
+    }
+
+    auto forBlock = this->statement();
+
+    if (condition == nullptr) {
+        condition = new Statement({
+            .type = +StatementType::ExpressionStatement,
+            .expressionstatement = new ExpressionStatement({
+                .expr = new Expression({
+                    .type = +ExpressionType::LiteralExpression,
+                    .literalexpression = new LiteralExpression({
+                        new Token({
+                            .lexeme =  "true",
+                            .type = +TokenType::TRUE,
+                            .line = 0
+                        })
+                    })
+                })
+            })
+        });
+    }
+
+    auto whileBlock = new vector<Declaration*>({
+        new Declaration({
+            .type = +DeclarationType::StatementDeclaration,
+            .statementdeclaration = new StatementDeclaration({ forBlock })
+        })
+    });
+
+    if (increment) {
+        whileBlock->push_back(new Declaration({
+            .type = +DeclarationType::StatementDeclaration,
+            .statementdeclaration = new StatementDeclaration({
+                new Statement({
+                    .type = +StatementType::ExpressionStatement,
+                    .expressionstatement = new ExpressionStatement({
+                        increment
+                    })
+                })
+            })
+        }));
+    }
+
+    auto whileStatement = new Statement({
+        .type = +StatementType::WhileStatement,
+        .whilestatement = new WhileStatement({ 
+            condition->expressionstatement->expr, 
+            new Statement({
+                .type = +StatementType::BlockStatement,
+                .blockstatement = new BlockStatement({ whileBlock })
+            })
+        })
+    });
+
+    block->push_back(new Declaration({
+        .type = +DeclarationType::StatementDeclaration,
+        .statementdeclaration = new StatementDeclaration({ whileStatement })
+    }));
+
+    return new Statement({
+        .type = +StatementType::BlockStatement,
+        .blockstatement = new BlockStatement({ block })
+    });
+
+}
+
 Statement* CPPLox::LoxParser::statement() {
     if (this->match(TokenType::PRINT)) {
         return this->printExpression();
@@ -304,6 +394,9 @@ Statement* CPPLox::LoxParser::statement() {
     }
     if (this->match(TokenType::WHILE)) {
         return this->whileStatement();
+    }
+    if (this->match(TokenType::FOR)) {
+        return this->forStatement();
     }
     return this->statementExpression();
 }

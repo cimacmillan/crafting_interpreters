@@ -30,6 +30,7 @@ private:
     Statement* blockStatement();
     Statement* ifStatement();
     Statement* whileStatement();
+    Statement* forStatement();
     Expression* assignment();
     Expression* logicalOr();
     Expression* logicalAnd();

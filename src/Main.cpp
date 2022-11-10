@@ -7,7 +7,6 @@
 #include "cpplox/CPPLox.h"
 #include "cpplox/TokenScanner.h"
 #include "cpplox/Expr.h"
-#include "cpplox/ExprPrint.h"
 #include "cpplox/LoxParser.h"
 #include "cpplox/Interpreter.h"
 
