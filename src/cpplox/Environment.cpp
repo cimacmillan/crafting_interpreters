@@ -1,6 +1,7 @@
 #include "Environment.h"
 
 #include <iostream>
+#include <string>
 
 void Environment::print() {
     std::cout << "Environment" << std::endl;
@@ -9,24 +10,24 @@ void Environment::print() {
     }
 }
 
-bool Environment::defineVariable(Token token) {
+bool Environment::defineVariable(std::string lexeme) {
     // Variable is already defined, error
-    if (this->variables.find(token.lexeme) != this->variables.end()) {
+    if (this->variables.find(lexeme) != this->variables.end()) {
         return false;
     }
-    this->variables.emplace(token.lexeme, (LoxValue){ .type=LoxValueType::NIL });
+    this->variables.emplace(lexeme, (LoxValue){ .type=LoxValueType::NIL });
     return true;
 }
 
-bool Environment::setVariable(Token token, LoxValue value) {
+bool Environment::setVariable(std::string lexeme, LoxValue value) {
     // Variable is not defined
-    if (this->variables.find(token.lexeme) == this->variables.end()) {
+    if (this->variables.find(lexeme) == this->variables.end()) {
         if (this->parent) {
-            return this->parent->setVariable(token, value);
+            return this->parent->setVariable(lexeme, value);
         }
         return false;
     }
-    this->variables.find(token.lexeme)->second = value;
+    this->variables.find(lexeme)->second = value;
     return true;
 }
 

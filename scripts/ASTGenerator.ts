@@ -89,9 +89,17 @@ const LOX_AST: AST = [
         }
     },
     {
+        type: AstEntryType.MEMBER,
+        name: "CallExpression",
+        members: {
+            "callee": "Expression",
+            "arguments": "vector<Expression*>"
+        }
+    },
+    {
         type: AstEntryType.UNION,
         name: "Expression",
-        union: ["BinaryExpression", "GroupingExpression", "UnaryExpression", "LiteralExpression", "VariableExpression", "AssignExpression", "LogicalExpression"]
+        union: ["BinaryExpression", "GroupingExpression", "UnaryExpression", "LiteralExpression", "VariableExpression", "AssignExpression", "LogicalExpression", "CallExpression"]
     },
     {
         type: AstEntryType.MEMBER,
@@ -180,7 +188,7 @@ function outputMemberType(entry: MemberAstEntry): string {
 
 function outputUnionCreatorFunction(ast: AST, type: string, entry: string) {
     let cPlusPlus = "";
-    cPlusPlus += `\t${type}* as${entry}(${entry} *${entry.toLocaleLowerCase()}) {\n`
+    cPlusPlus += `\tstatic ${type}* as${entry}(${entry} *${entry.toLocaleLowerCase()}) {\n`
     cPlusPlus += `\t\treturn new ${type}({.type=${type}Type::${entry}, .${entry.toLocaleLowerCase()}=${entry.toLocaleLowerCase()}});\n`;
     cPlusPlus += "\t}\n"
     return cPlusPlus;

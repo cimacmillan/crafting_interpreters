@@ -2,8 +2,15 @@
 
 #include <enum.h>
 #include <iostream>
+#include <vector>
 
-BETTER_ENUM(LoxValueType, char, NUMBER, STRING, BOOLEAN, NIL);
+struct LoxCallable 
+{
+    struct LoxValue (*func)(std::vector<struct LoxValue> arguments);
+};
+
+
+BETTER_ENUM(LoxValueType, char, NUMBER, STRING, BOOLEAN, NIL, CALLABLE);
 
 struct LoxValue {
     LoxValueType type;
@@ -11,6 +18,7 @@ struct LoxValue {
         double number;
         std::string *str;
         bool boolean;
+        LoxCallable *callable;
     };
 };
 

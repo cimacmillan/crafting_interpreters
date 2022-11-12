@@ -32,7 +32,11 @@ struct AssignExpression {
 	struct Token *variable;
 	struct Expression *value;
 };
-BETTER_ENUM(ExpressionType, char, BinaryExpression,GroupingExpression,UnaryExpression,LiteralExpression,VariableExpression,AssignExpression,LogicalExpression);
+struct CallExpression {
+	struct Expression *callee;
+	struct vector<Expression*> *arguments;
+};
+BETTER_ENUM(ExpressionType, char, BinaryExpression,GroupingExpression,UnaryExpression,LiteralExpression,VariableExpression,AssignExpression,LogicalExpression,CallExpression);
 struct Expression {
 	ExpressionType type;
 	union {
@@ -43,27 +47,31 @@ struct Expression {
 		VariableExpression *variableexpression;
 		AssignExpression *assignexpression;
 		LogicalExpression *logicalexpression;
+		CallExpression *callexpression;
 	};
-	Expression* asBinaryExpression(BinaryExpression *binaryexpression) {
+	static Expression* asBinaryExpression(BinaryExpression *binaryexpression) {
 		return new Expression({.type=ExpressionType::BinaryExpression, .binaryexpression=binaryexpression});
 	}
-	Expression* asGroupingExpression(GroupingExpression *groupingexpression) {
+	static Expression* asGroupingExpression(GroupingExpression *groupingexpression) {
 		return new Expression({.type=ExpressionType::GroupingExpression, .groupingexpression=groupingexpression});
 	}
-	Expression* asUnaryExpression(UnaryExpression *unaryexpression) {
+	static Expression* asUnaryExpression(UnaryExpression *unaryexpression) {
 		return new Expression({.type=ExpressionType::UnaryExpression, .unaryexpression=unaryexpression});
 	}
-	Expression* asLiteralExpression(LiteralExpression *literalexpression) {
+	static Expression* asLiteralExpression(LiteralExpression *literalexpression) {
 		return new Expression({.type=ExpressionType::LiteralExpression, .literalexpression=literalexpression});
 	}
-	Expression* asVariableExpression(VariableExpression *variableexpression) {
+	static Expression* asVariableExpression(VariableExpression *variableexpression) {
 		return new Expression({.type=ExpressionType::VariableExpression, .variableexpression=variableexpression});
 	}
-	Expression* asAssignExpression(AssignExpression *assignexpression) {
+	static Expression* asAssignExpression(AssignExpression *assignexpression) {
 		return new Expression({.type=ExpressionType::AssignExpression, .assignexpression=assignexpression});
 	}
-	Expression* asLogicalExpression(LogicalExpression *logicalexpression) {
+	static Expression* asLogicalExpression(LogicalExpression *logicalexpression) {
 		return new Expression({.type=ExpressionType::LogicalExpression, .logicalexpression=logicalexpression});
+	}
+	static Expression* asCallExpression(CallExpression *callexpression) {
+		return new Expression({.type=ExpressionType::CallExpression, .callexpression=callexpression});
 	}
 };
 struct ExpressionStatement {
@@ -97,19 +105,19 @@ struct Statement {
 		IfStatement *ifstatement;
 		WhileStatement *whilestatement;
 	};
-	Statement* asExpressionStatement(ExpressionStatement *expressionstatement) {
+	static Statement* asExpressionStatement(ExpressionStatement *expressionstatement) {
 		return new Statement({.type=StatementType::ExpressionStatement, .expressionstatement=expressionstatement});
 	}
-	Statement* asPrintStatement(PrintStatement *printstatement) {
+	static Statement* asPrintStatement(PrintStatement *printstatement) {
 		return new Statement({.type=StatementType::PrintStatement, .printstatement=printstatement});
 	}
-	Statement* asBlockStatement(BlockStatement *blockstatement) {
+	static Statement* asBlockStatement(BlockStatement *blockstatement) {
 		return new Statement({.type=StatementType::BlockStatement, .blockstatement=blockstatement});
 	}
-	Statement* asIfStatement(IfStatement *ifstatement) {
+	static Statement* asIfStatement(IfStatement *ifstatement) {
 		return new Statement({.type=StatementType::IfStatement, .ifstatement=ifstatement});
 	}
-	Statement* asWhileStatement(WhileStatement *whilestatement) {
+	static Statement* asWhileStatement(WhileStatement *whilestatement) {
 		return new Statement({.type=StatementType::WhileStatement, .whilestatement=whilestatement});
 	}
 };
@@ -134,10 +142,10 @@ struct Declaration {
 		VarDeclaration *vardeclaration;
 		StatementDeclaration *statementdeclaration;
 	};
-	Declaration* asVarDeclaration(VarDeclaration *vardeclaration) {
+	static Declaration* asVarDeclaration(VarDeclaration *vardeclaration) {
 		return new Declaration({.type=DeclarationType::VarDeclaration, .vardeclaration=vardeclaration});
 	}
-	Declaration* asStatementDeclaration(StatementDeclaration *statementdeclaration) {
+	static Declaration* asStatementDeclaration(StatementDeclaration *statementdeclaration) {
 		return new Declaration({.type=DeclarationType::StatementDeclaration, .statementdeclaration=statementdeclaration});
 	}
 };

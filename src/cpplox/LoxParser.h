@@ -40,6 +40,7 @@ private:
     Expression* term();
     Expression* factor();
     Expression* unary();
+    Expression* call();
     Expression* primary();
     Declaration* var_declaration();
     Declaration* statement_declaration();

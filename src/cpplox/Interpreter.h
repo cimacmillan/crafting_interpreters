@@ -32,7 +32,7 @@ private:
     Environment environment;
 
 public:
-    Interpreter(LoxProgram program): program(program), environment(Environment(nullptr)) {}
+    Interpreter(LoxProgram program, Environment env): program(program), environment(env) {}
     void run();
 
 };

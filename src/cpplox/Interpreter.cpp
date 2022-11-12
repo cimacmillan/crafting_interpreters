@@ -155,7 +155,7 @@ LoxValue evaluate(BinaryExpression* expr, Environment *environment) {
 
 LoxValue evaluate(AssignExpression* expr, Environment *env) {
     LoxValue value = evaluate(expr->value, env);
-    if(!env->setVariable(*(expr->variable), value)) {
+    if(!env->setVariable(expr->variable->lexeme, value)) {
         stringstream ss;
         ss << "Variable " << (expr->variable->lexeme) << " is undefined";
         runtimeError(ss.str());
@@ -179,6 +179,19 @@ LoxValue evaluate(LogicalExpression* expr, Environment *env) {
     return evaluate(expr->right, env);
 }
 
+LoxValue evaluate(CallExpression* expr, Environment *environment) {
+    LoxValue callee = evaluate(expr->callee, environment);
+    if (callee.type != +LoxValueType::CALLABLE) {
+        stringstream ss;
+        ss << "Callee ";
+        ss << callee;
+        ss << " is not callable";
+        runtimeError(ss.str());
+    }
+    std::vector<LoxValue> values;
+    return callee.callable->func(values);
+}
+
 LoxValue evaluate(Expression* expr, Environment *environment) {
     switch (expr->type) {
         case ExpressionType::LiteralExpression:
@@ -195,6 +208,8 @@ LoxValue evaluate(Expression* expr, Environment *environment) {
             return evaluate(expr->assignexpression, environment);
         case ExpressionType::LogicalExpression:
             return evaluate(expr->logicalexpression, environment);
+        case ExpressionType::CallExpression:
+            return evaluate(expr->callexpression, environment);
     }
     runtimeError("Unknown expression type");
 }
@@ -243,13 +258,13 @@ void evaluate(Statement* statement, Environment *environment) {
 
 void evaluate(VarDeclaration* varDeclaration, Environment *environment) {
     LoxValue evaluated = varDeclaration->expr == nullptr ? (LoxValue){.type = LoxValueType::NIL} : evaluate(varDeclaration->expr, environment);
-    auto defineResult = environment->defineVariable(*(varDeclaration->identifier));
+    auto defineResult = environment->defineVariable(varDeclaration->identifier->lexeme);
     if (!defineResult) {
         std::stringstream error;
         error << "Variable " << varDeclaration->identifier->lexeme << " is already defined";
         runtimeError(error.str());
     }
-    environment->setVariable(*(varDeclaration->identifier), evaluated);
+    environment->setVariable(varDeclaration->identifier->lexeme, evaluated);
 }
 
 void evaluate(StatementDeclaration* statementDeclaration, Environment *environment) {

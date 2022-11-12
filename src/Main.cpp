@@ -2,6 +2,8 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <chrono>
+
 
 #include "FileUtils.h"
 #include "cpplox/CPPLox.h"
@@ -10,7 +12,11 @@
 #include "cpplox/LoxParser.h"
 #include "cpplox/Interpreter.h"
 
+
 using namespace std;
+using namespace std::chrono;
+
+typedef std::numeric_limits< double > dbl;
 
 enum LoxInterpreterResponse {
     SUCCESS = 0,
@@ -23,14 +29,14 @@ enum class RunLineResponse {
     QUIT
 };
 
-int run(string source) {
+int run(string source, Environment env) {
     CPPLox::TokenScanner tokenScanner(source);
     vector<Token> tokens = tokenScanner.scanTokens();
     CPPLox::LoxParser parser(tokens);
     LoxProgram program = parser.parse();
 
     try {
-        CPPLox::Interpreter interpreter(program);
+        CPPLox::Interpreter interpreter(program, env);
         interpreter.run();
     } catch (LoxRuntimeError error) {
         cout << error << endl;
@@ -39,7 +45,7 @@ int run(string source) {
     return SUCCESS;
 }
 
-int runPrompt() {
+int runPrompt(Environment env) {
     while (true) {
         string line;
         cout << "\n" << "> ";
@@ -47,27 +53,50 @@ int runPrompt() {
         if (line == "quit" || line == "exit") {
             break;
         }
-        run(line);
+        run(line, env);
     }
 
     return SUCCESS;
 }
 
 
-int runFile(string filename) {
+int runFile(string filename, Environment env) {
     string source = FileUtils::readFile(filename);
-    run(source);
+    run(source, env);
     return LoxInterpreterResponse::SUCCESS;
 }
 
+LoxValue clock(vector<LoxValue> args) {
+    milliseconds ms = duration_cast< milliseconds >(
+        system_clock::now().time_since_epoch()
+    );
+    
+    return (LoxValue){.type=LoxValueType::NUMBER, .number=(double)ms.count()};
+}
+
+Environment createDefaultEnvironment() {
+    Environment env(nullptr);
+    env.defineVariable("clock");
+    env.setVariable("clock", (LoxValue){
+        .type= +LoxValueType::CALLABLE,
+        .callable=new LoxCallable({ 
+            .func = clock
+        })
+    });
+    return env;
+}
+
 int main(int argc, char** argv) {
+    Environment env = createDefaultEnvironment();
+    cout.precision(dbl::max_digits10);
+
     if (argc > 2) {
         cerr << "Usage: lox [script]" << endl;
     } else if (argc == 2) {
         string filename = { argv[1] };
-        return runFile(filename);
+        return runFile(filename, env);
     } else {
-        return runPrompt();
+        return runPrompt(env);
     }
 
     return LoxInterpreterResponse::FAILURE;

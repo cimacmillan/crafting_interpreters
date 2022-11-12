@@ -115,6 +115,15 @@ Expression* CPPLox::LoxParser::primary() {
     return nullptr;
 }
 
+Expression* CPPLox::LoxParser::call() {
+    Expression* primary = this->primary();
+    if (this->match(TokenType::LEFT_PAREN)) {
+        this->consume(TokenType::RIGHT_PAREN);
+        return Expression::asCallExpression(new CallExpression({primary, new vector<Expression*>()}));
+    }
+    return primary;
+}
+
 Expression* CPPLox::LoxParser::unary() {
     if (this->match(TokenType::BANG) || this->match(TokenType::MINUS)) {
         Token *previous = new Token(this->previous());
@@ -124,7 +133,7 @@ Expression* CPPLox::LoxParser::unary() {
             .unaryexpression = new UnaryExpression({ again, previous })
         });
     }
-    return this->primary();
+    return this->call();
 }
 
 Expression* CPPLox::LoxParser::factor() {

@@ -12,8 +12,8 @@ private:
 
 public:
     Environment(Environment *parent) : parent(parent) {}
-    bool defineVariable(Token token);
-    bool setVariable(Token token, LoxValue value);
+    bool defineVariable(std::string lexeme);
+    bool setVariable(std::string lexeme, LoxValue value);
     std::optional<LoxValue> getVariable(Token token);
     void print();
 
