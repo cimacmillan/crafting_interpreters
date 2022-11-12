@@ -44,6 +44,27 @@ struct Expression {
 		AssignExpression *assignexpression;
 		LogicalExpression *logicalexpression;
 	};
+	Expression* asBinaryExpression(BinaryExpression *binaryexpression) {
+		return new Expression({.type=ExpressionType::BinaryExpression, .binaryexpression=binaryexpression});
+	}
+	Expression* asGroupingExpression(GroupingExpression *groupingexpression) {
+		return new Expression({.type=ExpressionType::GroupingExpression, .groupingexpression=groupingexpression});
+	}
+	Expression* asUnaryExpression(UnaryExpression *unaryexpression) {
+		return new Expression({.type=ExpressionType::UnaryExpression, .unaryexpression=unaryexpression});
+	}
+	Expression* asLiteralExpression(LiteralExpression *literalexpression) {
+		return new Expression({.type=ExpressionType::LiteralExpression, .literalexpression=literalexpression});
+	}
+	Expression* asVariableExpression(VariableExpression *variableexpression) {
+		return new Expression({.type=ExpressionType::VariableExpression, .variableexpression=variableexpression});
+	}
+	Expression* asAssignExpression(AssignExpression *assignexpression) {
+		return new Expression({.type=ExpressionType::AssignExpression, .assignexpression=assignexpression});
+	}
+	Expression* asLogicalExpression(LogicalExpression *logicalexpression) {
+		return new Expression({.type=ExpressionType::LogicalExpression, .logicalexpression=logicalexpression});
+	}
 };
 struct ExpressionStatement {
 	struct Expression *expr;
@@ -76,6 +97,21 @@ struct Statement {
 		IfStatement *ifstatement;
 		WhileStatement *whilestatement;
 	};
+	Statement* asExpressionStatement(ExpressionStatement *expressionstatement) {
+		return new Statement({.type=StatementType::ExpressionStatement, .expressionstatement=expressionstatement});
+	}
+	Statement* asPrintStatement(PrintStatement *printstatement) {
+		return new Statement({.type=StatementType::PrintStatement, .printstatement=printstatement});
+	}
+	Statement* asBlockStatement(BlockStatement *blockstatement) {
+		return new Statement({.type=StatementType::BlockStatement, .blockstatement=blockstatement});
+	}
+	Statement* asIfStatement(IfStatement *ifstatement) {
+		return new Statement({.type=StatementType::IfStatement, .ifstatement=ifstatement});
+	}
+	Statement* asWhileStatement(WhileStatement *whilestatement) {
+		return new Statement({.type=StatementType::WhileStatement, .whilestatement=whilestatement});
+	}
 };
 struct VarDeclaration {
 	struct Token *var;
@@ -98,4 +134,10 @@ struct Declaration {
 		VarDeclaration *vardeclaration;
 		StatementDeclaration *statementdeclaration;
 	};
+	Declaration* asVarDeclaration(VarDeclaration *vardeclaration) {
+		return new Declaration({.type=DeclarationType::VarDeclaration, .vardeclaration=vardeclaration});
+	}
+	Declaration* asStatementDeclaration(StatementDeclaration *statementdeclaration) {
+		return new Declaration({.type=DeclarationType::StatementDeclaration, .statementdeclaration=statementdeclaration});
+	}
 };
