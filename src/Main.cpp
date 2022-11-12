@@ -74,6 +74,15 @@ LoxValue clock(vector<LoxValue> args) {
     return (LoxValue){.type=LoxValueType::NUMBER, .number=(double)ms.count()};
 }
 
+LoxValue prints(vector<LoxValue> args) {
+    for (auto arg : args) {
+        cout << arg;
+    }
+    cout << endl;
+    return (LoxValue){.type=LoxValueType::NIL};
+
+}
+
 Environment createDefaultEnvironment() {
     Environment env(nullptr);
     env.defineVariable("clock");
@@ -81,6 +90,13 @@ Environment createDefaultEnvironment() {
         .type= +LoxValueType::CALLABLE,
         .callable=new LoxCallable({ 
             .func = clock
+        })
+    });
+    env.defineVariable("prints");
+    env.setVariable("prints", (LoxValue) {
+        .type= +LoxValueType::CALLABLE,
+        .callable=new LoxCallable({
+            .func = prints
         })
     });
     return env;

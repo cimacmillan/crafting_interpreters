@@ -189,6 +189,9 @@ LoxValue evaluate(CallExpression* expr, Environment *environment) {
         runtimeError(ss.str());
     }
     std::vector<LoxValue> values;
+    for (auto arg_expr : *(expr->arguments)) {
+        values.push_back(evaluate(arg_expr, environment));
+    }
     return callee.callable->func(values);
 }
 
