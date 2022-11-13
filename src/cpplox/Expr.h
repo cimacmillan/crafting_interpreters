@@ -6,7 +6,3 @@
 #include <vector>
 #include "Token.h"
 
-struct LoxProgram {
-    std::vector<Declaration*> declarations;
-};
-

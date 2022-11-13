@@ -500,9 +500,9 @@ Declaration* CPPLox::LoxParser::declaration() {
 }
 
 LoxProgram CPPLox::LoxParser::parse() {
-    LoxProgram program;
+    LoxProgram program = { new vector<Declaration*>() };
     while (!this->isAtEnd()) {
-        program.declarations.push_back(this->declaration());
+        program.program->push_back(this->declaration());
     }
     return program;
 }

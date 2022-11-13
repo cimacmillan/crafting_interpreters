@@ -311,7 +311,7 @@ void evaluate(Declaration* declaration, Environment *environment) {
 }
 
 void CPPLox::Interpreter::run() {
-    for (Declaration* declaration : this->program.declarations) {
+    for (Declaration* declaration : *(this->program.program)) {
         evaluate(declaration, &(this->environment));
     }
 }

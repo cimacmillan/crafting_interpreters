@@ -166,3 +166,73 @@ struct Declaration {
 		return new Declaration({.type=DeclarationType::FunctionDeclaration, .functiondeclaration=functiondeclaration});
 	}
 };
+struct LoxProgram {
+	struct vector<Declaration*> *program;
+};
+class AstVisitor {
+public:
+	virtual void visit(BinaryExpression *entry) = 0;
+	virtual void visit(GroupingExpression *entry) = 0;
+	virtual void visit(UnaryExpression *entry) = 0;
+	virtual void visit(LiteralExpression *entry) = 0;
+	virtual void visit(VariableExpression *entry) = 0;
+	virtual void visit(LogicalExpression *entry) = 0;
+	virtual void visit(AssignExpression *entry) = 0;
+	virtual void visit(CallExpression *entry) = 0;
+	void visit(Expression *entry) {
+		switch(entry->type) {
+			case ExpressionType::BinaryExpression:
+				return this->visit(entry);
+			case ExpressionType::GroupingExpression:
+				return this->visit(entry);
+			case ExpressionType::UnaryExpression:
+				return this->visit(entry);
+			case ExpressionType::LiteralExpression:
+				return this->visit(entry);
+			case ExpressionType::VariableExpression:
+				return this->visit(entry);
+			case ExpressionType::AssignExpression:
+				return this->visit(entry);
+			case ExpressionType::LogicalExpression:
+				return this->visit(entry);
+			case ExpressionType::CallExpression:
+				return this->visit(entry);
+		}
+	}
+	virtual void visit(ExpressionStatement *entry) = 0;
+	virtual void visit(PrintStatement *entry) = 0;
+	virtual void visit(BlockStatement *entry) = 0;
+	virtual void visit(IfStatement *entry) = 0;
+	virtual void visit(WhileStatement *entry) = 0;
+	virtual void visit(ReturnStatement *entry) = 0;
+	void visit(Statement *entry) {
+		switch(entry->type) {
+			case StatementType::ExpressionStatement:
+				return this->visit(entry);
+			case StatementType::PrintStatement:
+				return this->visit(entry);
+			case StatementType::BlockStatement:
+				return this->visit(entry);
+			case StatementType::IfStatement:
+				return this->visit(entry);
+			case StatementType::WhileStatement:
+				return this->visit(entry);
+			case StatementType::ReturnStatement:
+				return this->visit(entry);
+		}
+	}
+	virtual void visit(VarDeclaration *entry) = 0;
+	virtual void visit(StatementDeclaration *entry) = 0;
+	virtual void visit(FunctionDeclaration *entry) = 0;
+	void visit(Declaration *entry) {
+		switch(entry->type) {
+			case DeclarationType::VarDeclaration:
+				return this->visit(entry);
+			case DeclarationType::StatementDeclaration:
+				return this->visit(entry);
+			case DeclarationType::FunctionDeclaration:
+				return this->visit(entry);
+		}
+	}
+	virtual void visit(LoxProgram *entry) = 0;
+};

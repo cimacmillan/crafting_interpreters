@@ -1,1 +1,0 @@
-ts-node scripts/ASTGenerator.ts && sh scripts/rebuild_all.sh
