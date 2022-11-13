@@ -96,7 +96,10 @@ struct WhileStatement {
 	struct Expression *condition;
 	struct Statement *block;
 };
-BETTER_ENUM(StatementType, char, ExpressionStatement,PrintStatement,BlockStatement,IfStatement,WhileStatement);
+struct ReturnStatement {
+	struct Expression *expr;
+};
+BETTER_ENUM(StatementType, char, ExpressionStatement,PrintStatement,BlockStatement,IfStatement,WhileStatement,ReturnStatement);
 struct Statement {
 	StatementType type;
 	union {
@@ -105,6 +108,7 @@ struct Statement {
 		BlockStatement *blockstatement;
 		IfStatement *ifstatement;
 		WhileStatement *whilestatement;
+		ReturnStatement *returnstatement;
 	};
 	static Statement* asExpressionStatement(ExpressionStatement *expressionstatement) {
 		return new Statement({.type=StatementType::ExpressionStatement, .expressionstatement=expressionstatement});
@@ -120,6 +124,9 @@ struct Statement {
 	}
 	static Statement* asWhileStatement(WhileStatement *whilestatement) {
 		return new Statement({.type=StatementType::WhileStatement, .whilestatement=whilestatement});
+	}
+	static Statement* asReturnStatement(ReturnStatement *returnstatement) {
+		return new Statement({.type=StatementType::ReturnStatement, .returnstatement=returnstatement});
 	}
 };
 struct VarDeclaration {

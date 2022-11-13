@@ -232,7 +232,7 @@ void evaluate(IfStatement *ifStatement, Environment *environment) {
     bool result = isTruthy(evaluate(ifStatement->condition, environment));
     if (result) {
         evaluate(ifStatement->trueBlock, environment);
-    } else {
+    } else if (ifStatement->falseBlock != nullptr) {
         evaluate(ifStatement->falseBlock, environment);
     }
 }
@@ -242,6 +242,11 @@ void evaluate(WhileStatement *whileStatement, Environment *environment) {
         evaluate(whileStatement->block, environment);
     }
 }
+
+void evaluate(ReturnStatement *returnStatement, Environment *environment) {
+    LoxValue value = evaluate(returnStatement->expr, environment);
+    throw (LoxReturn) { value };
+}   
 
 void evaluate(Statement* statement, Environment *environment) {
     switch (statement->type) {
@@ -259,6 +264,9 @@ void evaluate(Statement* statement, Environment *environment) {
         break;
         case StatementType::WhileStatement:
             evaluate(statement->whilestatement, environment);
+        break;
+        case StatementType::ReturnStatement:
+            evaluate(statement->returnstatement, environment);
         break;
     }
 }

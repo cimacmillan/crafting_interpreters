@@ -19,6 +19,10 @@ struct LoxValue LoxFunction::call(std::vector<struct LoxValue> arguments) {
         env.defineVariable(name);
         env.setVariable(name, arguments[i]);
     }
-    evaluate(decl->block, &env);
+    try {
+        evaluate(decl->block, &env);
+    } catch (LoxReturn rtn) {
+        return rtn.value;
+    }
     return (LoxValue){.type = LoxValueType::NIL};
 }

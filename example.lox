@@ -1,16 +1,12 @@
-fun count() {
-    print x;
-    var count = 0;
-    fun increment() {
-        count = count + 1;
-        print count;
+fun fib(a) {
+    if (a <= 2) {
+        return 1;
     }
-    increment();
-    increment();
-    increment();
-    increment();
+    return fib(a - 1) + fib(a - 2);
 }
 
-var x = 10;
+var time = clock();
+print fib(27);
+var after = clock();
 
-count();
+prints((after - time) / 1000, " seconds to compute");

@@ -31,6 +31,7 @@ private:
     Statement* ifStatement();
     Statement* whileStatement();
     Statement* forStatement();
+    Statement* returnStatement();
     Expression* assignment();
     Expression* logicalOr();
     Expression* logicalAnd();

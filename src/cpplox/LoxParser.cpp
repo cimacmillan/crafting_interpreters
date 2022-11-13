@@ -397,6 +397,12 @@ Statement* CPPLox::LoxParser::forStatement() {
 
 }
 
+Statement* CPPLox::LoxParser::returnStatement() {
+    Expression* expr = this->expression();
+    this->consume(TokenType::SEMICOLON);
+    return Statement::asReturnStatement(new ReturnStatement({ expr }));
+}
+
 Statement* CPPLox::LoxParser::statement() {
     if (this->match(TokenType::PRINT)) {
         return this->printExpression();
@@ -412,6 +418,9 @@ Statement* CPPLox::LoxParser::statement() {
     }
     if (this->match(TokenType::FOR)) {
         return this->forStatement();
+    }
+    if (this->match(TokenType::RETURN)) {
+        return this->returnStatement();
     }
     return this->statementExpression();
 }

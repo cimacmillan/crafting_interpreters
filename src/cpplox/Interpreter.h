@@ -14,6 +14,10 @@ struct LoxRuntimeError {
     std::string message;
 };
 
+struct LoxReturn {
+    LoxValue value;
+};
+
 std::ostream & operator<<(std::ostream & os, const LoxRuntimeError & error);
 
 LoxValue evaluate(LiteralExpression* expr, Environment *env);
