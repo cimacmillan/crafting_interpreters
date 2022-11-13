@@ -1,5 +1,7 @@
 #include "Interpreter.h"
 #include "CPPLox.h"
+#include "LoxFunction.h"
+
 #include <string>
 #include <sstream>
 #include <stdlib.h>
@@ -89,6 +91,8 @@ bool isEqual(LoxValue a, LoxValue b) {
             return a.number == b.number;
         case LoxValueType::STRING:
             return *(a.str) == *(b.str);
+        case LoxValueType::CALLABLE:
+            return false;
     }
 }
 
@@ -192,7 +196,7 @@ LoxValue evaluate(CallExpression* expr, Environment *environment) {
     for (auto arg_expr : *(expr->arguments)) {
         values.push_back(evaluate(arg_expr, environment));
     }
-    return callee.callable->func(values);
+    return callee.callable->call(values);
 }
 
 LoxValue evaluate(Expression* expr, Environment *environment) {
@@ -274,6 +278,16 @@ void evaluate(StatementDeclaration* statementDeclaration, Environment *environme
     evaluate(statementDeclaration->statement, environment);
 }
 
+void evaluate(FunctionDeclaration* functionDeclaration, Environment *environment) {
+    // LoxCallable callable
+    auto function = new LoxFunction(functionDeclaration, new Environment(environment));
+    environment->defineVariable(functionDeclaration->identifier->lexeme);
+    environment->setVariable(functionDeclaration->identifier->lexeme, (LoxValue){
+        .type = LoxValueType::CALLABLE,
+        .callable = function
+    });
+}
+
 void evaluate(Declaration* declaration, Environment *environment) {
     switch (declaration->type) {
         case DeclarationType::VarDeclaration:
@@ -281,6 +295,9 @@ void evaluate(Declaration* declaration, Environment *environment) {
         break;
         case DeclarationType::StatementDeclaration:
             evaluate(declaration->statementdeclaration, environment);
+        break;
+        case DeclarationType::FunctionDeclaration:
+            evaluate(declaration->functiondeclaration, environment);
         break;
     }
 }

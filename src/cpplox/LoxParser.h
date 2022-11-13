@@ -43,6 +43,7 @@ private:
     Expression* call();
     Expression* primary();
     Declaration* var_declaration();
+    Declaration* function_declaration();
     Declaration* statement_declaration();
     Declaration* declaration();
 

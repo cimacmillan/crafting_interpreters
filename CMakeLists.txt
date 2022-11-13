@@ -14,12 +14,27 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # include_directories(${PROJECT_SOURCE_DIR})
 
-file(GLOB sources
-     "src/*.h"
-     "src/*.cpp"
-     "src/**/*.h"
-     "src/**/*.cpp"
+set(sources 
+    src/Main.cpp
+    src/FileUtils.cpp
+
+    src/cpplox/CPPLox.cpp
+    src/cpplox/Environment.cpp
+    src/cpplox/Expr.cpp
+    src/cpplox/Interpreter.cpp
+    src/cpplox/LoxParser.cpp
+    src/cpplox/LoxValue.cpp
+    src/cpplox/Token.cpp
+    src/cpplox/TokenScanner.cpp
+    src/cpplox/LoxFunction.cpp
 )
+
+# file(GLOB sources
+#      "src/*.h"
+#      "src/*.cpp"
+#      "src/**/*.h"
+#      "src/**/*.cpp"
+# )
 
 # Add SDL2 library
 find_package(SDL2 REQUIRED)

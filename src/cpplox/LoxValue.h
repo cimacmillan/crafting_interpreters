@@ -3,10 +3,12 @@
 #include <enum.h>
 #include <iostream>
 #include <vector>
+#include "ast/ast.h"
 
-struct LoxCallable 
+class LoxCallable 
 {
-    struct LoxValue (*func)(std::vector<struct LoxValue> arguments);
+public:
+    virtual struct LoxValue call(std::vector<struct LoxValue> arguments) = 0;
 };
 
 

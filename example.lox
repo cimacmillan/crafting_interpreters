@@ -1,1 +1,16 @@
-prints("hello", " world ", clock());
+fun count() {
+    print x;
+    var count = 0;
+    fun increment() {
+        count = count + 1;
+        print count;
+    }
+    increment();
+    increment();
+    increment();
+    increment();
+}
+
+var x = 10;
+
+count();

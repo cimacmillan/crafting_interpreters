@@ -459,9 +459,33 @@ Declaration* CPPLox::LoxParser::statement_declaration() {
     });
 }
 
+Declaration* CPPLox::LoxParser::function_declaration() {
+    this->consume(TokenType::IDENTIFIER);
+    Token *identifier = new Token(this->previous());
+    this->consume(TokenType::LEFT_PAREN);
+    auto args = new vector<Token*>();
+    if (!this->match(TokenType::RIGHT_PAREN)) {
+        do {
+            this->consume(TokenType::IDENTIFIER);
+            args->push_back(new Token(this->previous()));
+        } while (this->match(TokenType::COMMA));
+        this->consume(TokenType::RIGHT_PAREN);
+    }
+    this->consume(TokenType::LEFT_BRACE);
+    Statement *block = this->blockStatement();
+    return Declaration::asFunctionDeclaration(new FunctionDeclaration({
+        identifier,
+        args,
+        block
+    }));
+}
+
 Declaration* CPPLox::LoxParser::declaration() {
     if (match(TokenType::VAR)) {
         return this->var_declaration();
+    }
+    if (match(TokenType::FUN)) {
+        return this->function_declaration();
     }
     return this->statement_declaration();
 }

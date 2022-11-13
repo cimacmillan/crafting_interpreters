@@ -1,3 +1,5 @@
+#pragma once
+
 #include "LoxValue.h"
 #include "Token.h"
 

@@ -11,6 +11,7 @@
 #include "cpplox/Expr.h"
 #include "cpplox/LoxParser.h"
 #include "cpplox/Interpreter.h"
+#include "cpplox/LoxFunction.h"
 
 
 using namespace std;
@@ -88,16 +89,12 @@ Environment createDefaultEnvironment() {
     env.defineVariable("clock");
     env.setVariable("clock", (LoxValue){
         .type= +LoxValueType::CALLABLE,
-        .callable=new LoxCallable({ 
-            .func = clock
-        })
+        .callable=new LoxNativeFunction(clock)
     });
     env.defineVariable("prints");
     env.setVariable("prints", (LoxValue) {
         .type= +LoxValueType::CALLABLE,
-        .callable=new LoxCallable({
-            .func = prints
-        })
+        .callable=new LoxNativeFunction(prints)
     });
     return env;
 }
