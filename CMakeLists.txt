@@ -27,6 +27,7 @@ set(sources
     src/cpplox/Token.cpp
     src/cpplox/TokenScanner.cpp
     src/cpplox/LoxFunction.cpp
+    src/cpplox/Analyzer.cpp
 )
 
 # file(GLOB sources

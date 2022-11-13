@@ -171,68 +171,85 @@ struct LoxProgram {
 };
 class AstVisitor {
 public:
-	virtual void visit(BinaryExpression *entry) = 0;
-	virtual void visit(GroupingExpression *entry) = 0;
-	virtual void visit(UnaryExpression *entry) = 0;
-	virtual void visit(LiteralExpression *entry) = 0;
-	virtual void visit(VariableExpression *entry) = 0;
-	virtual void visit(LogicalExpression *entry) = 0;
-	virtual void visit(AssignExpression *entry) = 0;
-	virtual void visit(CallExpression *entry) = 0;
+	void visit(BinaryExpression *entry);
+	void visit(GroupingExpression *entry);
+	void visit(UnaryExpression *entry);
+	void visit(LiteralExpression *entry);
+	void visit(VariableExpression *entry);
+	void visit(LogicalExpression *entry);
+	void visit(AssignExpression *entry);
+	void visit(CallExpression *entry);
 	void visit(Expression *entry) {
 		switch(entry->type) {
 			case ExpressionType::BinaryExpression:
-				return this->visit(entry);
+				this->visit(entry->binaryexpression);
+				break;
 			case ExpressionType::GroupingExpression:
-				return this->visit(entry);
+				this->visit(entry->groupingexpression);
+				break;
 			case ExpressionType::UnaryExpression:
-				return this->visit(entry);
+				this->visit(entry->unaryexpression);
+				break;
 			case ExpressionType::LiteralExpression:
-				return this->visit(entry);
+				this->visit(entry->literalexpression);
+				break;
 			case ExpressionType::VariableExpression:
-				return this->visit(entry);
+				this->visit(entry->variableexpression);
+				break;
 			case ExpressionType::AssignExpression:
-				return this->visit(entry);
+				this->visit(entry->assignexpression);
+				break;
 			case ExpressionType::LogicalExpression:
-				return this->visit(entry);
+				this->visit(entry->logicalexpression);
+				break;
 			case ExpressionType::CallExpression:
-				return this->visit(entry);
+				this->visit(entry->callexpression);
+				break;
 		}
 	}
-	virtual void visit(ExpressionStatement *entry) = 0;
-	virtual void visit(PrintStatement *entry) = 0;
-	virtual void visit(BlockStatement *entry) = 0;
-	virtual void visit(IfStatement *entry) = 0;
-	virtual void visit(WhileStatement *entry) = 0;
-	virtual void visit(ReturnStatement *entry) = 0;
+	void visit(ExpressionStatement *entry);
+	void visit(PrintStatement *entry);
+	void visit(BlockStatement *entry);
+	void visit(IfStatement *entry);
+	void visit(WhileStatement *entry);
+	void visit(ReturnStatement *entry);
 	void visit(Statement *entry) {
 		switch(entry->type) {
 			case StatementType::ExpressionStatement:
-				return this->visit(entry);
+				this->visit(entry->expressionstatement);
+				break;
 			case StatementType::PrintStatement:
-				return this->visit(entry);
+				this->visit(entry->printstatement);
+				break;
 			case StatementType::BlockStatement:
-				return this->visit(entry);
+				this->visit(entry->blockstatement);
+				break;
 			case StatementType::IfStatement:
-				return this->visit(entry);
+				this->visit(entry->ifstatement);
+				break;
 			case StatementType::WhileStatement:
-				return this->visit(entry);
+				this->visit(entry->whilestatement);
+				break;
 			case StatementType::ReturnStatement:
-				return this->visit(entry);
+				this->visit(entry->returnstatement);
+				break;
 		}
 	}
-	virtual void visit(VarDeclaration *entry) = 0;
-	virtual void visit(StatementDeclaration *entry) = 0;
-	virtual void visit(FunctionDeclaration *entry) = 0;
+	void visit(VarDeclaration *entry);
+	void visit(StatementDeclaration *entry);
+	void visit(FunctionDeclaration *entry);
 	void visit(Declaration *entry) {
 		switch(entry->type) {
 			case DeclarationType::VarDeclaration:
-				return this->visit(entry);
+				this->visit(entry->vardeclaration);
+				break;
 			case DeclarationType::StatementDeclaration:
-				return this->visit(entry);
+				this->visit(entry->statementdeclaration);
+				break;
 			case DeclarationType::FunctionDeclaration:
-				return this->visit(entry);
+				this->visit(entry->functiondeclaration);
+				break;
 		}
 	}
-	virtual void visit(LoxProgram *entry) = 0;
+	void visit(LoxProgram *entry);
 };

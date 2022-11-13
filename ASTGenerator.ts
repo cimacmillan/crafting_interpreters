@@ -250,7 +250,7 @@ function outputEntry(ast: AST, entry: AstEntry) {
 }
 
 function outputVisitorMember(ast: AST, entry: MemberAstEntry) {
-    return `\tvirtual void visit(${entry.name} *entry) = 0;\n`
+    return `\tvoid visit(${entry.name} *entry);\n`
 }
 
 function outputVisitorUnion(ast: AST, entry: UnionAstEntry) {
@@ -259,7 +259,8 @@ function outputVisitorUnion(ast: AST, entry: UnionAstEntry) {
     cpp += `\t\tswitch(entry->type) {\n`
     for (let name of entry.union) {
         cpp += `\t\t\tcase ${entry.name}Type::${name}:\n`
-        cpp += `\t\t\t\treturn this->visit(entry);\n`
+        cpp += `\t\t\t\tthis->visit(entry->${name.toLowerCase()});\n`
+        cpp += `\t\t\t\tbreak;\n`
     }
     cpp += `\t\t}\n`
     cpp += `\t}\n`;

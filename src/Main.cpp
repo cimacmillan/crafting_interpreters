@@ -12,6 +12,7 @@
 #include "cpplox/LoxParser.h"
 #include "cpplox/Interpreter.h"
 #include "cpplox/LoxFunction.h"
+#include "cpplox/Analyzer.h"
 
 
 using namespace std;
@@ -35,9 +36,11 @@ int run(string source, Environment env) {
     vector<Token> tokens = tokenScanner.scanTokens();
     CPPLox::LoxParser parser(tokens);
     LoxProgram program = parser.parse();
-
+    CPPLox::Interpreter interpreter(program, env);
+    Analyzer analyzer(&interpreter);
+    analyzer.visit(&program);
     try {
-        CPPLox::Interpreter interpreter(program, env);
+
         interpreter.run();
     } catch (LoxRuntimeError error) {
         cout << error << endl;

@@ -38,6 +38,7 @@ private:
 public:
     Interpreter(LoxProgram program, Environment env): program(program), environment(env) {}
     void run();
+    void setVariableHops(Expression* expr, int hops);
 
 };
 };
