@@ -1,8 +1,11 @@
 #include "Analyzer.h"
 #include "CPPLox.h"
 
-void Analyzer::declare(std::string lexeme) {
-    this->scopes.back()[lexeme] = true;
+void Analyzer::declare(Token token) {
+    if (this->scopes.back().find(token.lexeme) != this->scopes.back().end()) {
+        CPPLox::fatal_token(token, "cannot redefine variable");
+    }
+    this->scopes.back()[token.lexeme] = true;
 }
 
 void Analyzer::resolve(VariableExpression *expr) {
@@ -53,8 +56,8 @@ void Analyzer::visit(ExpressionStatement *entry) {
 void Analyzer::visit(PrintStatement *entry) {
     this->visit(entry->expr);
 }
-void Analyzer::visit(BlockStatement *entry) {
-    this->scopes.push_back({});
+void Analyzer::visit(BlockStatement *entry, std::unordered_map<string, bool> args) {
+    this->scopes.push_back(args);
     auto blocks = *(entry->block);
     for (auto block : blocks) {
         this->visit(block);
@@ -73,6 +76,9 @@ void Analyzer::visit(WhileStatement *entry) {
     this->visit(entry->block);
 }
 void Analyzer::visit(ReturnStatement *entry) {
+    if (this->funcType == FunctionType::NONE) {
+        CPPLox::fatal(0, "Cannot return outside of function");
+    }
     if (entry->expr) {
         this->visit(entry->expr);
     }
@@ -82,19 +88,22 @@ void Analyzer::visit(VarDeclaration *entry) {
     if (entry->expr) {
         this->visit(entry->expr);
     }
-    this->declare(name);
+    this->declare(*(entry->identifier));
 }
 void Analyzer::visit(StatementDeclaration *entry) {
     this->visit(entry->statement);
 }
 void Analyzer::visit(FunctionDeclaration *entry) {
     std::string name = entry->identifier->lexeme;
-    this->declare(name);
+    this->declare(*(entry->identifier));
     auto scope = std::unordered_map<string, bool>();
     for (auto token : *(entry->argIdentifiers)) {
         scope[token->lexeme] = true;
     }
-    this->visit(entry->block);
+    auto temp = this->funcType;
+    this->funcType = FunctionType::FUNCTION;
+    this->visit(entry->block->blockstatement, scope);
+    this->funcType = temp;
 }
 void Analyzer::visit(LoxProgram *entry) {
     auto global = std::unordered_map<std::string, bool>();

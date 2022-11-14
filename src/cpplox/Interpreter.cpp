@@ -255,8 +255,12 @@ void evaluate(WhileStatement *whileStatement, CPPLox::Interpreter *environment) 
 }
 
 void evaluate(ReturnStatement *returnStatement, CPPLox::Interpreter *environment) {
-    LoxValue value = evaluate(returnStatement->expr, environment);
-    throw (LoxReturn) { value };
+    if (returnStatement->expr != nullptr) {
+        LoxValue value = evaluate(returnStatement->expr, environment);
+        throw (LoxReturn) { value };
+    } else {
+        throw (LoxReturn) { {.type=LoxValueType::NIL} };
+    }
 }   
 
 void evaluate(Statement* statement, CPPLox::Interpreter *environment) {

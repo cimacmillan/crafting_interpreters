@@ -398,8 +398,11 @@ Statement* CPPLox::LoxParser::forStatement() {
 }
 
 Statement* CPPLox::LoxParser::returnStatement() {
-    Expression* expr = this->expression();
-    this->consume(TokenType::SEMICOLON);
+    Expression* expr = nullptr;
+    if (!this->match(TokenType::SEMICOLON)) {
+        expr = this->expression();
+        this->consume(TokenType::SEMICOLON);
+    }
     return Statement::asReturnStatement(new ReturnStatement({ expr }));
 }
 

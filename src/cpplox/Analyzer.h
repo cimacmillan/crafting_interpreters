@@ -7,13 +7,19 @@
 #include <string>
 #include <stack>
 
+enum FunctionType {
+	NONE = 0,
+	FUNCTION
+};
+
 class Analyzer {
 private:
     CPPLox::Interpreter *interpreter;
     std::vector<std::unordered_map<std::string, bool>> scopes;
+	FunctionType funcType;
 
 public:
-    Analyzer(CPPLox::Interpreter *interpreter): interpreter(interpreter) {}
+    Analyzer(CPPLox::Interpreter *interpreter): interpreter(interpreter), funcType(FunctionType::NONE) {}
 		void visit(BinaryExpression *entry);
 	void visit(GroupingExpression *entry);
 	void visit(UnaryExpression *entry);
@@ -52,7 +58,7 @@ public:
 	}
 	void visit(ExpressionStatement *entry);
 	void visit(PrintStatement *entry);
-	void visit(BlockStatement *entry);
+	void visit(BlockStatement *entry, std::unordered_map<string, bool> args);
 	void visit(IfStatement *entry);
 	void visit(WhileStatement *entry);
 	void visit(ReturnStatement *entry);
@@ -65,7 +71,7 @@ public:
 				this->visit(entry->printstatement);
 				break;
 			case StatementType::BlockStatement:
-				this->visit(entry->blockstatement);
+				this->visit(entry->blockstatement, {});
 				break;
 			case StatementType::IfStatement:
 				this->visit(entry->ifstatement);
@@ -97,6 +103,6 @@ public:
 	void visit(LoxProgram *entry);
 
 
-	void declare(std::string lexeme);
+	void declare(Token lexeme);
 	void resolve(VariableExpression* expr);
 };
