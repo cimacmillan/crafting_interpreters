@@ -13,6 +13,14 @@ void runtimeError(std::string message) {
     throw LoxRuntimeError({ .message=message });
 }
 
+void CPPLox::Interpreter::setVariableHops(VariableExpression* expr, int hops) {
+    this->variable_hops[expr] = hops;
+}
+
+int CPPLox::Interpreter::getVariableHops(VariableExpression* expr) {
+    return this->variable_hops[expr];
+}
+
 std::ostream & operator<<(std::ostream & os, const LoxRuntimeError & error) {
     os << "LoxRuntimeError: " << error.message;
     return os;
@@ -22,8 +30,8 @@ double parseNumber(std::string lexeme) {
     return atof(lexeme.c_str());
 }
 
-LoxValue evaluate(VariableExpression* expr, Environment *env) {
-    auto value = env->getVariable(*(expr->variable));
+LoxValue evaluate(VariableExpression* expr, CPPLox::Interpreter *env) {
+    auto value = env->currentEnv->getVariable(*(expr->variable), env->getVariableHops(expr));
     if (!value.has_value()) {
         std::stringstream ss;
         ss << "Variable " << expr->variable->lexeme << " is not defined";
@@ -32,7 +40,7 @@ LoxValue evaluate(VariableExpression* expr, Environment *env) {
     return value.value();
 }
 
-LoxValue evaluate(LiteralExpression* expr, Environment *env) {
+LoxValue evaluate(LiteralExpression* expr, CPPLox::Interpreter *env) {
     switch(expr->literal->type) {
         case +TokenType::NUMBER:
             return { .type=LoxValueType::NUMBER, .number=parseNumber(expr->literal->lexeme)};
@@ -51,7 +59,7 @@ LoxValue evaluate(LiteralExpression* expr, Environment *env) {
     return (LoxValue){ .type = LoxValueType::NIL };
 }
 
-LoxValue evaluate(GroupingExpression* expr, Environment *environment) {
+LoxValue evaluate(GroupingExpression* expr, CPPLox::Interpreter *environment) {
     return evaluate(expr->grouped, environment);
 }
 
@@ -61,7 +69,7 @@ bool isTruthy(LoxValue value) {
     return true;
 }
 
-LoxValue evaluate(UnaryExpression* expr, Environment *environment) {
+LoxValue evaluate(UnaryExpression* expr, CPPLox::Interpreter *environment) {
     LoxValue value = evaluate(expr->expression, environment);
     if (expr->unary->type == +TokenType::MINUS) {
         if (value.type == +LoxValueType::NUMBER) {
@@ -96,7 +104,7 @@ bool isEqual(LoxValue a, LoxValue b) {
     }
 }
 
-LoxValue evaluate(BinaryExpression* expr, Environment *environment) {
+LoxValue evaluate(BinaryExpression* expr, CPPLox::Interpreter *environment) {
     LoxValue left = evaluate(expr->left, environment);
     LoxValue right = evaluate(expr->right, environment);
     switch (expr->op->type) {
@@ -157,9 +165,9 @@ LoxValue evaluate(BinaryExpression* expr, Environment *environment) {
     return (LoxValue){.type=LoxValueType::NIL};
 }
 
-LoxValue evaluate(AssignExpression* expr, Environment *env) {
+LoxValue evaluate(AssignExpression* expr, CPPLox::Interpreter *env) {
     LoxValue value = evaluate(expr->value, env);
-    if(!env->setVariable(expr->variable->lexeme, value)) {
+    if(!env->currentEnv->setVariable(expr->variable->lexeme, value)) {
         stringstream ss;
         ss << "Variable " << (expr->variable->lexeme) << " is undefined";
         runtimeError(ss.str());
@@ -167,7 +175,7 @@ LoxValue evaluate(AssignExpression* expr, Environment *env) {
     return value;
 }
 
-LoxValue evaluate(LogicalExpression* expr, Environment *env) {
+LoxValue evaluate(LogicalExpression* expr, CPPLox::Interpreter *env) {
     LoxValue left = evaluate(expr->left, env);
 
     if (expr->op->type == +TokenType::OR) {
@@ -183,7 +191,7 @@ LoxValue evaluate(LogicalExpression* expr, Environment *env) {
     return evaluate(expr->right, env);
 }
 
-LoxValue evaluate(CallExpression* expr, Environment *environment) {
+LoxValue evaluate(CallExpression* expr, CPPLox::Interpreter *environment) {
     LoxValue callee = evaluate(expr->callee, environment);
     if (callee.type != +LoxValueType::CALLABLE) {
         stringstream ss;
@@ -199,7 +207,7 @@ LoxValue evaluate(CallExpression* expr, Environment *environment) {
     return callee.callable->call(values);
 }
 
-LoxValue evaluate(Expression* expr, Environment *environment) {
+LoxValue evaluate(Expression* expr, CPPLox::Interpreter *environment) {
     switch (expr->type) {
         case ExpressionType::LiteralExpression:
             return evaluate(expr->literalexpression, environment);
@@ -221,14 +229,17 @@ LoxValue evaluate(Expression* expr, Environment *environment) {
     runtimeError("Unknown expression type");
 }
 
-void evaluate(BlockStatement *block, Environment *environment) {
-    Environment child(environment);
+void evaluate(BlockStatement *block, CPPLox::Interpreter *environment, std::unordered_map<std::string, LoxValue> args) {
+    Environment child(environment->currentEnv, args);
+    auto temp = environment->currentEnv; 
+    environment->currentEnv = &child;
     for (auto statement : *(block->block)) {
-        evaluate(statement, &child);
+        evaluate(statement, environment);
     }
+    environment->currentEnv = temp;
 }
 
-void evaluate(IfStatement *ifStatement, Environment *environment) {
+void evaluate(IfStatement *ifStatement, CPPLox::Interpreter *environment) {
     bool result = isTruthy(evaluate(ifStatement->condition, environment));
     if (result) {
         evaluate(ifStatement->trueBlock, environment);
@@ -237,18 +248,18 @@ void evaluate(IfStatement *ifStatement, Environment *environment) {
     }
 }
 
-void evaluate(WhileStatement *whileStatement, Environment *environment) {
+void evaluate(WhileStatement *whileStatement, CPPLox::Interpreter *environment) {
     while (isTruthy(evaluate(whileStatement->condition, environment))) {
         evaluate(whileStatement->block, environment);
     }
 }
 
-void evaluate(ReturnStatement *returnStatement, Environment *environment) {
+void evaluate(ReturnStatement *returnStatement, CPPLox::Interpreter *environment) {
     LoxValue value = evaluate(returnStatement->expr, environment);
     throw (LoxReturn) { value };
 }   
 
-void evaluate(Statement* statement, Environment *environment) {
+void evaluate(Statement* statement, CPPLox::Interpreter *environment) {
     switch (statement->type) {
         case StatementType::ExpressionStatement:
             evaluate(statement->expressionstatement->expr, environment);
@@ -257,7 +268,7 @@ void evaluate(Statement* statement, Environment *environment) {
             cout << evaluate(statement->printstatement->expr, environment) << endl;
         break;
         case StatementType::BlockStatement:
-            evaluate(statement->blockstatement, environment);
+            evaluate(statement->blockstatement, environment, {});
         break;
         case StatementType::IfStatement:
             evaluate(statement->ifstatement, environment);
@@ -271,32 +282,32 @@ void evaluate(Statement* statement, Environment *environment) {
     }
 }
 
-void evaluate(VarDeclaration* varDeclaration, Environment *environment) {
+void evaluate(VarDeclaration* varDeclaration, CPPLox::Interpreter *environment) {
     LoxValue evaluated = varDeclaration->expr == nullptr ? (LoxValue){.type = LoxValueType::NIL} : evaluate(varDeclaration->expr, environment);
-    auto defineResult = environment->defineVariable(varDeclaration->identifier->lexeme);
+    auto defineResult = environment->currentEnv->defineVariable(varDeclaration->identifier->lexeme);
     if (!defineResult) {
         std::stringstream error;
         error << "Variable " << varDeclaration->identifier->lexeme << " is already defined";
         runtimeError(error.str());
     }
-    environment->setVariable(varDeclaration->identifier->lexeme, evaluated);
+    environment->currentEnv->setVariable(varDeclaration->identifier->lexeme, evaluated);
 }
 
-void evaluate(StatementDeclaration* statementDeclaration, Environment *environment) {
+void evaluate(StatementDeclaration* statementDeclaration, CPPLox::Interpreter *environment) {
     evaluate(statementDeclaration->statement, environment);
 }
 
-void evaluate(FunctionDeclaration* functionDeclaration, Environment *environment) {
+void evaluate(FunctionDeclaration* functionDeclaration, CPPLox::Interpreter *environment) {
     // LoxCallable callable
-    auto function = new LoxFunction(functionDeclaration, new Environment(environment));
-    environment->defineVariable(functionDeclaration->identifier->lexeme);
-    environment->setVariable(functionDeclaration->identifier->lexeme, (LoxValue){
+    auto function = new LoxFunction(functionDeclaration, environment->currentEnv, environment);
+    environment->currentEnv->defineVariable(functionDeclaration->identifier->lexeme);
+    environment->currentEnv->setVariable(functionDeclaration->identifier->lexeme, (LoxValue){
         .type = LoxValueType::CALLABLE,
         .callable = function
     });
 }
 
-void evaluate(Declaration* declaration, Environment *environment) {
+void evaluate(Declaration* declaration, CPPLox::Interpreter *environment) {
     switch (declaration->type) {
         case DeclarationType::VarDeclaration:
             evaluate(declaration->vardeclaration, environment);
@@ -311,8 +322,9 @@ void evaluate(Declaration* declaration, Environment *environment) {
 }
 
 void CPPLox::Interpreter::run() {
+    this->currentEnv = &(this->environment);
     for (Declaration* declaration : *(this->program.program)) {
-        evaluate(declaration, &(this->environment));
+        evaluate(declaration, this);
     }
 }
 

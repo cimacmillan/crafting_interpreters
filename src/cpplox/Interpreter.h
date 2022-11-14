@@ -7,6 +7,7 @@
 #include <enum.h>
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 using namespace std;
 
@@ -20,26 +21,31 @@ struct LoxReturn {
 
 std::ostream & operator<<(std::ostream & os, const LoxRuntimeError & error);
 
-LoxValue evaluate(LiteralExpression* expr, Environment *env);
-LoxValue evaluate(GroupingExpression* expr, Environment *env);
-LoxValue evaluate(UnaryExpression* expr, Environment *env);
-LoxValue evaluate(BinaryExpression* expr, Environment *env);
-LoxValue evaluate(VariableExpression* expr, Environment *env);
-LoxValue evaluate(Expression* expr, Environment *env);
-void evaluate(Statement* declaration, Environment *environment);
-void evaluate(Declaration* declaration, Environment *environment);
-
 namespace CPPLox {
 class Interpreter {
-private:
+public:
     LoxProgram program;
     Environment environment;
+    Environment *currentEnv;
+    std::unordered_map<VariableExpression*, int> variable_hops;
 
 public:
     Interpreter(LoxProgram program, Environment env): program(program), environment(env) {}
     void run();
-    void setVariableHops(Expression* expr, int hops);
+    void setVariableHops(VariableExpression* expr, int hops);
+    int getVariableHops(VariableExpression* expr);
 
 };
 };
+
+LoxValue evaluate(LiteralExpression* expr, CPPLox::Interpreter *env);
+LoxValue evaluate(GroupingExpression* expr, CPPLox::Interpreter *env);
+LoxValue evaluate(UnaryExpression* expr, CPPLox::Interpreter *env);
+LoxValue evaluate(BinaryExpression* expr, CPPLox::Interpreter *env);
+LoxValue evaluate(VariableExpression* expr, CPPLox::Interpreter *env);
+LoxValue evaluate(Expression* expr, CPPLox::Interpreter *env);
+void evaluate(BlockStatement *block, CPPLox::Interpreter *environment, std::unordered_map<std::string, LoxValue> args);
+void evaluate(Statement* declaration, CPPLox::Interpreter *environment);
+void evaluate(Declaration* declaration, CPPLox::Interpreter *environment);
+
 

@@ -88,7 +88,7 @@ LoxValue prints(vector<LoxValue> args) {
 }
 
 Environment createDefaultEnvironment() {
-    Environment env(nullptr);
+    Environment env(nullptr, {});
     env.defineVariable("clock");
     env.setVariable("clock", (LoxValue){
         .type= +LoxValueType::CALLABLE,

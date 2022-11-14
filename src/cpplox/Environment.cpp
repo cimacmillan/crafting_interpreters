@@ -1,4 +1,5 @@
 #include "Environment.h"
+#include "CPPLox.h"
 
 #include <iostream>
 #include <string>
@@ -31,10 +32,16 @@ bool Environment::setVariable(std::string lexeme, LoxValue value) {
     return true;
 }
 
-std::optional<LoxValue> Environment::getVariable(Token token) {
+std::optional<LoxValue> Environment::getVariable(Token token, int hops) {
+    if (hops > 0) {
+        if (this->parent == nullptr) {
+            CPPLox::fatal_token(token, "Interpreter error, failed to locate parent environment");
+        }
+        return this->parent->getVariable(token, hops-1);
+    }
     if (this->variables.find(token.lexeme) == this->variables.end()) {
         if (this->parent) {
-            return this->parent->getVariable(token);
+            return this->parent->getVariable(token, 0);
         }
         return std::nullopt;
     }

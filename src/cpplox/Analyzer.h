@@ -10,7 +10,7 @@
 class Analyzer {
 private:
     CPPLox::Interpreter *interpreter;
-    std::stack<std::unordered_map<std::string, bool>> scopes;
+    std::vector<std::unordered_map<std::string, bool>> scopes;
 
 public:
     Analyzer(CPPLox::Interpreter *interpreter): interpreter(interpreter) {}
@@ -95,4 +95,8 @@ public:
 		}
 	}
 	void visit(LoxProgram *entry);
+
+
+	void declare(std::string lexeme);
+	void resolve(VariableExpression* expr);
 };

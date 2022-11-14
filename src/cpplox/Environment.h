@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <string>
 #include <optional>
+#include <iostream>
 
 class Environment {
 private:
@@ -13,10 +14,10 @@ private:
     Environment *parent;
 
 public:
-    Environment(Environment *parent) : parent(parent) {}
+    Environment(Environment *parent, std::unordered_map<std::string, LoxValue> args) : parent(parent), variables(args) {}
     bool defineVariable(std::string lexeme);
     bool setVariable(std::string lexeme, LoxValue value);
-    std::optional<LoxValue> getVariable(Token token);
+    std::optional<LoxValue> getVariable(Token token, int hops);
     void print();
 
 };

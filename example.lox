@@ -1,13 +1,19 @@
+var a = "global";
+{
+  fun showA() {
+    print a;
+  }
 
-var test = "hello";
+  for (var i = 0; i < 10; i = i + 1) {
+    print a;
+  }
 
-fun a() {
-    fun b() {
-        print test;
-    }   
-    b();
-    var test = "goodbye";
-    b();
+  showA();
+  var a = "block";
+  showA();
+
+
+  for (var i = 0; i < 10; i = i + 1) {
+    print a;
+  }
 }
-
-a();
