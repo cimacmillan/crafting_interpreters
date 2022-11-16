@@ -492,12 +492,33 @@ Declaration* CPPLox::LoxParser::function_declaration() {
     }));
 }
 
+Declaration* CPPLox::LoxParser::class_declaration() {
+    this->consume(TokenType::IDENTIFIER);
+    Token *identifier = new Token(this->previous());
+    this->consume(TokenType::LEFT_BRACE);
+
+    auto methods = new std::vector<FunctionDeclaration*>();
+
+    while (!this->match(TokenType::RIGHT_BRACE)) {
+        this->consume(TokenType::FUN);
+        methods->push_back(this->function_declaration()->functiondeclaration);
+    }
+
+    return Declaration::asClassDeclaration(new ClassDeclaration({
+        identifier,
+        methods
+    }));
+}
+
 Declaration* CPPLox::LoxParser::declaration() {
     if (match(TokenType::VAR)) {
         return this->var_declaration();
     }
     if (match(TokenType::FUN)) {
         return this->function_declaration();
+    }
+    if (match(TokenType::CLASS)) {
+        return this->class_declaration();
     }
     return this->statement_declaration();
 }

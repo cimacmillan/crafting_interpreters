@@ -17,6 +17,12 @@ std::ostream & operator<<(std::ostream & os, const LoxValue & value) {
         case LoxValueType::NIL:
             os << "nil";
             break;
+        case LoxValueType::CALLABLE:
+            os << value.callable->to_string();
+            break;
+        case LoxValueType::INSTANCE:
+            os << value.instance->to_string();
+            break;
     }
     return os;
 }

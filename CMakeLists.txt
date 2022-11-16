@@ -27,6 +27,8 @@ set(sources
     src/cpplox/Token.cpp
     src/cpplox/TokenScanner.cpp
     src/cpplox/LoxFunction.cpp
+    src/cpplox/LoxInstance.cpp
+    src/cpplox/LoxClass.cpp
     src/cpplox/Analyzer.cpp
 )
 

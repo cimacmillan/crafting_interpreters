@@ -3,16 +3,13 @@
 #include <enum.h>
 #include <iostream>
 #include <vector>
+#include <string>
+
 #include "ast/ast.h"
+#include "LoxInstance.h"
+#include "LoxCallable.h"
 
-class LoxCallable 
-{
-public:
-    virtual struct LoxValue call(std::vector<struct LoxValue> arguments) = 0;
-};
-
-
-BETTER_ENUM(LoxValueType, char, NUMBER, STRING, BOOLEAN, NIL, CALLABLE);
+BETTER_ENUM(LoxValueType, char, NUMBER, STRING, BOOLEAN, NIL, CALLABLE, INSTANCE);
 
 struct LoxValue {
     LoxValueType type;
@@ -21,6 +18,7 @@ struct LoxValue {
         std::string *str;
         bool boolean;
         LoxCallable *callable;
+        LoxInstance *instance;
     };
 };
 

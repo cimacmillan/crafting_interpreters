@@ -1,14 +1,21 @@
+#include "sstream"
+
 #include "LoxValue.h"
 #include "Environment.h"
 #include "Interpreter.h"
 #include "LoxFunction.h"
 
-LoxNativeFunction::LoxNativeFunction(struct LoxValue (*func)(std::vector<struct LoxValue> arguments)): func(func) {}
+LoxNativeFunction::LoxNativeFunction(struct LoxValue (*func)(std::vector<struct LoxValue> arguments), std::string signature): func(func), signature(signature) {}
+
+std::string LoxNativeFunction::to_string() {
+    return this->signature;
+}
+
 LoxValue LoxNativeFunction::call(std::vector<struct LoxValue> arguments) {
     return this->func(arguments);
 }
 
-LoxFunction::LoxFunction(FunctionDeclaration *decl, Environment *scope, CPPLox::Interpreter *env): decl(decl), scope(scope), env(env) {
+LoxFunction::LoxFunction(FunctionDeclaration *decl, Environment *scope, Interpreter *env): decl(decl), scope(scope), env(env) {
 
 }
 struct LoxValue LoxFunction::call(std::vector<struct LoxValue> arguments) {
@@ -28,4 +35,21 @@ struct LoxValue LoxFunction::call(std::vector<struct LoxValue> arguments) {
         return rtn.value;
     }
     return (LoxValue){.type = LoxValueType::NIL};
+}
+
+std::string LoxFunction::to_string() {
+    stringstream ss;
+    ss << "fun ";
+    ss << this->decl->identifier->lexeme;
+    ss << "(";
+    bool c_sw = false;
+    for (auto ident : *(this->decl->argIdentifiers)) {
+        if (!c_sw) {
+            ss << ",";
+            c_sw = true;
+        }
+        ss << ident->lexeme;
+    }
+    ss << ")";
+    return ss.str();
 }

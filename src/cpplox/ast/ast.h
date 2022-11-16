@@ -148,13 +148,18 @@ struct FunctionDeclaration {
 	struct vector<Token*> *argIdentifiers;
 	struct Statement *block;
 };
-BETTER_ENUM(DeclarationType, char, VarDeclaration,StatementDeclaration,FunctionDeclaration);
+struct ClassDeclaration {
+	struct Token *identifier;
+	struct vector<FunctionDeclaration*> *methods;
+};
+BETTER_ENUM(DeclarationType, char, VarDeclaration,StatementDeclaration,FunctionDeclaration,ClassDeclaration);
 struct Declaration {
 	DeclarationType type;
 	union {
 		VarDeclaration *vardeclaration;
 		StatementDeclaration *statementdeclaration;
 		FunctionDeclaration *functiondeclaration;
+		ClassDeclaration *classdeclaration;
 	};
 	static Declaration* asVarDeclaration(VarDeclaration *vardeclaration) {
 		return new Declaration({.type=DeclarationType::VarDeclaration, .vardeclaration=vardeclaration});
@@ -164,6 +169,9 @@ struct Declaration {
 	}
 	static Declaration* asFunctionDeclaration(FunctionDeclaration *functiondeclaration) {
 		return new Declaration({.type=DeclarationType::FunctionDeclaration, .functiondeclaration=functiondeclaration});
+	}
+	static Declaration* asClassDeclaration(ClassDeclaration *classdeclaration) {
+		return new Declaration({.type=DeclarationType::ClassDeclaration, .classdeclaration=classdeclaration});
 	}
 };
 struct LoxProgram {
@@ -238,6 +246,7 @@ public:
 	void visit(VarDeclaration *entry);
 	void visit(StatementDeclaration *entry);
 	void visit(FunctionDeclaration *entry);
+	void visit(ClassDeclaration *entry);
 	void visit(Declaration *entry) {
 		switch(entry->type) {
 			case DeclarationType::VarDeclaration:
@@ -248,6 +257,9 @@ public:
 				break;
 			case DeclarationType::FunctionDeclaration:
 				this->visit(entry->functiondeclaration);
+				break;
+			case DeclarationType::ClassDeclaration:
+				this->visit(entry->classdeclaration);
 				break;
 		}
 	}

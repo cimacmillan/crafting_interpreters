@@ -36,7 +36,7 @@ int run(string source, Environment env) {
     vector<Token> tokens = tokenScanner.scanTokens();
     CPPLox::LoxParser parser(tokens);
     LoxProgram program = parser.parse();
-    CPPLox::Interpreter interpreter(program, env);
+    Interpreter interpreter(program, env);
     Analyzer analyzer(&interpreter);
     analyzer.visit(&program);
     try {
@@ -92,12 +92,12 @@ Environment createDefaultEnvironment() {
     env.defineVariable("clock");
     env.setVariable("clock", (LoxValue){
         .type= +LoxValueType::CALLABLE,
-        .callable=new LoxNativeFunction(clock)
+        .callable=new LoxNativeFunction(clock, "fun clock()")
     });
     env.defineVariable("prints");
     env.setVariable("prints", (LoxValue) {
         .type= +LoxValueType::CALLABLE,
-        .callable=new LoxNativeFunction(prints)
+        .callable=new LoxNativeFunction(prints, "fun prints(args...)")
     });
     return env;
 }

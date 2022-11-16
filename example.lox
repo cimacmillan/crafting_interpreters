@@ -1,5 +1,11 @@
-fun add(a, b) {
-    return a + b;
+class Dog {
+    fun woof() {
+        print "woof";
+    }
 }
 
-print add(10, 20);
+print Dog;
+
+var x = Dog();
+
+print x;

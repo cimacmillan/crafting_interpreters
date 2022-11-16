@@ -45,6 +45,7 @@ private:
     Expression* primary();
     Declaration* var_declaration();
     Declaration* function_declaration();
+    Declaration* class_declaration();
     Declaration* statement_declaration();
     Declaration* declaration();
 

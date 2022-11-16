@@ -14,12 +14,12 @@ enum FunctionType {
 
 class Analyzer {
 private:
-    CPPLox::Interpreter *interpreter;
+    Interpreter *interpreter;
     std::vector<std::unordered_map<std::string, bool>> scopes;
 	FunctionType funcType;
 
 public:
-    Analyzer(CPPLox::Interpreter *interpreter): interpreter(interpreter), funcType(FunctionType::NONE) {}
+    Analyzer(Interpreter *interpreter): interpreter(interpreter), funcType(FunctionType::NONE) {}
 		void visit(BinaryExpression *entry);
 	void visit(GroupingExpression *entry);
 	void visit(UnaryExpression *entry);
@@ -87,6 +87,7 @@ public:
 	void visit(VarDeclaration *entry);
 	void visit(StatementDeclaration *entry);
 	void visit(FunctionDeclaration *entry);
+	void visit(ClassDeclaration *entry);
 	void visit(Declaration *entry) {
 		switch(entry->type) {
 			case DeclarationType::VarDeclaration:
@@ -97,6 +98,9 @@ public:
 				break;
 			case DeclarationType::FunctionDeclaration:
 				this->visit(entry->functiondeclaration);
+				break;
+			case DeclarationType::ClassDeclaration:
+				this->visit(entry->classdeclaration);
 				break;
 		}
 	}

@@ -186,9 +186,17 @@ const LOX_AST: AST = [
         }
     },
     {
+        type: AstEntryType.MEMBER,
+        name: "ClassDeclaration",
+        members: {
+            "identifier": "Token",
+            "methods": "vector<FunctionDeclaration*>"
+        }
+    },
+    {
         type: AstEntryType.UNION,
         name: "Declaration",
-        union: ["VarDeclaration", "StatementDeclaration", "FunctionDeclaration"]
+        union: ["VarDeclaration", "StatementDeclaration", "FunctionDeclaration", "ClassDeclaration"]
     },
     {
         type: AstEntryType.MEMBER,
