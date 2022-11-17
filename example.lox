@@ -7,4 +7,8 @@ class Dog {
 var x = Dog();
 x.age = 10;
 
+var y = Dog();
+y.age = 9;
+
 print x.getAge();
+print y.getAge();
