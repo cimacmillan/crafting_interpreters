@@ -14,11 +14,11 @@ void runtimeError(std::string message) {
     throw LoxRuntimeError({ .message=message });
 }
 
-void Interpreter::setVariableHops(VariableExpression* expr, int hops) {
+void Interpreter::setVariableHops(Expression* expr, int hops) {
     this->variable_hops[expr] = hops;
 }
 
-int Interpreter::getVariableHops(VariableExpression* expr) {
+int Interpreter::getVariableHops(Expression* expr) {
     return this->variable_hops[expr];
 }
 
@@ -31,11 +31,21 @@ double parseNumber(std::string lexeme) {
     return atof(lexeme.c_str());
 }
 
-LoxValue evaluate(VariableExpression* expr, Interpreter *env) {
-    auto value = env->currentEnv->getVariable(*(expr->variable), env->getVariableHops(expr));
+LoxValue evaluate(Expression* parent, VariableExpression* expr, Interpreter *env) {
+    auto value = env->currentEnv->getVariable(*(expr->variable), env->getVariableHops(parent));
     if (!value.has_value()) {
         std::stringstream ss;
         ss << "Variable " << expr->variable->lexeme << " is not defined";
+        runtimeError(ss.str());
+    }
+    return value.value();
+}
+
+LoxValue evaluate(Expression* parent, ThisExpression* expr, Interpreter *env) {
+    auto value = env->currentEnv->getVariable(*(expr->this_t), env->getVariableHops(parent));
+    if (!value.has_value()) {
+        std::stringstream ss;
+        ss << "Variable " << expr->this_t->lexeme << " is not defined";
         runtimeError(ss.str());
     }
     return value.value();
@@ -253,7 +263,7 @@ LoxValue evaluate(Expression* expr, Interpreter *environment) {
         case ExpressionType::UnaryExpression:
             return evaluate(expr->unaryexpression, environment);
         case ExpressionType::VariableExpression:
-            return evaluate(expr->variableexpression, environment);
+            return evaluate(expr, expr->variableexpression, environment);
         case ExpressionType::AssignExpression:
             return evaluate(expr->assignexpression, environment);
         case ExpressionType::LogicalExpression:
@@ -264,6 +274,8 @@ LoxValue evaluate(Expression* expr, Interpreter *environment) {
             return evaluate(expr->getexpression, environment);
         case ExpressionType::SetExpression:
             return evaluate(expr->setexpression, environment);
+        case ExpressionType::ThisExpression:
+            return evaluate(expr, expr->thisexpression, environment);
     }
     runtimeError("Unknown expression type");
 }

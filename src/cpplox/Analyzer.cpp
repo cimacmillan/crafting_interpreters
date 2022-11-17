@@ -8,17 +8,18 @@ void Analyzer::declare(Token token) {
     this->scopes.back()[token.lexeme] = true;
 }
 
-void Analyzer::resolve(VariableExpression *expr) {
+void Analyzer::resolve(Expression *expr, Token keyword) {
     int hops = 0;
     int size = this->scopes.size();
     for (int i = 0; i < size; i++) {
-        bool result = this->scopes[size - i - 1][expr->variable->lexeme];
+        bool result = this->scopes[size - i - 1][keyword.lexeme];
         if (result) {
             this->interpreter->setVariableHops(expr, i);
             return;
         }
     }
-    CPPLox::fatal_token(*(expr->variable), "is used before it is defined");
+
+    CPPLox::fatal_token(keyword, "Variable is used before it is defined");
 }
 
 void Analyzer::visit(BinaryExpression *entry) {
@@ -34,8 +35,8 @@ void Analyzer::visit(GroupingExpression *entry) {
 void Analyzer::visit(LiteralExpression *entry) {
     // no-op
 }
-void Analyzer::visit(VariableExpression *entry) {
-    this->resolve(entry);
+void Analyzer::visit(Expression* parent, VariableExpression *entry) {
+    this->resolve(parent, *(entry->variable));
 }
 void Analyzer::visit(LogicalExpression *entry) {
     this->visit(entry->left);
@@ -57,6 +58,11 @@ void Analyzer::visit(SetExpression *entry) {
     this->visit(entry->variable);
     this->visit(entry->value);
 }
+
+void Analyzer::visit(Expression* parent, ThisExpression *entry) {
+    this->resolve(parent, *(entry->this_t));
+}
+
 void Analyzer::visit(ExpressionStatement *entry) {
     this->visit(entry->expr);
 }
@@ -117,9 +123,11 @@ void Analyzer::visit(ClassDeclaration *entry) {
     this->declare(*(entry->identifier));
     auto temp = this->funcType;
     this->funcType = FunctionType::METHOD;
+    this->scopes.push_back({{ "this", true }});
     for (auto fun : *(entry->methods)) {
         this->visit(fun);
     }
+    this->scopes.pop_back();
     this->funcType = temp;
 }
 void Analyzer::visit(LoxProgram *entry) {

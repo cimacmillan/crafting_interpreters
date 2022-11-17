@@ -19,13 +19,13 @@ public:
     LoxProgram program;
     Environment environment;
     Environment *currentEnv;
-    std::unordered_map<VariableExpression*, int> variable_hops;
+    std::unordered_map<Expression*, int> variable_hops;
 
 public:
     Interpreter(LoxProgram program, Environment env): program(program), environment(env) {}
     void run();
-    void setVariableHops(VariableExpression* expr, int hops);
-    int getVariableHops(VariableExpression* expr);
+    void setVariableHops(Expression* expr, int hops);
+    int getVariableHops(Expression* expr);
 
 };
 

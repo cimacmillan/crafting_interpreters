@@ -111,6 +111,11 @@ Expression* CPPLox::LoxParser::primary() {
         CPPLox::fatal_token(this->peek(), "expected right parenthesis");
     }
 
+    if (this->match(TokenType::THIS)) {
+        Token* this_token = new Token(this->previous());
+        return Expression::asThisExpression(new ThisExpression({ this_token }));
+    }
+
     CPPLox::fatal_token(this->peek(), "Expected expression");
     return nullptr;
 }

@@ -1,7 +1,7 @@
 #include "LoxClass.h"
 #include "LoxInstance.h"
 #include "LoxValue.h"
-#include "LoxError.h"
+#include "LoxError.h" 
 
 #include <sstream>
 
@@ -23,7 +23,7 @@ LoxValue LoxInstance::get_member(std::string name) {
 
     auto func_opt = this->klass->find_method(name);
     if (func_opt.has_value()) {
-        LoxCallable *func = func_opt.value();
+        LoxCallable *func = func_opt.value()->bind(this);
         return (LoxValue){
             .type = LoxValueType::CALLABLE,
             .callable = func

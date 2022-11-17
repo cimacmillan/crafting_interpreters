@@ -20,6 +20,7 @@ public:
     struct LoxValue call(std::vector<struct LoxValue> arguments);
     std::string to_string();
     std::optional<LoxCallable*> find_method(std::string name);
+    LoxCallable* bind(struct LoxInstance *instance);
 };
 
 

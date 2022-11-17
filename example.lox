@@ -1,18 +1,10 @@
 class Dog {
-    fun woof() {
-        print "woof";
-        fun another() {
-            print "another";
-        }
-        return another;
-    }
-
     fun getAge() {
-        return 5;
+        return this.age;
     }
 }
 
 var x = Dog();
-x.woof()();
+x.age = 10;
 
 print x.getAge();

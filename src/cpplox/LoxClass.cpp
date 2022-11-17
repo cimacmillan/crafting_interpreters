@@ -31,3 +31,8 @@ std::optional<LoxCallable*> LoxClass::find_method(std::string name) {
 
     return function->second;
 }
+
+LoxCallable* LoxClass::bind(struct LoxInstance *instance) {
+    // no-op
+    return this;
+}

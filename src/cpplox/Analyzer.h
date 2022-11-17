@@ -25,12 +25,13 @@ public:
 	void visit(GroupingExpression *entry);
 	void visit(UnaryExpression *entry);
 	void visit(LiteralExpression *entry);
-	void visit(VariableExpression *entry);
+	void visit(Expression* parent, VariableExpression *entry);
 	void visit(LogicalExpression *entry);
 	void visit(AssignExpression *entry);
 	void visit(CallExpression *entry);
 	void visit(GetExpression *entry);
     void visit(SetExpression *entry);
+    void visit(Expression* parent, ThisExpression *entry);
 	void visit(Expression *entry) {
 		switch(entry->type) {
 			case ExpressionType::BinaryExpression:
@@ -46,7 +47,7 @@ public:
 				this->visit(entry->literalexpression);
 				break;
 			case ExpressionType::VariableExpression:
-				this->visit(entry->variableexpression);
+				this->visit(entry, entry->variableexpression);
 				break;
 			case ExpressionType::AssignExpression:
 				this->visit(entry->assignexpression);
@@ -62,6 +63,9 @@ public:
 				break;
             case ExpressionType::SetExpression:
 				this->visit(entry->setexpression);
+				break;
+            case ExpressionType::ThisExpression:
+				this->visit(entry, entry->thisexpression);
 				break;
 		}
 	}
@@ -117,5 +121,5 @@ public:
 
 
 	void declare(Token lexeme);
-	void resolve(VariableExpression* expr);
+	void resolve(Expression *expr, Token keyword);
 };
