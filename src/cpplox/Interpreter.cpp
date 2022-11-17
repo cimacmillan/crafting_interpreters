@@ -222,6 +222,26 @@ LoxValue evaluate(GetExpression* expr, Interpreter *environment) {
     return target.instance->get_member(expr->value->lexeme);
 }
 
+LoxValue evaluate(SetExpression* expr, Interpreter *environment) {
+    if (expr->variable->type != +ExpressionType::GetExpression) {
+        stringstream ss;
+        ss << "Cannot set value on a non member";
+        runtimeError(ss.str());
+    }
+    
+    LoxValue target = evaluate(expr->variable->getexpression->target, environment);
+    if (target.type != +LoxValueType::INSTANCE) {
+        stringstream ss;
+        ss << "Member target ";
+        ss << target;
+        ss << " is not an instance of a class. Cannot set a member on it.";
+        runtimeError(ss.str());
+    }
+
+    LoxValue value =  evaluate(expr->value, environment);
+    target.instance->set_member(expr->variable->getexpression->value->lexeme, value);
+}
+
 LoxValue evaluate(Expression* expr, Interpreter *environment) {
     switch (expr->type) {
         case ExpressionType::LiteralExpression:
@@ -242,6 +262,8 @@ LoxValue evaluate(Expression* expr, Interpreter *environment) {
             return evaluate(expr->callexpression, environment);
         case ExpressionType::GetExpression:
             return evaluate(expr->getexpression, environment);
+        case ExpressionType::SetExpression:
+            return evaluate(expr->setexpression, environment);
     }
     runtimeError("Unknown expression type");
 }

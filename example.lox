@@ -10,6 +10,8 @@ var x = Dog();
 
 print x;
 
+x.name = "doggy";
+
 var y = x.name;
 
 print y;

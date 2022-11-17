@@ -53,6 +53,10 @@ void Analyzer::visit(CallExpression *entry) {
 void Analyzer::visit(GetExpression *entry) {
     this->visit(entry->target);
 }
+void Analyzer::visit(SetExpression *entry) {
+    this->visit(entry->variable);
+    this->visit(entry->value);
+}
 void Analyzer::visit(ExpressionStatement *entry) {
     this->visit(entry->expr);
 }

@@ -15,6 +15,7 @@ public:
     LoxInstance(LoxClass *klass);
     std::string to_string();
     LoxValue get_member(std::string name);
+    void set_member(std::string name, LoxValue value);
 };
 
 

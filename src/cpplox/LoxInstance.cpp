@@ -29,5 +29,9 @@ LoxValue LoxInstance::get_member(std::string name) {
     return this->members.at(name);
 }
 
+void LoxInstance::set_member(std::string name, LoxValue value) {
+    this->members.emplace(name, value);
+}
+
 
 

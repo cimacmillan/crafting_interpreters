@@ -87,7 +87,8 @@
         "iomanip": "cpp",
         "variant": "cpp",
         "filesystem": "cpp",
-        "version": "cpp"
+        "version": "cpp",
+        "__functional_03": "cpp"
     },
     "cmake.configureOnOpen": false
 }

@@ -232,14 +232,23 @@ Expression* CPPLox::LoxParser::logicalOr() {
 Expression* CPPLox::LoxParser::assignment() {
     Expression* lvalue = logicalOr();
     if (this->match(TokenType::EQUAL)) {
-        if (lvalue->type != +ExpressionType::VariableExpression) {
-            CPPLox::fatal_token(this->peek(), "Expected variable for left of assignemnt =");
+        if (lvalue->type == +ExpressionType::VariableExpression) {
+            Expression* rvalue = assignment();
+            return new Expression({
+                .type = +ExpressionType::AssignExpression,
+                .assignexpression = new AssignExpression({ lvalue->variableexpression->variable, rvalue })
+            });
         }
-        Expression* rvalue = assignment();
-        return new Expression({
-            .type = +ExpressionType::AssignExpression,
-            .assignexpression = new AssignExpression({ lvalue->variableexpression->variable, rvalue })
-        });
+        if (lvalue->type == +ExpressionType::GetExpression) {
+            Expression* rvalue = assignment();
+            return new Expression({
+                .type = +ExpressionType::SetExpression,
+                .setexpression = new SetExpression({ lvalue, rvalue })
+            });
+        }
+
+        CPPLox::fatal_token(this->peek(), "Expected variable or member for left of assignemnt =");
+        
     }
     return lvalue;
 }

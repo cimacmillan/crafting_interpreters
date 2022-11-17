@@ -33,6 +33,10 @@ struct AssignExpression {
 	struct Token *variable;
 	struct Expression *value;
 };
+struct SetExpression {
+	struct Expression *variable;
+	struct Expression *value;
+};
 struct CallExpression {
 	struct Expression *callee;
 	struct vector<Expression*> *arguments;
@@ -41,7 +45,7 @@ struct GetExpression {
 	struct Expression *target;
 	struct Token *value;
 };
-BETTER_ENUM(ExpressionType, char, BinaryExpression,GroupingExpression,UnaryExpression,LiteralExpression,VariableExpression,AssignExpression,LogicalExpression,CallExpression,GetExpression);
+BETTER_ENUM(ExpressionType, char, BinaryExpression,GroupingExpression,UnaryExpression,LiteralExpression,VariableExpression,AssignExpression,LogicalExpression,CallExpression,GetExpression,SetExpression);
 struct Expression {
 	ExpressionType type;
 	union {
@@ -54,6 +58,7 @@ struct Expression {
 		LogicalExpression *logicalexpression;
 		CallExpression *callexpression;
 		GetExpression *getexpression;
+		SetExpression *setexpression;
 	};
 	static Expression* asBinaryExpression(BinaryExpression *binaryexpression) {
 		return new Expression({.type=ExpressionType::BinaryExpression, .binaryexpression=binaryexpression});
@@ -81,6 +86,9 @@ struct Expression {
 	}
 	static Expression* asGetExpression(GetExpression *getexpression) {
 		return new Expression({.type=ExpressionType::GetExpression, .getexpression=getexpression});
+	}
+	static Expression* asSetExpression(SetExpression *setexpression) {
+		return new Expression({.type=ExpressionType::SetExpression, .setexpression=setexpression});
 	}
 };
 struct ExpressionStatement {
@@ -194,6 +202,7 @@ public:
 	void visit(VariableExpression *entry);
 	void visit(LogicalExpression *entry);
 	void visit(AssignExpression *entry);
+	void visit(SetExpression *entry);
 	void visit(CallExpression *entry);
 	void visit(GetExpression *entry);
 	void visit(Expression *entry) {
@@ -224,6 +233,9 @@ public:
 				break;
 			case ExpressionType::GetExpression:
 				this->visit(entry->getexpression);
+				break;
+			case ExpressionType::SetExpression:
+				this->visit(entry->setexpression);
 				break;
 		}
 	}
