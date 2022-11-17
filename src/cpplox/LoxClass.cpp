@@ -2,10 +2,11 @@
 #include "LoxInstance.h"
 #include "LoxValue.h"
 #include "Token.h"
+#include "LoxFunction.h"
 
 #include <sstream>
 
-LoxClass::LoxClass(ClassDeclaration *decl, Environment *scope, Interpreter *env): decl(decl), scope(scope), env(env) {}
+LoxClass::LoxClass(ClassDeclaration *decl, Environment *scope, Interpreter *env, std::unordered_map<std::string, LoxCallable*> methods): decl(decl), scope(scope), env(env), methods(methods) {}
 
 struct LoxValue LoxClass::call(std::vector<struct LoxValue> arguments) {
     return (LoxValue){
@@ -19,4 +20,14 @@ std::string LoxClass::to_string() {
     ss << "class ";
     ss << this->decl->identifier->lexeme;
     return ss.str();
+}
+
+std::optional<LoxCallable*> LoxClass::find_method(std::string name) {
+    auto function = this->methods.find(name);
+
+    if (function == this->methods.end()) {
+        return std::nullopt;
+    }
+
+    return function->second;
 }

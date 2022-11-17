@@ -1,17 +1,18 @@
 class Dog {
     fun woof() {
         print "woof";
+        fun another() {
+            print "another";
+        }
+        return another;
+    }
+
+    fun getAge() {
+        return 5;
     }
 }
 
-print Dog;
-
 var x = Dog();
+x.woof()();
 
-print x;
-
-x.name = "doggy";
-
-var y = x.name;
-
-print y;
+print x.getAge();

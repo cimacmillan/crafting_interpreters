@@ -352,7 +352,12 @@ void evaluate(FunctionDeclaration* functionDeclaration, Interpreter *environment
 
 void evaluate(ClassDeclaration* classDeclaration, Interpreter *environment) {
     // LoxCallable callable
-    auto classDecl = new LoxClass(classDeclaration, environment->currentEnv, environment);
+    std::unordered_map<std::string, LoxCallable*> methods;
+    for (auto method : *(classDeclaration->methods)) {
+        methods.emplace(method->identifier->lexeme, new LoxFunction(method, environment->currentEnv, environment));
+    }
+
+    auto classDecl = new LoxClass(classDeclaration, environment->currentEnv, environment, methods);
     environment->currentEnv->defineVariable(classDeclaration->identifier->lexeme);
     environment->currentEnv->setVariable(classDeclaration->identifier->lexeme, (LoxValue){
         .type = LoxValueType::CALLABLE,

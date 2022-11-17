@@ -115,9 +115,12 @@ void Analyzer::visit(FunctionDeclaration *entry) {
 void Analyzer::visit(ClassDeclaration *entry) {
     std::string name = entry->identifier->lexeme;
     this->declare(*(entry->identifier));
+    auto temp = this->funcType;
+    this->funcType = FunctionType::METHOD;
     for (auto fun : *(entry->methods)) {
         this->visit(fun);
     }
+    this->funcType = temp;
 }
 void Analyzer::visit(LoxProgram *entry) {
     auto global = std::unordered_map<std::string, bool>();

@@ -9,7 +9,8 @@
 
 enum FunctionType {
 	NONE = 0,
-	FUNCTION
+	FUNCTION,
+    METHOD
 };
 
 class Analyzer {
