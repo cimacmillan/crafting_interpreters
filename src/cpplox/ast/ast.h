@@ -37,7 +37,11 @@ struct CallExpression {
 	struct Expression *callee;
 	struct vector<Expression*> *arguments;
 };
-BETTER_ENUM(ExpressionType, char, BinaryExpression,GroupingExpression,UnaryExpression,LiteralExpression,VariableExpression,AssignExpression,LogicalExpression,CallExpression);
+struct GetExpression {
+	struct Expression *target;
+	struct Token *value;
+};
+BETTER_ENUM(ExpressionType, char, BinaryExpression,GroupingExpression,UnaryExpression,LiteralExpression,VariableExpression,AssignExpression,LogicalExpression,CallExpression,GetExpression);
 struct Expression {
 	ExpressionType type;
 	union {
@@ -49,6 +53,7 @@ struct Expression {
 		AssignExpression *assignexpression;
 		LogicalExpression *logicalexpression;
 		CallExpression *callexpression;
+		GetExpression *getexpression;
 	};
 	static Expression* asBinaryExpression(BinaryExpression *binaryexpression) {
 		return new Expression({.type=ExpressionType::BinaryExpression, .binaryexpression=binaryexpression});
@@ -73,6 +78,9 @@ struct Expression {
 	}
 	static Expression* asCallExpression(CallExpression *callexpression) {
 		return new Expression({.type=ExpressionType::CallExpression, .callexpression=callexpression});
+	}
+	static Expression* asGetExpression(GetExpression *getexpression) {
+		return new Expression({.type=ExpressionType::GetExpression, .getexpression=getexpression});
 	}
 };
 struct ExpressionStatement {
@@ -187,6 +195,7 @@ public:
 	void visit(LogicalExpression *entry);
 	void visit(AssignExpression *entry);
 	void visit(CallExpression *entry);
+	void visit(GetExpression *entry);
 	void visit(Expression *entry) {
 		switch(entry->type) {
 			case ExpressionType::BinaryExpression:
@@ -212,6 +221,9 @@ public:
 				break;
 			case ExpressionType::CallExpression:
 				this->visit(entry->callexpression);
+				break;
+			case ExpressionType::GetExpression:
+				this->visit(entry->getexpression);
 				break;
 		}
 	}

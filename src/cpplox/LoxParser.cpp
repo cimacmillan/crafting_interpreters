@@ -117,15 +117,24 @@ Expression* CPPLox::LoxParser::primary() {
 
 Expression* CPPLox::LoxParser::call() {
     Expression* primary = this->primary();
-    if (this->match(TokenType::LEFT_PAREN)) {
-        auto args = new vector<Expression*>();
-        if (!this->check(TokenType::RIGHT_PAREN)) {
-            do {
-                args->push_back(this->expression());
-            } while (this->match(TokenType::COMMA));
+    while (true) {
+        if (this->match(TokenType::LEFT_PAREN)) {
+            auto args = new vector<Expression*>();
+            if (!this->check(TokenType::RIGHT_PAREN)) {
+                do {
+                    args->push_back(this->expression());
+                } while (this->match(TokenType::COMMA));
+            }
+            this->consume(TokenType::RIGHT_PAREN);
+            primary = Expression::asCallExpression(new CallExpression({primary, args}));
+        } else if(this->match(TokenType::DOT)) {
+            this->consume(TokenType::IDENTIFIER);
+            auto value = new Token(this->previous());
+            primary = Expression::asGetExpression(new GetExpression({primary, value}));
+
+        } else {
+            break;
         }
-        this->consume(TokenType::RIGHT_PAREN);
-        return Expression::asCallExpression(new CallExpression({primary, args}));
     }
     return primary;
 }

@@ -50,6 +50,9 @@ void Analyzer::visit(CallExpression *entry) {
         this->visit(arg);
     }
 }
+void Analyzer::visit(GetExpression *entry) {
+    this->visit(entry->target);
+}
 void Analyzer::visit(ExpressionStatement *entry) {
     this->visit(entry->expr);
 }

@@ -3,6 +3,7 @@
 #include "Expr.h"
 #include "LoxValue.h"
 #include "Environment.h"
+#include "LoxError.h"
 
 #include <enum.h>
 #include <iostream>
@@ -10,14 +11,6 @@
 #include <unordered_map>
 
 using namespace std;
-
-struct LoxRuntimeError {
-    std::string message;
-};
-
-struct LoxReturn {
-    LoxValue value;
-};
 
 std::ostream & operator<<(std::ostream & os, const LoxRuntimeError & error);
 

@@ -13,7 +13,7 @@
 #include "cpplox/Interpreter.h"
 #include "cpplox/LoxFunction.h"
 #include "cpplox/Analyzer.h"
-
+#include "cpplox/LoxError.h"
 
 using namespace std;
 using namespace std::chrono;

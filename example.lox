@@ -9,3 +9,7 @@ print Dog;
 var x = Dog();
 
 print x;
+
+var y = x.name;
+
+print y;

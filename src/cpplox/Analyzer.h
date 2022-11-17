@@ -28,6 +28,7 @@ public:
 	void visit(LogicalExpression *entry);
 	void visit(AssignExpression *entry);
 	void visit(CallExpression *entry);
+	void visit(GetExpression *entry);
 	void visit(Expression *entry) {
 		switch(entry->type) {
 			case ExpressionType::BinaryExpression:
@@ -53,6 +54,9 @@ public:
 				break;
 			case ExpressionType::CallExpression:
 				this->visit(entry->callexpression);
+				break;
+			case ExpressionType::GetExpression:
+				this->visit(entry->getexpression);
 				break;
 		}
 	}

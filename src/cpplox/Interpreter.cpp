@@ -208,6 +208,20 @@ LoxValue evaluate(CallExpression* expr, Interpreter *environment) {
     return callee.callable->call(values);
 }
 
+LoxValue evaluate(GetExpression* expr, Interpreter *environment) {
+    LoxValue target = evaluate(expr->target, environment);
+    if (target.type != +LoxValueType::INSTANCE) {
+        stringstream ss;
+        ss << "Member target ";
+        ss << target;
+        ss << " is not an instance of a class. Cannot get ";
+        ss << expr->value;
+        ss << " from it";
+        runtimeError(ss.str());
+    }
+    return target.instance->get_member(expr->value->lexeme);
+}
+
 LoxValue evaluate(Expression* expr, Interpreter *environment) {
     switch (expr->type) {
         case ExpressionType::LiteralExpression:
@@ -226,6 +240,8 @@ LoxValue evaluate(Expression* expr, Interpreter *environment) {
             return evaluate(expr->logicalexpression, environment);
         case ExpressionType::CallExpression:
             return evaluate(expr->callexpression, environment);
+        case ExpressionType::GetExpression:
+            return evaluate(expr->getexpression, environment);
     }
     runtimeError("Unknown expression type");
 }
