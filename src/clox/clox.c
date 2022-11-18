@@ -7,12 +7,14 @@ int main (int argc, const char** argv) {
     (void)argv;
     printf("Hello World\n");
 
-    Chunk chunk;
+    lox_chunk chunk;
     chunk_init(&chunk);
-    chunk_add(&chunk, OP_RETURN);
-    chunk_add(&chunk, OP_RETURN);
-    chunk_add(&chunk, OP_RETURN);
-    chunk_add(&chunk, OP_RETURN);
+
+    uint8_t ten = chunk_add_constant(&chunk, 10);
+
+    chunk_add_code(&chunk, OP_RETURN);
+    chunk_add_code(&chunk, OP_CONSTANT);
+    chunk_add_code(&chunk, ten);
 
     disassemble_chunk(&chunk, "test");
 

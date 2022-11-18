@@ -92,7 +92,8 @@
         "chunk.h": "c",
         "__functional_base_03": "c",
         "common.h": "c",
-        "memory.h": "c"
+        "memory.h": "c",
+        "value.h": "c"
     },
     "cmake.configureOnOpen": false
 }

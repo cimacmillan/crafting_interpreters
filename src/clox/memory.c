@@ -1,7 +1,5 @@
 #include "memory.h"
 
-DYNAMIC_ARRAY_IMPL(uint8_t)
-
 void* reallocate(void* pointer, size_t before, size_t after) {
     (void)before;
     if (after == 0) {

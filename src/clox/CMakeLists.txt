@@ -17,6 +17,7 @@ set(sources
     chunk.c
     debug.c
     memory.c
+    value.c
 )
 
 # add the executable

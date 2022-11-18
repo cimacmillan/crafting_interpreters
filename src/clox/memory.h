@@ -47,6 +47,4 @@
 
 void* reallocate(void* pointer, size_t before, size_t after);
 
-DYNAMIC_ARRAY_H(uint8_t)
-
 #endif
