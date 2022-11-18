@@ -136,8 +136,7 @@ const LOX_AST: AST = [
         type: AstEntryType.MEMBER,
         name: "ExpressionStatement",
         members: {
-            "expr": "Expression",
-            "semicolon": "Token"
+            "expr": "Expression"
         }
     },
     {
@@ -200,11 +199,7 @@ const LOX_AST: AST = [
         type: AstEntryType.MEMBER,
         name: "StatementDeclaration",
         members: {
-            "statement": "Statement",
-            "identifier": "Token",
-            "equals": "Token",
-            "expr": "Expression",
-            "semi": "Token"
+            "statement": "Statement"
         }
     },
     {

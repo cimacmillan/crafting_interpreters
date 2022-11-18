@@ -273,10 +273,9 @@ Statement *CPPLox::LoxParser::statementExpression() {
     if (!this->match(TokenType::SEMICOLON)) {
         CPPLox::fatal_token(this->peek(), "Expected semicolon");
     }
-    Token *semi = new Token(this->previous());
     return new Statement(
         {.type = +StatementType::ExpressionStatement,
-         .expressionstatement = new ExpressionStatement({expr, semi})});
+         .expressionstatement = new ExpressionStatement({ expr })});
 }
 
 Statement *CPPLox::LoxParser::blockStatement() {

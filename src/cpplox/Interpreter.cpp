@@ -53,6 +53,7 @@ LoxValue evaluate(Expression *parent, ThisExpression *expr, Interpreter *env) {
 }
 
 LoxValue evaluate(LiteralExpression *expr, Interpreter *env) {
+    (void)env;
     switch (expr->literal->type) {
     case +TokenType::NUMBER:
         return {.type = LoxValueType::NUMBER,
@@ -69,7 +70,7 @@ LoxValue evaluate(LiteralExpression *expr, Interpreter *env) {
         runtimeError("Invalid literal type");
         break;
     }
-    return (LoxValue){.type = LoxValueType::NIL};
+    return LoxValue({.type = LoxValueType::NIL});
 }
 
 LoxValue evaluate(GroupingExpression *expr, Interpreter *environment) {
@@ -96,7 +97,7 @@ LoxValue evaluate(UnaryExpression *expr, Interpreter *environment) {
     }
 
     runtimeError("Invalid unary operation for value type ");
-    return (LoxValue){.type = LoxValueType::NIL};
+    return LoxValue({.type = LoxValueType::NIL});
 }
 
 bool isDualType(LoxValue a, LoxValue b, LoxValueType type) {
@@ -117,6 +118,8 @@ bool isEqual(LoxValue a, LoxValue b) {
         return *(a.str) == *(b.str);
     case LoxValueType::CALLABLE:
         return false;
+    case LoxValueType::INSTANCE:
+        return a.instance == b.instance;
     }
 }
 
@@ -184,10 +187,40 @@ LoxValue evaluate(BinaryExpression *expr, Interpreter *environment) {
         return {.type = LoxValueType::BOOLEAN,
                 .boolean = !isEqual(left, right)};
         break;
+    case TokenType::LEFT_PAREN:
+    case TokenType::RIGHT_PAREN:
+    case TokenType::LEFT_BRACE:
+    case TokenType::RIGHT_BRACE:
+    case TokenType::COMMA:
+    case TokenType::SEMICOLON:
+    case TokenType::DOT:
+    case TokenType::BANG:
+    case TokenType::EQUAL:
+    case TokenType::IDENTIFIER:
+    case TokenType::STRING:
+    case TokenType::NUMBER:
+    case TokenType::AND:
+    case TokenType::CLASS:
+    case TokenType::ELSE:
+    case TokenType::FUN:
+    case TokenType::FOR:
+    case TokenType::IF:
+    case TokenType::NIL:
+    case TokenType::OR:
+    case TokenType::PRINT:
+    case TokenType::FALSE:
+    case TokenType::RETURN:
+    case TokenType::SUPER:
+    case TokenType::THIS:
+    case TokenType::TRUE:
+    case TokenType::VAR:
+    case TokenType::WHILE:
+    case TokenType::FILE_END:
+        break;
     }
 
     runtimeError("Invalid binary operation for value type");
-    return (LoxValue){.type = LoxValueType::NIL};
+    return LoxValue({.type = LoxValueType::NIL});
 }
 
 LoxValue evaluate(AssignExpression *expr, Interpreter *env) {
@@ -266,6 +299,8 @@ LoxValue evaluate(SetExpression *expr, Interpreter *environment) {
     LoxValue value = evaluate(expr->value, environment);
     target.instance->set_member(expr->variable->getexpression->value->lexeme,
                                 value);
+
+    return value;
 }
 
 LoxValue evaluate(Expression *parent, SuperExpression *expr, Interpreter *env) {
@@ -312,7 +347,7 @@ LoxValue evaluate(Expression *parent, SuperExpression *expr, Interpreter *env) {
     LoxCallable *method = maybe_method.value();
     method = method->bind(instance_obj);
 
-    return (LoxValue){ .type = LoxValueType::CALLABLE, .callable=method };
+    return LoxValue({ .type = LoxValueType::CALLABLE, .callable=method });
 }
 
 LoxValue evaluate(Expression *expr, Interpreter *environment) {
@@ -374,9 +409,9 @@ void evaluate(WhileStatement *whileStatement, Interpreter *environment) {
 void evaluate(ReturnStatement *returnStatement, Interpreter *environment) {
     if (returnStatement->expr != nullptr) {
         LoxValue value = evaluate(returnStatement->expr, environment);
-        throw(LoxReturn){value};
+        throw LoxReturn({value});
     } else {
-        throw(LoxReturn){{.type = LoxValueType::NIL}};
+        throw LoxReturn({{.type = LoxValueType::NIL}});
     }
 }
 
@@ -405,7 +440,7 @@ void evaluate(Statement *statement, Interpreter *environment) {
 
 void evaluate(VarDeclaration *varDeclaration, Interpreter *environment) {
     LoxValue evaluated = varDeclaration->expr == nullptr
-                             ? (LoxValue){.type = LoxValueType::NIL}
+                             ? LoxValue({.type = LoxValueType::NIL})
                              : evaluate(varDeclaration->expr, environment);
     auto defineResult = environment->currentEnv->defineVariable(
         varDeclaration->identifier->lexeme);
@@ -433,7 +468,7 @@ void evaluate(FunctionDeclaration *functionDeclaration,
         functionDeclaration->identifier->lexeme);
     environment->currentEnv->setVariable(
         functionDeclaration->identifier->lexeme,
-        (LoxValue){.type = LoxValueType::CALLABLE, .callable = function});
+        LoxValue({.type = LoxValueType::CALLABLE, .callable = function}));
 }
 
 void evaluate(ClassDeclaration *classDeclaration, Interpreter *environment) {
@@ -449,7 +484,7 @@ void evaluate(ClassDeclaration *classDeclaration, Interpreter *environment) {
 
     auto env = environment->currentEnv;
     if (classDeclaration->parent) {
-        env = new Environment(env, {{ "super", (LoxValue){.type=LoxValueType::CALLABLE, .callable=parent }}});
+        env = new Environment(env, {{ "super", LoxValue({.type=LoxValueType::CALLABLE, .callable=parent })}});
     }
 
     std::unordered_map<std::string, LoxCallable *> methods;
@@ -465,7 +500,7 @@ void evaluate(ClassDeclaration *classDeclaration, Interpreter *environment) {
         classDeclaration->identifier->lexeme);
     environment->currentEnv->setVariable(
         classDeclaration->identifier->lexeme,
-        (LoxValue){.type = LoxValueType::CALLABLE, .callable = classDecl});
+        LoxValue({.type = LoxValueType::CALLABLE, .callable = classDecl}));
 }
 
 void evaluate(Declaration *declaration, Interpreter *environment) {

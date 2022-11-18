@@ -26,7 +26,7 @@ LoxValue LoxInstance::get_member(std::string name) {
     auto func_opt = this->klass->find_method(name);
     if (func_opt.has_value()) {
         LoxCallable *func = func_opt.value()->bind(this);
-        return (LoxValue){.type = LoxValueType::CALLABLE, .callable = func};
+        return LoxValue({.type = LoxValueType::CALLABLE, .callable = func});
     }
 
     std::stringstream ss;

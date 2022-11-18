@@ -108,7 +108,6 @@ struct Expression {
 };
 struct ExpressionStatement {
 	struct Expression *expr;
-	struct Token *semicolon;
 };
 struct PrintStatement {
 	struct Token *print;
@@ -169,10 +168,6 @@ struct VarDeclaration {
 };
 struct StatementDeclaration {
 	struct Statement *statement;
-	struct Token *identifier;
-	struct Token *equals;
-	struct Expression *expr;
-	struct Token *semi;
 };
 struct FunctionDeclaration {
 	struct Token *identifier;

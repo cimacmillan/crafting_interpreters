@@ -64,11 +64,12 @@ int runFile(string filename, Environment env) {
 }
 
 LoxValue clock(vector<LoxValue> args) {
+    (void)args;
     milliseconds ms =
         duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
-    return (LoxValue){.type = LoxValueType::NUMBER,
-                      .number = (double)ms.count()};
+    return LoxValue({.type = LoxValueType::NUMBER,
+                      .number = (double)ms.count()});
 }
 
 LoxValue prints(vector<LoxValue> args) {
@@ -76,7 +77,7 @@ LoxValue prints(vector<LoxValue> args) {
         cout << arg;
     }
     cout << endl;
-    return (LoxValue){.type = LoxValueType::NIL};
+    return LoxValue({.type = LoxValueType::NIL});
 }
 
 LoxValue program_exit_code(vector<LoxValue> args) {
@@ -94,22 +95,24 @@ LoxValue program_exit_code(vector<LoxValue> args) {
         auto value = args[0].number;
         exit(value);
     }
+
+    return LoxValue({.type = LoxValueType::NIL});
 }
 
 Environment createDefaultEnvironment() {
     Environment env(nullptr, {});
     env.defineVariable("clock");
-    env.setVariable("clock", (LoxValue){.type = +LoxValueType::CALLABLE,
+    env.setVariable("clock", LoxValue({.type = +LoxValueType::CALLABLE,
                                         .callable = new LoxNativeFunction(
-                                            clock, "fun clock()")});
+                                            clock, "fun clock()")}));
     env.defineVariable("prints");
-    env.setVariable("prints", (LoxValue){.type = +LoxValueType::CALLABLE,
+    env.setVariable("prints", LoxValue({.type = +LoxValueType::CALLABLE,
                                          .callable = new LoxNativeFunction(
-                                             prints, "fun prints(args...)")});
+                                             prints, "fun prints(args...)")}));
     env.defineVariable("exit");
-    env.setVariable("exit", (LoxValue){.type = +LoxValueType::CALLABLE,
+    env.setVariable("exit", LoxValue({.type = +LoxValueType::CALLABLE,
                                          .callable = new LoxNativeFunction(
-                                             program_exit_code, "fun exit(number, stdout, stderr)")});                                
+                                             program_exit_code, "fun exit(number, stdout, stderr)")}));                                
     return env;
 }
 

@@ -1,2 +1,2 @@
 #!/bin/bash
-cmake . && cmake --build .
+cmake -Bbuild -H. && cmake --build build

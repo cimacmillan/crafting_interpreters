@@ -98,7 +98,7 @@ std::vector<Token> CPPLox::TokenScanner::scanTokens() {
         this->scanToken();
     }
 
-    this->tokens.push_back((Token){"", TokenType::FILE_END, this->line});
+    this->tokens.push_back(Token({"", TokenType::FILE_END, this->line}));
     return tokens;
 }
 
@@ -109,7 +109,7 @@ void CPPLox::TokenScanner::lockToken(TokenType type) {
     if (type == +TokenType::STRING) {
         lexeme = lexeme.substr(1, lexeme.size() - 2);
     }
-    this->tokens.push_back((Token){lexeme, type, this->line});
+    this->tokens.push_back(Token({lexeme, type, this->line}));
 }
 
 void CPPLox::TokenScanner::scanToken() {

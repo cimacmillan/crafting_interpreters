@@ -18,7 +18,7 @@ struct LoxValue LoxClass::call(std::vector<struct LoxValue> arguments) {
             func.callable->call(arguments);
         }
     }
-    return (LoxValue){.type = LoxValueType::INSTANCE, .instance = instance};
+    return LoxValue({.type = LoxValueType::INSTANCE, .instance = instance});
 }
 
 std::string LoxClass::to_string() {
@@ -42,7 +42,8 @@ std::optional<LoxCallable *> LoxClass::find_method(std::string name) {
     return std::nullopt;
 }
 
-LoxCallable *LoxClass::bind(struct LoxInstance *instance) {
+LoxCallable *LoxClass::bind(class LoxInstance *instance) {
+    (void)instance;
     // no-op
     return this;
 }

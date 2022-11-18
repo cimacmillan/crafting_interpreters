@@ -17,7 +17,7 @@ class LoxNativeFunction : public LoxCallable {
         std::string signature);
     struct LoxValue call(std::vector<struct LoxValue> arguments);
     std::string to_string();
-    LoxCallable *bind(struct LoxInstance *instance);
+    LoxCallable *bind(class LoxInstance *instance);
 };
 
 class LoxFunction : public LoxCallable {
@@ -31,5 +31,5 @@ class LoxFunction : public LoxCallable {
                 Interpreter *env);
     struct LoxValue call(std::vector<struct LoxValue> arguments);
     std::string to_string();
-    LoxCallable *bind(struct LoxInstance *instance);
+    LoxCallable *bind(class LoxInstance *instance);
 };

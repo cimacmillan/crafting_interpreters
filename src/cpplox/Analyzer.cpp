@@ -9,7 +9,6 @@ void Analyzer::declare(Token token) {
 }
 
 void Analyzer::resolve(Expression *expr, Token keyword) {
-    int hops = 0;
     int size = this->scopes.size();
     for (int i = 0; i < size; i++) {
         bool result = this->scopes[size - i - 1][keyword.lexeme];
@@ -29,6 +28,7 @@ void Analyzer::visit(BinaryExpression *entry) {
 void Analyzer::visit(UnaryExpression *entry) { this->visit(entry->expression); }
 void Analyzer::visit(GroupingExpression *entry) { this->visit(entry->grouped); }
 void Analyzer::visit(LiteralExpression *entry) {
+    (void)entry;
     // no-op
 }
 void Analyzer::visit(Expression *parent, VariableExpression *entry) {

@@ -9,8 +9,7 @@ set(EXEC_NAME lox)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../build)
-
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../)
 
 set(sources 
     FileUtils.cpp
@@ -35,4 +34,6 @@ include_directories("../../libs/better-enums")
 add_executable(${EXEC_NAME} 
     ${sources} Main.cpp
 )
+
+target_compile_options(${EXEC_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror)
 

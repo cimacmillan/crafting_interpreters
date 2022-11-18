@@ -9,7 +9,7 @@ set(EXEC_NAME clox)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../build)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../)
 
 
 set(sources 
@@ -18,4 +18,6 @@ set(sources
 
 # add the executable
 add_executable(${EXEC_NAME} ${sources})
+
+target_compile_options(${EXEC_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror)
 

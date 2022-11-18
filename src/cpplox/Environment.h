@@ -16,7 +16,7 @@ class Environment {
   public:
     Environment(Environment *parent,
                 std::unordered_map<std::string, LoxValue> args)
-        : parent(parent), variables(args) {}
+        : variables(args), parent(parent) {}
     bool defineVariable(std::string lexeme);
     bool setVariable(std::string lexeme, struct LoxValue value);
     std::optional<LoxValue> getVariable(Token token, int hops);

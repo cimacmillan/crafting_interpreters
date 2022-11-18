@@ -17,7 +17,7 @@ bool Environment::defineVariable(std::string lexeme) {
     if (this->variables.find(lexeme) != this->variables.end()) {
         return false;
     }
-    this->variables.emplace(lexeme, (LoxValue){.type = LoxValueType::NIL});
+    this->variables.emplace(lexeme, LoxValue({.type = LoxValueType::NIL}));
     return true;
 }
 
