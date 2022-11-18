@@ -52,10 +52,18 @@ void Analyzer::visit(SetExpression *entry) {
 }
 
 void Analyzer::visit(Expression *parent, ThisExpression *entry) {
+    if (this->classType == ClassType::NONE) {
+        CPPLox::fatal_token(*(entry->this_t), "Cannot use this outside of class");
+    }
+
     this->resolve(parent, *(entry->this_t));
 }
 
 void Analyzer::visit(Expression *parent, SuperExpression *entry) {
+    if (this->classType != ClassType::SUBCLASS) {
+        CPPLox::fatal_token(*(entry->super_t), "Cannot use super outside of subclass");
+    }
+
     this->resolve(parent, *(entry->super_t));
 }
 
@@ -119,7 +127,11 @@ void Analyzer::visit(ClassDeclaration *entry) {
         this->visit(entry->parent);
     }
 
+    auto previousClassType = this->classType;
+    this->classType = ClassType::CLASS;
+
     if (entry->parent) {
+        this->classType = ClassType::SUBCLASS;
         this->scopes.push_back({{"super", true}});
     }
 
@@ -135,6 +147,8 @@ void Analyzer::visit(ClassDeclaration *entry) {
     if (entry->parent) {
         this->scopes.pop_back();
     }
+
+    this->classType = previousClassType;
 }
 void Analyzer::visit(LoxProgram *entry) {
     auto global = std::unordered_map<std::string, bool>();

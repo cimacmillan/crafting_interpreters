@@ -7,17 +7,19 @@
 #include <string>
 #include <unordered_map>
 
-enum FunctionType { NONE = 0, FUNCTION, METHOD };
+enum class FunctionType { NONE = 0, FUNCTION, METHOD };
+enum class ClassType { NONE = 0, CLASS, SUBCLASS };
 
 class Analyzer {
   private:
     Interpreter *interpreter;
     std::vector<std::unordered_map<std::string, bool>> scopes;
     FunctionType funcType;
+    ClassType classType;
 
   public:
     Analyzer(Interpreter *interpreter)
-        : interpreter(interpreter), funcType(FunctionType::NONE) {}
+        : interpreter(interpreter), funcType(FunctionType::NONE), classType(ClassType::NONE) {}
     void visit(BinaryExpression *entry);
     void visit(GroupingExpression *entry);
     void visit(UnaryExpression *entry);
@@ -66,7 +68,7 @@ class Analyzer {
             this->visit(entry, entry->thisexpression);
             break;
         case ExpressionType::SuperExpression:
-            this->visit(entry, entry->thisexpression);
+            this->visit(entry, entry->superexpression);
             break;
         }
     }

@@ -2,6 +2,7 @@
 class Animal {
     fun sound() {
         print "Animal noise";
+        // super.something();
     }
 }
 
@@ -14,6 +15,10 @@ class Dog < Animal {
 
 class Cat < Animal {
 
+}
+
+fun badThis() {
+    // this.hello();
 }
 
 var dog = Dog();
