@@ -25,6 +25,13 @@ static int constant_instruction(const char* name, lox_chunk *chunk, int offset) 
 int disassemble_instruction(lox_chunk *chunk, int offset) {
     (void)chunk;
     printf("%04d ", offset);
+    int line_number = chunk->line_numbers.code[offset];
+    if (offset > 0 && line_number == chunk->line_numbers.code[offset - 1]) {
+        printf("   | ");
+    } else {
+        printf("%04d ", line_number);
+    }
+
     uint8_t code = chunk->bytecode.code[offset];
     switch (code) {
         case OP_RETURN:

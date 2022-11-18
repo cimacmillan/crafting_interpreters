@@ -12,9 +12,9 @@ int main (int argc, const char** argv) {
 
     uint8_t ten = chunk_add_constant(&chunk, 10);
 
-    chunk_add_code(&chunk, OP_RETURN);
-    chunk_add_code(&chunk, OP_CONSTANT);
-    chunk_add_code(&chunk, ten);
+    chunk_add_code(&chunk, OP_RETURN, 123);
+    chunk_add_code(&chunk, OP_CONSTANT, 123);
+    chunk_add_code(&chunk, ten, 123);
 
     disassemble_chunk(&chunk, "test");
 
