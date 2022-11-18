@@ -268,6 +268,53 @@ LoxValue evaluate(SetExpression *expr, Interpreter *environment) {
                                 value);
 }
 
+LoxValue evaluate(Expression *parent, SuperExpression *expr, Interpreter *env) {
+    auto hops = env->getVariableHops(parent);
+    auto value = env->currentEnv->getVariable(*(expr->super_t), hops);
+    if (!value.has_value()) {
+        stringstream ss;
+        ss << "No class bound to super " << *(expr->super_t);
+        runtimeError(ss.str());
+    }
+
+    auto parent_class = dynamic_cast<LoxClass*>(value->callable);
+    if (!parent_class) {
+        stringstream ss;
+        ss << "No parent class exists at token " << *(expr->super_t);
+        runtimeError(ss.str());
+    }
+
+    Token token = *(expr->super_t);
+    token.lexeme = "this";
+    auto lox_instance = env->currentEnv->getVariable(token, hops - 1);
+
+    if (!lox_instance.has_value()) {
+        stringstream ss;
+        ss << "No this keyword bound at super call " << *(expr->super_t);
+        runtimeError(ss.str());
+    }
+
+    if (lox_instance->type != +LoxValueType::INSTANCE) {
+        stringstream ss;
+        ss << "No instance bound to this keyword bound at super call " << *(expr->super_t);
+        runtimeError(ss.str());
+    }
+
+    LoxInstance *instance_obj = lox_instance->instance;
+    auto maybe_method = parent_class->find_method(expr->access->lexeme);
+
+    if (!maybe_method.has_value()) {
+        stringstream ss;
+        ss << "Superclass has no method " << *(expr->access);
+        runtimeError(ss.str());
+    }
+
+    LoxCallable *method = maybe_method.value();
+    method = method->bind(instance_obj);
+
+    return (LoxValue){ .type = LoxValueType::CALLABLE, .callable=method };
+}
+
 LoxValue evaluate(Expression *expr, Interpreter *environment) {
     switch (expr->type) {
     case ExpressionType::LiteralExpression:
@@ -292,6 +339,8 @@ LoxValue evaluate(Expression *expr, Interpreter *environment) {
         return evaluate(expr->setexpression, environment);
     case ExpressionType::ThisExpression:
         return evaluate(expr, expr->thisexpression, environment);
+    case ExpressionType::SuperExpression:
+        return evaluate(expr, expr->superexpression, environment);
     }
     runtimeError("Unknown expression type");
 }
@@ -389,12 +438,6 @@ void evaluate(FunctionDeclaration *functionDeclaration,
 
 void evaluate(ClassDeclaration *classDeclaration, Interpreter *environment) {
     // LoxCallable callable
-    std::unordered_map<std::string, LoxCallable *> methods;
-    for (auto method : *(classDeclaration->methods)) {
-        methods.emplace(
-            method->identifier->lexeme,
-            new LoxFunction(method, environment->currentEnv, environment));
-    }
 
     LoxClass *parent = nullptr;
     if (classDeclaration->parent) {
@@ -404,7 +447,19 @@ void evaluate(ClassDeclaration *classDeclaration, Interpreter *environment) {
         parent = dynamic_cast<LoxClass*>(value->callable);
     }
 
-    auto classDecl = new LoxClass(classDeclaration, environment->currentEnv,
+    auto env = environment->currentEnv;
+    if (classDeclaration->parent) {
+        env = new Environment(env, {{ "super", (LoxValue){.type=LoxValueType::CALLABLE, .callable=parent }}});
+    }
+
+    std::unordered_map<std::string, LoxCallable *> methods;
+    for (auto method : *(classDeclaration->methods)) {
+        methods.emplace(
+            method->identifier->lexeme,
+            new LoxFunction(method, env, environment));
+    }
+
+    auto classDecl = new LoxClass(classDeclaration, env,
                                   environment, methods, parent);
     environment->currentEnv->defineVariable(
         classDeclaration->identifier->lexeme);

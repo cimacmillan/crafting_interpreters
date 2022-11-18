@@ -120,9 +120,17 @@ const LOX_AST: AST = [
         }
     },
     {
+        type: AstEntryType.MEMBER,
+        name: "SuperExpression",
+        members: {
+            "super_t": "Token",
+            "access": "Token"
+        }
+    },
+    {
         type: AstEntryType.UNION,
         name: "Expression",
-        union: ["BinaryExpression", "GroupingExpression", "UnaryExpression", "LiteralExpression", "VariableExpression", "AssignExpression", "LogicalExpression", "CallExpression", "GetExpression", "SetExpression", "ThisExpression"],
+        union: ["BinaryExpression", "GroupingExpression", "UnaryExpression", "LiteralExpression", "VariableExpression", "AssignExpression", "LogicalExpression", "CallExpression", "GetExpression", "SetExpression", "ThisExpression", "SuperExpression"],
     },
     {
         type: AstEntryType.MEMBER,

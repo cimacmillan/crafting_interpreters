@@ -29,6 +29,7 @@ class Analyzer {
     void visit(GetExpression *entry);
     void visit(SetExpression *entry);
     void visit(Expression *parent, ThisExpression *entry);
+    void visit(Expression *parent, SuperExpression *entry);
     void visit(Expression *entry) {
         switch (entry->type) {
         case ExpressionType::BinaryExpression:
@@ -62,6 +63,9 @@ class Analyzer {
             this->visit(entry->setexpression);
             break;
         case ExpressionType::ThisExpression:
+            this->visit(entry, entry->thisexpression);
+            break;
+        case ExpressionType::SuperExpression:
             this->visit(entry, entry->thisexpression);
             break;
         }

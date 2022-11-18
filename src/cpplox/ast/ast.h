@@ -48,7 +48,11 @@ struct GetExpression {
 struct ThisExpression {
 	struct Token *this_t;
 };
-BETTER_ENUM(ExpressionType, char, BinaryExpression,GroupingExpression,UnaryExpression,LiteralExpression,VariableExpression,AssignExpression,LogicalExpression,CallExpression,GetExpression,SetExpression,ThisExpression);
+struct SuperExpression {
+	struct Token *super_t;
+	struct Token *access;
+};
+BETTER_ENUM(ExpressionType, char, BinaryExpression,GroupingExpression,UnaryExpression,LiteralExpression,VariableExpression,AssignExpression,LogicalExpression,CallExpression,GetExpression,SetExpression,ThisExpression,SuperExpression);
 struct Expression {
 	ExpressionType type;
 	union {
@@ -63,6 +67,7 @@ struct Expression {
 		GetExpression *getexpression;
 		SetExpression *setexpression;
 		ThisExpression *thisexpression;
+		SuperExpression *superexpression;
 	};
 	static Expression* asBinaryExpression(BinaryExpression *binaryexpression) {
 		return new Expression({.type=ExpressionType::BinaryExpression, .binaryexpression=binaryexpression});
@@ -96,6 +101,9 @@ struct Expression {
 	}
 	static Expression* asThisExpression(ThisExpression *thisexpression) {
 		return new Expression({.type=ExpressionType::ThisExpression, .thisexpression=thisexpression});
+	}
+	static Expression* asSuperExpression(SuperExpression *superexpression) {
+		return new Expression({.type=ExpressionType::SuperExpression, .superexpression=superexpression});
 	}
 };
 struct ExpressionStatement {
@@ -214,6 +222,7 @@ public:
 	void visit(CallExpression *entry);
 	void visit(GetExpression *entry);
 	void visit(ThisExpression *entry);
+	void visit(SuperExpression *entry);
 	void visit(Expression *entry) {
 		switch(entry->type) {
 			case ExpressionType::BinaryExpression:
@@ -248,6 +257,9 @@ public:
 				break;
 			case ExpressionType::ThisExpression:
 				this->visit(entry->thisexpression);
+				break;
+			case ExpressionType::SuperExpression:
+				this->visit(entry->superexpression);
 				break;
 		}
 	}

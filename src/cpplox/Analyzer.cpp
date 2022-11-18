@@ -55,6 +55,10 @@ void Analyzer::visit(Expression *parent, ThisExpression *entry) {
     this->resolve(parent, *(entry->this_t));
 }
 
+void Analyzer::visit(Expression *parent, SuperExpression *entry) {
+    this->resolve(parent, *(entry->super_t));
+}
+
 void Analyzer::visit(ExpressionStatement *entry) { this->visit(entry->expr); }
 void Analyzer::visit(PrintStatement *entry) { this->visit(entry->expr); }
 void Analyzer::visit(BlockStatement *entry,
@@ -115,6 +119,10 @@ void Analyzer::visit(ClassDeclaration *entry) {
         this->visit(entry->parent);
     }
 
+    if (entry->parent) {
+        this->scopes.push_back({{"super", true}});
+    }
+
     auto temp = this->funcType;
     this->funcType = FunctionType::METHOD;
     this->scopes.push_back({{"this", true}});
@@ -123,6 +131,10 @@ void Analyzer::visit(ClassDeclaration *entry) {
     }
     this->scopes.pop_back();
     this->funcType = temp;
+
+    if (entry->parent) {
+        this->scopes.pop_back();
+    }
 }
 void Analyzer::visit(LoxProgram *entry) {
     auto global = std::unordered_map<std::string, bool>();

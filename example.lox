@@ -1,15 +1,14 @@
 
-// class Animal {
-//     fun sound() {
-//         print "Animal noise";
-//     }
-// }
-
-fun Animal() {}
+class Animal {
+    fun sound() {
+        print "Animal noise";
+    }
+}
 
 class Dog < Animal {
     fun sound() {
         print "woof";
+        super.sound();
     }
 }
 

@@ -106,6 +106,14 @@ Expression *CPPLox::LoxParser::primary() {
         return Expression::asThisExpression(new ThisExpression({this_token}));
     }
 
+    if (this->match(TokenType::SUPER)) {
+        Token *super_t = new Token(this->previous());
+        this->consume(TokenType::DOT);
+        this->consume(TokenType::IDENTIFIER);
+        Token *access = new Token(this->previous());
+        return Expression::asSuperExpression(new SuperExpression({super_t, access}));
+    }
+
     CPPLox::fatal_token(this->peek(), "Expected expression");
     return nullptr;
 }
