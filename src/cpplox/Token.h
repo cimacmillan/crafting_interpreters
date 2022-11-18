@@ -21,9 +21,9 @@ BETTER_ENUM(TokenType, char, LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
             FILE_END)
 
 struct Token {
-  std::string lexeme;
-  TokenType type;
-  unsigned int line;
+    std::string lexeme;
+    TokenType type;
+    unsigned int line;
 };
 
 std::ostream &operator<<(std::ostream &os, const Token &token);

@@ -4,9 +4,9 @@
 #include <string>
 
 struct LoxRuntimeError {
-  std::string message;
+    std::string message;
 };
 
 struct LoxReturn {
-  LoxValue value;
+    LoxValue value;
 };

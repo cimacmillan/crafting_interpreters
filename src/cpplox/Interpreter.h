@@ -15,18 +15,18 @@ using namespace std;
 std::ostream &operator<<(std::ostream &os, const LoxRuntimeError &error);
 
 class Interpreter {
-public:
-  LoxProgram program;
-  Environment environment;
-  Environment *currentEnv;
-  std::unordered_map<Expression *, int> variable_hops;
+  public:
+    LoxProgram program;
+    Environment environment;
+    Environment *currentEnv;
+    std::unordered_map<Expression *, int> variable_hops;
 
-public:
-  Interpreter(LoxProgram program, Environment env)
-      : program(program), environment(env) {}
-  void run();
-  void setVariableHops(Expression *expr, int hops);
-  int getVariableHops(Expression *expr);
+  public:
+    Interpreter(LoxProgram program, Environment env)
+        : program(program), environment(env) {}
+    void run();
+    void setVariableHops(Expression *expr, int hops);
+    int getVariableHops(Expression *expr);
 };
 
 LoxValue evaluate(LiteralExpression *expr, Interpreter *env);

@@ -213,7 +213,8 @@ const LOX_AST: AST = [
         name: "ClassDeclaration",
         members: {
             "identifier": "Token",
-            "methods": "vector<FunctionDeclaration*>"
+            "methods": "vector<FunctionDeclaration*>",
+            "parent": "VariableExpression"
         }
     },
     {

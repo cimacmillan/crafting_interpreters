@@ -1,13 +1,1 @@
-class Dog {
-    fun init() {
-        this.age = 10;
-    }
 
-    fun getAge() {
-        return this.age;
-    }
-}
-
-var x = Dog();
-
-print x.getAge();
