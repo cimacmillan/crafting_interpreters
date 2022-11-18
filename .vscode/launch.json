@@ -27,6 +27,18 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb"
-        }
+        },
+        {
+            "name": "(lldb) Launch Clox Example",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/clox",
+            "args": ["${workspaceFolder}/example.lox"],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
     ]
 }

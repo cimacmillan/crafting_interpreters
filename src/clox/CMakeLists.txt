@@ -14,6 +14,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../)
 
 set(sources 
     clox.c
+    chunk.c
+    debug.c
 )
 
 # add the executable

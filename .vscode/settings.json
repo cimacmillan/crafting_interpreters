@@ -88,7 +88,8 @@
         "variant": "cpp",
         "filesystem": "cpp",
         "version": "cpp",
-        "__functional_03": "cpp"
+        "__functional_03": "cpp",
+        "chunk.h": "c"
     },
     "cmake.configureOnOpen": false
 }
