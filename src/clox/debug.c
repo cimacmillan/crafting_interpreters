@@ -26,6 +26,7 @@ int disassemble_instruction(lox_chunk *chunk, int offset) {
     (void)chunk;
     printf("%04d ", offset);
     int line_number = chunk->line_numbers.code[offset];
+    // If the same line number made this bytecode, join it
     if (offset > 0 && line_number == chunk->line_numbers.code[offset - 1]) {
         printf("   | ");
     } else {

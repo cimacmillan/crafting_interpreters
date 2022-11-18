@@ -12,11 +12,10 @@ LoxClass::LoxClass(ClassDeclaration *decl, Environment *scope, Interpreter *env,
 
 struct LoxValue LoxClass::call(std::vector<struct LoxValue> arguments) {
     auto instance = new LoxInstance(this);
-    if (instance->has_member("init")) {
-        auto func = instance->get_member("init");
-        if (func.type == +LoxValueType::CALLABLE) {
-            func.callable->call(arguments);
-        }
+    auto method = this->find_method("init");
+    if (method) {
+        auto bound = method.value()->bind(instance);
+        bound->call(arguments);
     }
     return LoxValue({.type = LoxValueType::INSTANCE, .instance = instance});
 }

@@ -1,0 +1,37 @@
+
+print "Hello World";
+
+fun add (a, b) {
+    return a + b;
+}
+
+print add(1, 2);
+
+class Animal {
+    fun noise() {
+        print "animal noise";
+    }
+}
+
+class Dog < Animal {
+    fun init() {
+        print "init";
+        this.x = 10;
+    }
+
+    fun something() {
+        print "something";
+    }
+
+    fun noise() {
+        print "Woof";
+        super.noise();
+        print this.x;
+    }
+}
+
+var dog = Dog();
+dog.noise();
+
+var anim = Animal();
+anim.noise();
