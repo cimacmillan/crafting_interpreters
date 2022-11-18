@@ -467,20 +467,24 @@ Declaration *CPPLox::LoxParser::function_declaration() {
 Declaration *CPPLox::LoxParser::class_declaration() {
     this->consume(TokenType::IDENTIFIER);
     Token *identifier = new Token(this->previous());
-    this->consume(TokenType::LEFT_BRACE);
 
-    auto methods = new std::vector<FunctionDeclaration *>();
-
+    Expression *parent = nullptr;
     if (this->match(TokenType::LESS)) {
+        parent = this->primary();
+        if (parent->type != +ExpressionType::VariableExpression) {
+            CPPLox::fatal_token(this->previous(), "Expected class name for parent class");
+        }
     }
 
+    this->consume(TokenType::LEFT_BRACE);
+    auto methods = new std::vector<FunctionDeclaration *>();
     while (!this->match(TokenType::RIGHT_BRACE)) {
         this->consume(TokenType::FUN);
         methods->push_back(this->function_declaration()->functiondeclaration);
     }
 
     return Declaration::asClassDeclaration(
-        new ClassDeclaration({identifier, methods}));
+        new ClassDeclaration({identifier, methods, parent}));
 }
 
 Declaration *CPPLox::LoxParser::declaration() {

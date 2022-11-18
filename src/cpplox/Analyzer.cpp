@@ -110,6 +110,11 @@ void Analyzer::visit(FunctionDeclaration *entry) {
 void Analyzer::visit(ClassDeclaration *entry) {
     std::string name = entry->identifier->lexeme;
     this->declare(*(entry->identifier));
+
+    if (entry->parent) {
+        this->visit(entry->parent);
+    }
+
     auto temp = this->funcType;
     this->funcType = FunctionType::METHOD;
     this->scopes.push_back({{"this", true}});

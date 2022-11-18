@@ -7,14 +7,16 @@
 #include <sstream>
 
 LoxClass::LoxClass(ClassDeclaration *decl, Environment *scope, Interpreter *env,
-                   std::unordered_map<std::string, LoxCallable *> methods)
-    : decl(decl), scope(scope), env(env), methods(methods) {}
+                   std::unordered_map<std::string, LoxCallable *> methods, LoxClass *parent)
+    : decl(decl), scope(scope), env(env), methods(methods), parent(parent) {}
 
 struct LoxValue LoxClass::call(std::vector<struct LoxValue> arguments) {
     auto instance = new LoxInstance(this);
-    auto func = instance->get_member("init");
-    if (func.type == +LoxValueType::CALLABLE) {
-        func.callable->call(arguments);
+    if (instance->has_member("init")) {
+        auto func = instance->get_member("init");
+        if (func.type == +LoxValueType::CALLABLE) {
+            func.callable->call(arguments);
+        }
     }
     return (LoxValue){.type = LoxValueType::INSTANCE, .instance = instance};
 }
@@ -29,11 +31,15 @@ std::string LoxClass::to_string() {
 std::optional<LoxCallable *> LoxClass::find_method(std::string name) {
     auto function = this->methods.find(name);
 
-    if (function == this->methods.end()) {
-        return std::nullopt;
+    if (function != this->methods.end()) {
+        return function->second;
     }
 
-    return function->second;
+    if (this->parent) {
+        return this->parent->find_method(name);
+    }
+
+    return std::nullopt;
 }
 
 LoxCallable *LoxClass::bind(struct LoxInstance *instance) {

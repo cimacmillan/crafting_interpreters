@@ -14,11 +14,12 @@ class LoxClass : public LoxCallable {
     struct Environment *scope;
     struct Interpreter *env;
     std::unordered_map<std::string, LoxCallable *> methods;
+    LoxClass *parent;
 
   public:
     LoxClass(ClassDeclaration *decl, struct Environment *scope,
              struct Interpreter *env,
-             std::unordered_map<std::string, LoxCallable *> methods);
+             std::unordered_map<std::string, LoxCallable *> methods, LoxClass *parent);
     struct LoxValue call(std::vector<struct LoxValue> arguments);
     std::string to_string();
     std::optional<LoxCallable *> find_method(std::string name);

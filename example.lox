@@ -1,1 +1,25 @@
 
+// class Animal {
+//     fun sound() {
+//         print "Animal noise";
+//     }
+// }
+
+fun Animal() {}
+
+class Dog < Animal {
+    fun sound() {
+        print "woof";
+    }
+}
+
+class Cat < Animal {
+
+}
+
+var dog = Dog();
+var cat = Cat();
+
+dog.sound();
+cat.sound();
+

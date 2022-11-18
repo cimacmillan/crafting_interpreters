@@ -14,8 +14,12 @@ std::string LoxInstance::to_string() {
     return ss.str();
 }
 
+bool LoxInstance::has_member(std::string name) {
+    return this->members.find(name) != this->members.end();
+}
+
 LoxValue LoxInstance::get_member(std::string name) {
-    if (this->members.find(name) != this->members.end()) {
+    if (this->has_member(name)) {
         return this->members.at(name);
     }
 

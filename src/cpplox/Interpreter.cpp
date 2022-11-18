@@ -396,8 +396,16 @@ void evaluate(ClassDeclaration *classDeclaration, Interpreter *environment) {
             new LoxFunction(method, environment->currentEnv, environment));
     }
 
+    LoxClass *parent = nullptr;
+    if (classDeclaration->parent) {
+        auto value = environment->currentEnv->getVariable(*(classDeclaration->parent->variableexpression->variable),
+                                            environment->getVariableHops(classDeclaration->parent));
+        // TODO replace with specific LoxClass value type
+        parent = dynamic_cast<LoxClass*>(value->callable);
+    }
+
     auto classDecl = new LoxClass(classDeclaration, environment->currentEnv,
-                                  environment, methods);
+                                  environment, methods, parent);
     environment->currentEnv->defineVariable(
         classDeclaration->identifier->lexeme);
     environment->currentEnv->setVariable(
