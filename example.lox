@@ -1,14 +1,13 @@
 class Dog {
+    fun init() {
+        this.age = 10;
+    }
+
     fun getAge() {
         return this.age;
     }
 }
 
 var x = Dog();
-x.age = 10;
-
-var y = Dog();
-y.age = 9;
 
 print x.getAge();
-print y.getAge();

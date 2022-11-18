@@ -5,298 +5,329 @@
 using namespace std;
 
 struct BinaryExpression {
-	struct Expression *left;
-	struct Token *op;
-	struct Expression *right;
+  struct Expression *left;
+  struct Token *op;
+  struct Expression *right;
 };
 struct GroupingExpression {
-	struct Token *open;
-	struct Expression *grouped;
-	struct Token *close;
+  struct Token *open;
+  struct Expression *grouped;
+  struct Token *close;
 };
 struct UnaryExpression {
-	struct Expression *expression;
-	struct Token *unary;
+  struct Expression *expression;
+  struct Token *unary;
 };
 struct LiteralExpression {
-	struct Token *literal;
+  struct Token *literal;
 };
 struct VariableExpression {
-	struct Token *variable;
+  struct Token *variable;
 };
 struct LogicalExpression {
-	struct Expression *left;
-	struct Token *op;
-	struct Expression *right;
+  struct Expression *left;
+  struct Token *op;
+  struct Expression *right;
 };
 struct AssignExpression {
-	struct Token *variable;
-	struct Expression *value;
+  struct Token *variable;
+  struct Expression *value;
 };
 struct SetExpression {
-	struct Expression *variable;
-	struct Expression *value;
+  struct Expression *variable;
+  struct Expression *value;
 };
 struct CallExpression {
-	struct Expression *callee;
-	struct vector<Expression*> *arguments;
+  struct Expression *callee;
+  struct vector<Expression *> *arguments;
 };
 struct GetExpression {
-	struct Expression *target;
-	struct Token *value;
+  struct Expression *target;
+  struct Token *value;
 };
 struct ThisExpression {
-	struct Token *this_t;
+  struct Token *this_t;
 };
-BETTER_ENUM(ExpressionType, char, BinaryExpression,GroupingExpression,UnaryExpression,LiteralExpression,VariableExpression,AssignExpression,LogicalExpression,CallExpression,GetExpression,SetExpression,ThisExpression);
+BETTER_ENUM(ExpressionType, char, BinaryExpression, GroupingExpression,
+            UnaryExpression, LiteralExpression, VariableExpression,
+            AssignExpression, LogicalExpression, CallExpression, GetExpression,
+            SetExpression, ThisExpression);
 struct Expression {
-	ExpressionType type;
-	union {
-		BinaryExpression *binaryexpression;
-		GroupingExpression *groupingexpression;
-		UnaryExpression *unaryexpression;
-		LiteralExpression *literalexpression;
-		VariableExpression *variableexpression;
-		AssignExpression *assignexpression;
-		LogicalExpression *logicalexpression;
-		CallExpression *callexpression;
-		GetExpression *getexpression;
-		SetExpression *setexpression;
-		ThisExpression *thisexpression;
-	};
-	static Expression* asBinaryExpression(BinaryExpression *binaryexpression) {
-		return new Expression({.type=ExpressionType::BinaryExpression, .binaryexpression=binaryexpression});
-	}
-	static Expression* asGroupingExpression(GroupingExpression *groupingexpression) {
-		return new Expression({.type=ExpressionType::GroupingExpression, .groupingexpression=groupingexpression});
-	}
-	static Expression* asUnaryExpression(UnaryExpression *unaryexpression) {
-		return new Expression({.type=ExpressionType::UnaryExpression, .unaryexpression=unaryexpression});
-	}
-	static Expression* asLiteralExpression(LiteralExpression *literalexpression) {
-		return new Expression({.type=ExpressionType::LiteralExpression, .literalexpression=literalexpression});
-	}
-	static Expression* asVariableExpression(VariableExpression *variableexpression) {
-		return new Expression({.type=ExpressionType::VariableExpression, .variableexpression=variableexpression});
-	}
-	static Expression* asAssignExpression(AssignExpression *assignexpression) {
-		return new Expression({.type=ExpressionType::AssignExpression, .assignexpression=assignexpression});
-	}
-	static Expression* asLogicalExpression(LogicalExpression *logicalexpression) {
-		return new Expression({.type=ExpressionType::LogicalExpression, .logicalexpression=logicalexpression});
-	}
-	static Expression* asCallExpression(CallExpression *callexpression) {
-		return new Expression({.type=ExpressionType::CallExpression, .callexpression=callexpression});
-	}
-	static Expression* asGetExpression(GetExpression *getexpression) {
-		return new Expression({.type=ExpressionType::GetExpression, .getexpression=getexpression});
-	}
-	static Expression* asSetExpression(SetExpression *setexpression) {
-		return new Expression({.type=ExpressionType::SetExpression, .setexpression=setexpression});
-	}
-	static Expression* asThisExpression(ThisExpression *thisexpression) {
-		return new Expression({.type=ExpressionType::ThisExpression, .thisexpression=thisexpression});
-	}
+  ExpressionType type;
+  union {
+    BinaryExpression *binaryexpression;
+    GroupingExpression *groupingexpression;
+    UnaryExpression *unaryexpression;
+    LiteralExpression *literalexpression;
+    VariableExpression *variableexpression;
+    AssignExpression *assignexpression;
+    LogicalExpression *logicalexpression;
+    CallExpression *callexpression;
+    GetExpression *getexpression;
+    SetExpression *setexpression;
+    ThisExpression *thisexpression;
+  };
+  static Expression *asBinaryExpression(BinaryExpression *binaryexpression) {
+    return new Expression({.type = ExpressionType::BinaryExpression,
+                           .binaryexpression = binaryexpression});
+  }
+  static Expression *
+  asGroupingExpression(GroupingExpression *groupingexpression) {
+    return new Expression({.type = ExpressionType::GroupingExpression,
+                           .groupingexpression = groupingexpression});
+  }
+  static Expression *asUnaryExpression(UnaryExpression *unaryexpression) {
+    return new Expression({.type = ExpressionType::UnaryExpression,
+                           .unaryexpression = unaryexpression});
+  }
+  static Expression *asLiteralExpression(LiteralExpression *literalexpression) {
+    return new Expression({.type = ExpressionType::LiteralExpression,
+                           .literalexpression = literalexpression});
+  }
+  static Expression *
+  asVariableExpression(VariableExpression *variableexpression) {
+    return new Expression({.type = ExpressionType::VariableExpression,
+                           .variableexpression = variableexpression});
+  }
+  static Expression *asAssignExpression(AssignExpression *assignexpression) {
+    return new Expression({.type = ExpressionType::AssignExpression,
+                           .assignexpression = assignexpression});
+  }
+  static Expression *asLogicalExpression(LogicalExpression *logicalexpression) {
+    return new Expression({.type = ExpressionType::LogicalExpression,
+                           .logicalexpression = logicalexpression});
+  }
+  static Expression *asCallExpression(CallExpression *callexpression) {
+    return new Expression({.type = ExpressionType::CallExpression,
+                           .callexpression = callexpression});
+  }
+  static Expression *asGetExpression(GetExpression *getexpression) {
+    return new Expression({.type = ExpressionType::GetExpression,
+                           .getexpression = getexpression});
+  }
+  static Expression *asSetExpression(SetExpression *setexpression) {
+    return new Expression({.type = ExpressionType::SetExpression,
+                           .setexpression = setexpression});
+  }
+  static Expression *asThisExpression(ThisExpression *thisexpression) {
+    return new Expression({.type = ExpressionType::ThisExpression,
+                           .thisexpression = thisexpression});
+  }
 };
 struct ExpressionStatement {
-	struct Expression *expr;
-	struct Token *semicolon;
+  struct Expression *expr;
+  struct Token *semicolon;
 };
 struct PrintStatement {
-	struct Token *print;
-	struct Expression *expr;
-	struct Token *semicolon;
+  struct Token *print;
+  struct Expression *expr;
+  struct Token *semicolon;
 };
 struct BlockStatement {
-	struct vector<struct Declaration*> *block;
+  struct vector<struct Declaration *> *block;
 };
 struct IfStatement {
-	struct Expression *condition;
-	struct Statement *trueBlock;
-	struct Statement *falseBlock;
+  struct Expression *condition;
+  struct Statement *trueBlock;
+  struct Statement *falseBlock;
 };
 struct WhileStatement {
-	struct Expression *condition;
-	struct Statement *block;
+  struct Expression *condition;
+  struct Statement *block;
 };
 struct ReturnStatement {
-	struct Expression *expr;
+  struct Expression *expr;
 };
-BETTER_ENUM(StatementType, char, ExpressionStatement,PrintStatement,BlockStatement,IfStatement,WhileStatement,ReturnStatement);
+BETTER_ENUM(StatementType, char, ExpressionStatement, PrintStatement,
+            BlockStatement, IfStatement, WhileStatement, ReturnStatement);
 struct Statement {
-	StatementType type;
-	union {
-		ExpressionStatement *expressionstatement;
-		PrintStatement *printstatement;
-		BlockStatement *blockstatement;
-		IfStatement *ifstatement;
-		WhileStatement *whilestatement;
-		ReturnStatement *returnstatement;
-	};
-	static Statement* asExpressionStatement(ExpressionStatement *expressionstatement) {
-		return new Statement({.type=StatementType::ExpressionStatement, .expressionstatement=expressionstatement});
-	}
-	static Statement* asPrintStatement(PrintStatement *printstatement) {
-		return new Statement({.type=StatementType::PrintStatement, .printstatement=printstatement});
-	}
-	static Statement* asBlockStatement(BlockStatement *blockstatement) {
-		return new Statement({.type=StatementType::BlockStatement, .blockstatement=blockstatement});
-	}
-	static Statement* asIfStatement(IfStatement *ifstatement) {
-		return new Statement({.type=StatementType::IfStatement, .ifstatement=ifstatement});
-	}
-	static Statement* asWhileStatement(WhileStatement *whilestatement) {
-		return new Statement({.type=StatementType::WhileStatement, .whilestatement=whilestatement});
-	}
-	static Statement* asReturnStatement(ReturnStatement *returnstatement) {
-		return new Statement({.type=StatementType::ReturnStatement, .returnstatement=returnstatement});
-	}
+  StatementType type;
+  union {
+    ExpressionStatement *expressionstatement;
+    PrintStatement *printstatement;
+    BlockStatement *blockstatement;
+    IfStatement *ifstatement;
+    WhileStatement *whilestatement;
+    ReturnStatement *returnstatement;
+  };
+  static Statement *
+  asExpressionStatement(ExpressionStatement *expressionstatement) {
+    return new Statement({.type = StatementType::ExpressionStatement,
+                          .expressionstatement = expressionstatement});
+  }
+  static Statement *asPrintStatement(PrintStatement *printstatement) {
+    return new Statement({.type = StatementType::PrintStatement,
+                          .printstatement = printstatement});
+  }
+  static Statement *asBlockStatement(BlockStatement *blockstatement) {
+    return new Statement({.type = StatementType::BlockStatement,
+                          .blockstatement = blockstatement});
+  }
+  static Statement *asIfStatement(IfStatement *ifstatement) {
+    return new Statement(
+        {.type = StatementType::IfStatement, .ifstatement = ifstatement});
+  }
+  static Statement *asWhileStatement(WhileStatement *whilestatement) {
+    return new Statement({.type = StatementType::WhileStatement,
+                          .whilestatement = whilestatement});
+  }
+  static Statement *asReturnStatement(ReturnStatement *returnstatement) {
+    return new Statement({.type = StatementType::ReturnStatement,
+                          .returnstatement = returnstatement});
+  }
 };
 struct VarDeclaration {
-	struct Token *var;
-	struct Token *identifier;
-	struct Token *equals;
-	struct Expression *expr;
-	struct Token *semi;
+  struct Token *var;
+  struct Token *identifier;
+  struct Token *equals;
+  struct Expression *expr;
+  struct Token *semi;
 };
 struct StatementDeclaration {
-	struct Statement *statement;
-	struct Token *identifier;
-	struct Token *equals;
-	struct Expression *expr;
-	struct Token *semi;
+  struct Statement *statement;
+  struct Token *identifier;
+  struct Token *equals;
+  struct Expression *expr;
+  struct Token *semi;
 };
 struct FunctionDeclaration {
-	struct Token *identifier;
-	struct vector<Token*> *argIdentifiers;
-	struct Statement *block;
+  struct Token *identifier;
+  struct vector<Token *> *argIdentifiers;
+  struct Statement *block;
 };
 struct ClassDeclaration {
-	struct Token *identifier;
-	struct vector<FunctionDeclaration*> *methods;
+  struct Token *identifier;
+  struct vector<FunctionDeclaration *> *methods;
 };
-BETTER_ENUM(DeclarationType, char, VarDeclaration,StatementDeclaration,FunctionDeclaration,ClassDeclaration);
+BETTER_ENUM(DeclarationType, char, VarDeclaration, StatementDeclaration,
+            FunctionDeclaration, ClassDeclaration);
 struct Declaration {
-	DeclarationType type;
-	union {
-		VarDeclaration *vardeclaration;
-		StatementDeclaration *statementdeclaration;
-		FunctionDeclaration *functiondeclaration;
-		ClassDeclaration *classdeclaration;
-	};
-	static Declaration* asVarDeclaration(VarDeclaration *vardeclaration) {
-		return new Declaration({.type=DeclarationType::VarDeclaration, .vardeclaration=vardeclaration});
-	}
-	static Declaration* asStatementDeclaration(StatementDeclaration *statementdeclaration) {
-		return new Declaration({.type=DeclarationType::StatementDeclaration, .statementdeclaration=statementdeclaration});
-	}
-	static Declaration* asFunctionDeclaration(FunctionDeclaration *functiondeclaration) {
-		return new Declaration({.type=DeclarationType::FunctionDeclaration, .functiondeclaration=functiondeclaration});
-	}
-	static Declaration* asClassDeclaration(ClassDeclaration *classdeclaration) {
-		return new Declaration({.type=DeclarationType::ClassDeclaration, .classdeclaration=classdeclaration});
-	}
+  DeclarationType type;
+  union {
+    VarDeclaration *vardeclaration;
+    StatementDeclaration *statementdeclaration;
+    FunctionDeclaration *functiondeclaration;
+    ClassDeclaration *classdeclaration;
+  };
+  static Declaration *asVarDeclaration(VarDeclaration *vardeclaration) {
+    return new Declaration({.type = DeclarationType::VarDeclaration,
+                            .vardeclaration = vardeclaration});
+  }
+  static Declaration *
+  asStatementDeclaration(StatementDeclaration *statementdeclaration) {
+    return new Declaration({.type = DeclarationType::StatementDeclaration,
+                            .statementdeclaration = statementdeclaration});
+  }
+  static Declaration *
+  asFunctionDeclaration(FunctionDeclaration *functiondeclaration) {
+    return new Declaration({.type = DeclarationType::FunctionDeclaration,
+                            .functiondeclaration = functiondeclaration});
+  }
+  static Declaration *asClassDeclaration(ClassDeclaration *classdeclaration) {
+    return new Declaration({.type = DeclarationType::ClassDeclaration,
+                            .classdeclaration = classdeclaration});
+  }
 };
 struct LoxProgram {
-	struct vector<Declaration*> *program;
+  struct vector<Declaration *> *program;
 };
 class AstVisitor {
 public:
-	void visit(BinaryExpression *entry);
-	void visit(GroupingExpression *entry);
-	void visit(UnaryExpression *entry);
-	void visit(LiteralExpression *entry);
-	void visit(VariableExpression *entry);
-	void visit(LogicalExpression *entry);
-	void visit(AssignExpression *entry);
-	void visit(SetExpression *entry);
-	void visit(CallExpression *entry);
-	void visit(GetExpression *entry);
-	void visit(ThisExpression *entry);
-	void visit(Expression *entry) {
-		switch(entry->type) {
-			case ExpressionType::BinaryExpression:
-				this->visit(entry->binaryexpression);
-				break;
-			case ExpressionType::GroupingExpression:
-				this->visit(entry->groupingexpression);
-				break;
-			case ExpressionType::UnaryExpression:
-				this->visit(entry->unaryexpression);
-				break;
-			case ExpressionType::LiteralExpression:
-				this->visit(entry->literalexpression);
-				break;
-			case ExpressionType::VariableExpression:
-				this->visit(entry->variableexpression);
-				break;
-			case ExpressionType::AssignExpression:
-				this->visit(entry->assignexpression);
-				break;
-			case ExpressionType::LogicalExpression:
-				this->visit(entry->logicalexpression);
-				break;
-			case ExpressionType::CallExpression:
-				this->visit(entry->callexpression);
-				break;
-			case ExpressionType::GetExpression:
-				this->visit(entry->getexpression);
-				break;
-			case ExpressionType::SetExpression:
-				this->visit(entry->setexpression);
-				break;
-			case ExpressionType::ThisExpression:
-				this->visit(entry->thisexpression);
-				break;
-		}
-	}
-	void visit(ExpressionStatement *entry);
-	void visit(PrintStatement *entry);
-	void visit(BlockStatement *entry);
-	void visit(IfStatement *entry);
-	void visit(WhileStatement *entry);
-	void visit(ReturnStatement *entry);
-	void visit(Statement *entry) {
-		switch(entry->type) {
-			case StatementType::ExpressionStatement:
-				this->visit(entry->expressionstatement);
-				break;
-			case StatementType::PrintStatement:
-				this->visit(entry->printstatement);
-				break;
-			case StatementType::BlockStatement:
-				this->visit(entry->blockstatement);
-				break;
-			case StatementType::IfStatement:
-				this->visit(entry->ifstatement);
-				break;
-			case StatementType::WhileStatement:
-				this->visit(entry->whilestatement);
-				break;
-			case StatementType::ReturnStatement:
-				this->visit(entry->returnstatement);
-				break;
-		}
-	}
-	void visit(VarDeclaration *entry);
-	void visit(StatementDeclaration *entry);
-	void visit(FunctionDeclaration *entry);
-	void visit(ClassDeclaration *entry);
-	void visit(Declaration *entry) {
-		switch(entry->type) {
-			case DeclarationType::VarDeclaration:
-				this->visit(entry->vardeclaration);
-				break;
-			case DeclarationType::StatementDeclaration:
-				this->visit(entry->statementdeclaration);
-				break;
-			case DeclarationType::FunctionDeclaration:
-				this->visit(entry->functiondeclaration);
-				break;
-			case DeclarationType::ClassDeclaration:
-				this->visit(entry->classdeclaration);
-				break;
-		}
-	}
-	void visit(LoxProgram *entry);
+  void visit(BinaryExpression *entry);
+  void visit(GroupingExpression *entry);
+  void visit(UnaryExpression *entry);
+  void visit(LiteralExpression *entry);
+  void visit(VariableExpression *entry);
+  void visit(LogicalExpression *entry);
+  void visit(AssignExpression *entry);
+  void visit(SetExpression *entry);
+  void visit(CallExpression *entry);
+  void visit(GetExpression *entry);
+  void visit(ThisExpression *entry);
+  void visit(Expression *entry) {
+    switch (entry->type) {
+    case ExpressionType::BinaryExpression:
+      this->visit(entry->binaryexpression);
+      break;
+    case ExpressionType::GroupingExpression:
+      this->visit(entry->groupingexpression);
+      break;
+    case ExpressionType::UnaryExpression:
+      this->visit(entry->unaryexpression);
+      break;
+    case ExpressionType::LiteralExpression:
+      this->visit(entry->literalexpression);
+      break;
+    case ExpressionType::VariableExpression:
+      this->visit(entry->variableexpression);
+      break;
+    case ExpressionType::AssignExpression:
+      this->visit(entry->assignexpression);
+      break;
+    case ExpressionType::LogicalExpression:
+      this->visit(entry->logicalexpression);
+      break;
+    case ExpressionType::CallExpression:
+      this->visit(entry->callexpression);
+      break;
+    case ExpressionType::GetExpression:
+      this->visit(entry->getexpression);
+      break;
+    case ExpressionType::SetExpression:
+      this->visit(entry->setexpression);
+      break;
+    case ExpressionType::ThisExpression:
+      this->visit(entry->thisexpression);
+      break;
+    }
+  }
+  void visit(ExpressionStatement *entry);
+  void visit(PrintStatement *entry);
+  void visit(BlockStatement *entry);
+  void visit(IfStatement *entry);
+  void visit(WhileStatement *entry);
+  void visit(ReturnStatement *entry);
+  void visit(Statement *entry) {
+    switch (entry->type) {
+    case StatementType::ExpressionStatement:
+      this->visit(entry->expressionstatement);
+      break;
+    case StatementType::PrintStatement:
+      this->visit(entry->printstatement);
+      break;
+    case StatementType::BlockStatement:
+      this->visit(entry->blockstatement);
+      break;
+    case StatementType::IfStatement:
+      this->visit(entry->ifstatement);
+      break;
+    case StatementType::WhileStatement:
+      this->visit(entry->whilestatement);
+      break;
+    case StatementType::ReturnStatement:
+      this->visit(entry->returnstatement);
+      break;
+    }
+  }
+  void visit(VarDeclaration *entry);
+  void visit(StatementDeclaration *entry);
+  void visit(FunctionDeclaration *entry);
+  void visit(ClassDeclaration *entry);
+  void visit(Declaration *entry) {
+    switch (entry->type) {
+    case DeclarationType::VarDeclaration:
+      this->visit(entry->vardeclaration);
+      break;
+    case DeclarationType::StatementDeclaration:
+      this->visit(entry->statementdeclaration);
+      break;
+    case DeclarationType::FunctionDeclaration:
+      this->visit(entry->functiondeclaration);
+      break;
+    case DeclarationType::ClassDeclaration:
+      this->visit(entry->classdeclaration);
+      break;
+    }
+  }
+  void visit(LoxProgram *entry);
 };

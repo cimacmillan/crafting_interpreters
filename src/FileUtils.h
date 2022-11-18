@@ -4,7 +4,6 @@
 
 using namespace std;
 
-
 namespace FileUtils {
-    string readFile(string filename);
+string readFile(string filename);
 }

@@ -2,7 +2,6 @@
 
 #include "ast/ast.h"
 
+#include "Token.h"
 #include <enum.h>
 #include <vector>
-#include "Token.h"
-
