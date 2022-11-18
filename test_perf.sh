@@ -1,0 +1,1 @@
+sh rebuild_all.sh && ./build/lox lox/perf.lox
