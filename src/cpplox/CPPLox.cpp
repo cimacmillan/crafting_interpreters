@@ -7,7 +7,7 @@
 using namespace std;
 
 void CPPLox::report(int line, string message) {
-    cout << "[line " << line << "] Error: " << message << endl;
+    cerr << "[line " << line << "] Error: " << message << endl;
 }
 
 void CPPLox::fatal(int line, string message) {

@@ -1,0 +1,32 @@
+fun assert_equals(a, b, message) {
+    if (a == b) {
+        return;
+    }
+
+    exit(1, "", message);
+}
+
+fun add(a, b) {
+    return a + b;
+}
+
+fun sub(a, b) {
+    return a - b;
+}
+
+fun mult(a, b) {
+    return a * b;
+}
+
+fun div(a, b) {
+    return a / b;
+}
+
+assert_equals(add(1, 2), 3, "1 + 2 doesn't equal 3");
+assert_equals(add(-1, 2), 1, "-1 + 2 doesn't equal 1");
+
+assert_equals(sub(1, 2), -1, "1 - 2 doesn't equal -1s");
+
+assert_equals(mult(3, 4), 12, "3 * 4 doesn't equal 12");
+
+assert_equals(div(10, 5), 2, "10 / 5 doesn't equal 2");

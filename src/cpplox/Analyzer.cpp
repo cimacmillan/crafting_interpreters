@@ -151,7 +151,11 @@ void Analyzer::visit(ClassDeclaration *entry) {
     this->classType = previousClassType;
 }
 void Analyzer::visit(LoxProgram *entry) {
-    auto global = std::unordered_map<std::string, bool>();
+    auto global = std::unordered_map<std::string, bool>({
+        {"prints", true},
+        {"clock", true},
+        {"exit", true}
+    });
     this->scopes.push_back(global);
     for (auto decl : *(entry->program)) {
         this->visit(decl);

@@ -1,4 +1,3 @@
-
 class Animal {
     fun sound() {
         print "Animal noise";

@@ -35,7 +35,8 @@ int run(string source, Environment env) {
 
         interpreter.run();
     } catch (LoxRuntimeError error) {
-        cout << error << endl;
+        cerr << error << endl;
+        exit(1);
     }
 
     return SUCCESS;
@@ -78,6 +79,23 @@ LoxValue prints(vector<LoxValue> args) {
     return (LoxValue){.type = LoxValueType::NIL};
 }
 
+LoxValue program_exit_code(vector<LoxValue> args) {
+    if (args.size() > 2 && args[2].type == +LoxValueType::STRING) {
+        auto value = args[2].str;
+        cerr << *value << endl;
+    }
+
+    if (args.size() > 1 && args[1].type == +LoxValueType::STRING) {
+        auto value = args[1].str;
+        cout << *value << endl;
+    }
+
+    if (args.size() > 0 && args[0].type == +LoxValueType::NUMBER) {
+        auto value = args[0].number;
+        exit(value);
+    }
+}
+
 Environment createDefaultEnvironment() {
     Environment env(nullptr, {});
     env.defineVariable("clock");
@@ -88,6 +106,10 @@ Environment createDefaultEnvironment() {
     env.setVariable("prints", (LoxValue){.type = +LoxValueType::CALLABLE,
                                          .callable = new LoxNativeFunction(
                                              prints, "fun prints(args...)")});
+    env.defineVariable("exit");
+    env.setVariable("exit", (LoxValue){.type = +LoxValueType::CALLABLE,
+                                         .callable = new LoxNativeFunction(
+                                             program_exit_code, "fun exit(number, stdout, stderr)")});                                
     return env;
 }
 

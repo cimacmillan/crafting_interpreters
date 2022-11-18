@@ -1,9 +1,11 @@
-#include "sstream"
+#include <sstream>
 
 #include "Environment.h"
 #include "Interpreter.h"
 #include "LoxFunction.h"
 #include "LoxValue.h"
+
+#include <algorithm>
 
 LoxNativeFunction::LoxNativeFunction(
     struct LoxValue (*func)(std::vector<struct LoxValue> arguments),
@@ -24,7 +26,7 @@ LoxFunction::LoxFunction(FunctionDeclaration *decl, Environment *scope,
 
 struct LoxValue LoxFunction::call(std::vector<struct LoxValue> arguments) {
     auto args = std::unordered_map<std::string, LoxValue>();
-    auto argLength = arguments.size();
+    auto argLength = std::min(arguments.size(), this->decl->argIdentifiers->size());
     for (int i = 0; i < argLength; i++) {
         std::string name = this->decl->argIdentifiers->at(i)->lexeme;
         args.emplace(name, arguments[i]);
