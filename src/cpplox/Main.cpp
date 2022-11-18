@@ -5,14 +5,14 @@
 #include <vector>
 
 #include "FileUtils.h"
-#include "cpplox/Analyzer.h"
-#include "cpplox/CPPLox.h"
-#include "cpplox/Expr.h"
-#include "cpplox/Interpreter.h"
-#include "cpplox/LoxError.h"
-#include "cpplox/LoxFunction.h"
-#include "cpplox/LoxParser.h"
-#include "cpplox/TokenScanner.h"
+#include "Analyzer.h"
+#include "CPPLox.h"
+#include "Expr.h"
+#include "Interpreter.h"
+#include "LoxError.h"
+#include "LoxFunction.h"
+#include "LoxParser.h"
+#include "TokenScanner.h"
 
 using namespace std;
 using namespace std::chrono;

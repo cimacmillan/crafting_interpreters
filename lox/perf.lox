@@ -8,7 +8,7 @@ fun fib(a) {
 
 var before = clock();
 
-fib(20);
+fib(22);
 
 var after = clock();
 
