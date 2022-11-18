@@ -16,6 +16,7 @@ set(sources
     clox.c
     chunk.c
     debug.c
+    memory.c
 )
 
 # add the executable

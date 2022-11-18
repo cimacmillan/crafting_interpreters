@@ -89,7 +89,10 @@
         "filesystem": "cpp",
         "version": "cpp",
         "__functional_03": "cpp",
-        "chunk.h": "c"
+        "chunk.h": "c",
+        "__functional_base_03": "c",
+        "common.h": "c",
+        "memory.h": "c"
     },
     "cmake.configureOnOpen": false
 }

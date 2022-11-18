@@ -3,6 +3,39 @@
 
 #include "common.h"
 
+
+#define DYNAMIC_ARRAY_H(type) \
+    typedef struct { \
+        type *code; \
+        int size; \
+        int capacity; \
+    } type##_array; \
+    void type##_array_init(type##_array *array); \
+    void type##_array_add(type##_array *array, type code); \
+    void type##_array_free(type##_array *array); 
+
+#define DYNAMIC_ARRAY_IMPL(type) \
+    void type##_array_init(type##_array *array) { \
+        array->code = NULL; \
+        array->size = 0; \
+        array->capacity = 0; \
+    } \
+    void type##_array_add(type##_array *array, type code) { \
+        if (array->capacity <= array->size + 1) { \
+            int old_capacity = array->capacity; \
+            array->capacity = ARRAY_CAPACITY_GROW(array->capacity); \
+            array->code = ARRAY_GROW(array->code, type, old_capacity, array->capacity); \
+        } \
+        array->code[array->size] = code; \
+        array->size++; \
+    } \
+    void type##_array_free(type##_array *array) { \
+        int old_capacity = array->capacity; \
+        ARRAY_FREE(array->code, type, old_capacity); \
+        array->capacity = 0; \
+        array->size = 0; \
+    }
+
 #define ARRAY_CAPACITY_GROW(capacity) \
     ((capacity) < 8 ? 8 : (capacity) * 2)
 
@@ -12,20 +45,8 @@
 #define ARRAY_FREE(array, type, old_capacity) \
     (type*)reallocate(array, sizeof(type) * old_capacity, 0)
 
-void* reallocate(void* pointer, size_t before, size_t after) {
-    (void)before;
-    if (after == 0) {
-        free(pointer);
-        return NULL;
-    }
+void* reallocate(void* pointer, size_t before, size_t after);
 
-    void* result = realloc(pointer, after);
-
-    if (result == NULL) {
-        fprintf(stderr, "failed to allocate memory for dynamic array");
-    }
-
-    return result;
-}
+DYNAMIC_ARRAY_H(uint8_t)
 
 #endif
