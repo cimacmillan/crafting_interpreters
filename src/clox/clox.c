@@ -3,36 +3,32 @@
 #include "debug.h"
 #include "vm.h"
 
+static char* readFile(const char* file_name) {
+    FILE* file_handle = fopen(file_name, "rb");
+    fseek(file_handle, 0L, SEEK_END);
+    size_t fileSize = ftell(file_handle);
+    rewind(file_handle);
+
+    char* buffer = (char*)malloc(fileSize + 1);
+    size_t bytesRead = fread(buffer, sizeof(char), fileSize, file_handle);
+    buffer[bytesRead] = '\0';
+
+    fclose(file_handle);
+    return buffer;
+}
+
+lox_vm_result runFile(const char* file) {
+    char* source = readFile(file);
+    lox_vm_result result = interpret(source);
+    free(source);
+    return result;
+}
+
 int main (int argc, const char** argv) {
-    (void)argc;
-    (void)argv;
+    if (argc != 2) {
+        printf("Expecting 2 arguments\n");
+    }
 
-    lox_vm_init();
-
-    lox_chunk chunk;
-    chunk_init(&chunk);
-
-    uint8_t ten = chunk_add_constant(&chunk, 10);
-    chunk_add_code(&chunk, OP_CONSTANT, 123);
-    chunk_add_code(&chunk, ten, 123);
-
-    uint8_t twelve = chunk_add_constant(&chunk, 12);
-    chunk_add_code(&chunk, OP_CONSTANT, 123);
-    chunk_add_code(&chunk, twelve, 123);
-    
-    chunk_add_code(&chunk, OP_NEGATE, 123);
-    chunk_add_code(&chunk, OP_DIV, 123);
-
-
-    chunk_add_code(&chunk, OP_RETURN, 123);
-
-    // disassemble_chunk(&chunk, "test");
-
-    lox_vm_run(&chunk);
-
-    lox_vm_free();
-    chunk_free(&chunk);
-
-    return 0;
+    return runFile(argv[1]);
 }
 

@@ -68,3 +68,9 @@ lox_vm_result lox_vm_run(lox_chunk *chunk) {
 #undef STACK_POP
 }
 
+
+lox_vm_result interpret(char* source) {
+    printf("%s\n", source);
+    (void)source;
+    return LOX_VM_SUCCESS;
+}
