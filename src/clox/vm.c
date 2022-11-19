@@ -20,6 +20,13 @@ lox_vm_result lox_vm_run(lox_chunk *chunk) {
 #define READ_CONSTANT() (chunk->constants.code[READ_BYTE()])
 #define STACK_PUSH(value) (lox_value_array_add(&vm.stack, value))
 #define STACK_POP() (lox_value_array_pop(&vm.stack))
+#define MATH_BINARY(op) { \
+    lox_value b = STACK_POP(); \
+    lox_value a = STACK_POP(); \
+    lox_value result = a op b; \
+    STACK_PUSH(result); \
+    break; \
+}
 
     vm.ip = chunk->bytecode.code;
     for (;;) {
@@ -45,8 +52,13 @@ lox_vm_result lox_vm_run(lox_chunk *chunk) {
             }
             case OP_NEGATE: {
                 lox_value val = STACK_POP();
-                STACK_PUSH(-val);   
+                STACK_PUSH(-val);  
+                break; 
             }
+            case OP_ADD: MATH_BINARY(+)
+            case OP_SUB: MATH_BINARY(-)
+            case OP_MUL: MATH_BINARY(*)
+            case OP_DIV: MATH_BINARY(/)
         }
     }
     return LOX_VM_SUCCESS;

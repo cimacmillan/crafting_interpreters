@@ -23,6 +23,10 @@ static int constant_instruction(const char* name, lox_chunk *chunk, int offset) 
 }
 
 int disassemble_instruction(lox_chunk *chunk, int offset) {
+#define SIMPLE_CASE(X)  \
+    case X: \
+        return simple_instruction(""#X, offset);
+
     (void)chunk;
     printf("%04d ", offset);
     int line_number = chunk->line_numbers.code[offset];
@@ -35,15 +39,18 @@ int disassemble_instruction(lox_chunk *chunk, int offset) {
 
     uint8_t code = chunk->bytecode.code[offset];
     switch (code) {
-        case OP_RETURN:
-            return simple_instruction("OP_RETURN", offset);
+        SIMPLE_CASE(OP_RETURN)
+        SIMPLE_CASE(OP_NEGATE)
+        SIMPLE_CASE(OP_ADD)
+        SIMPLE_CASE(OP_SUB)
+        SIMPLE_CASE(OP_MUL)
+        SIMPLE_CASE(OP_DIV)
         case OP_CONSTANT:
             return constant_instruction("OP_CONSTANT", chunk, offset);
-        case OP_NEGATE:
-            return simple_instruction("OP_NEGATE", offset);
         default:
             printf("Unknown opcode %d\n", code);
             return offset + 1;
     }
     return 0;
+#undef SIMPLE_CASE
 }

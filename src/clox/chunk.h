@@ -12,6 +12,10 @@ typedef enum {
     OP_RETURN, // Return from function
     OP_CONSTANT, // Load constant onto stack
     OP_NEGATE, // Unary negate number on top of stack
+    OP_ADD, // Add top 2 stack values, push
+    OP_SUB, // Sub top 2 stack values, push
+    OP_MUL, // Mul top 2 stack values, push
+    OP_DIV, // Div top 2 stack values, push
 } lox_op_code;
 
 typedef struct {
