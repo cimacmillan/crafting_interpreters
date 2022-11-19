@@ -6,7 +6,6 @@
 #include "value.h"
 
 DYNAMIC_ARRAY_H(uint8_t)
-DYNAMIC_ARRAY_H(lox_value)
 DYNAMIC_ARRAY_H(int)
 
 typedef enum {

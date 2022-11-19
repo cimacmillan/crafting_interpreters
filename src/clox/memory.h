@@ -12,6 +12,7 @@
     } type##_array; \
     void type##_array_init(type##_array *array); \
     void type##_array_add(type##_array *array, type code); \
+    type type##_array_pop(type##_array *array); \
     void type##_array_free(type##_array *array); 
 
 #define DYNAMIC_ARRAY_IMPL(type) \
@@ -28,6 +29,11 @@
         } \
         array->code[array->size] = code; \
         array->size++; \
+    } \
+    type type##_array_pop(type##_array *array) { \
+        array->code[array->size]; \
+        array->size--; \
+        return array->code[array->size]; \
     } \
     void type##_array_free(type##_array *array) { \
         int old_capacity = array->capacity; \

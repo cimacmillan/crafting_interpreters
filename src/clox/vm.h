@@ -7,6 +7,7 @@
 typedef struct {
     lox_chunk *chunk;
     uint8_t *ip;
+    lox_value_array stack;
 } lox_vm;
 
 typedef enum {

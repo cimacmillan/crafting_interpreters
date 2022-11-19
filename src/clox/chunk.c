@@ -2,7 +2,6 @@
 #include "memory.h"
 
 DYNAMIC_ARRAY_IMPL(uint8_t)
-DYNAMIC_ARRAY_IMPL(lox_value)
 DYNAMIC_ARRAY_IMPL(int)
 
 void chunk_init(lox_chunk *chunk) {
