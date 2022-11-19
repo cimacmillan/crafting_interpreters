@@ -10,7 +10,8 @@ DYNAMIC_ARRAY_H(int)
 
 typedef enum {
     OP_RETURN, // Return from function
-    OP_CONSTANT, // Load constant
+    OP_CONSTANT, // Load constant onto stack
+    OP_NEGATE, // Unary negate number on top of stack
 } lox_op_code;
 
 typedef struct {

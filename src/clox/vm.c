@@ -19,11 +19,13 @@ lox_vm_result lox_vm_run(lox_chunk *chunk) {
 #define READ_BYTE() (*vm.ip++)
 #define READ_CONSTANT() (chunk->constants.code[READ_BYTE()])
 #define STACK_PUSH(value) (lox_value_array_add(&vm.stack, value))
+#define STACK_POP() (lox_value_array_pop(&vm.stack))
+
     vm.ip = chunk->bytecode.code;
     for (;;) {
         #ifdef DEBUG_PRINT
             printf("[stack] ");
-            for (int i = 0; i < vm.stack.size; i++) {
+            for (int i = vm.stack.size - 1; i >= 0; i--) {
                 printf("[ ");
                 lox_value_print(vm.stack.code[i]);
                 printf(" ]");
@@ -41,10 +43,16 @@ lox_vm_result lox_vm_run(lox_chunk *chunk) {
                 STACK_PUSH(val);
                 break;
             }
+            case OP_NEGATE: {
+                lox_value val = STACK_POP();
+                STACK_PUSH(-val);   
+            }
         }
     }
     return LOX_VM_SUCCESS;
 #undef READ_BYTE
 #undef READ_CONSTANT
+#undef STACK_PUSH
+#undef STACK_POP
 }
 

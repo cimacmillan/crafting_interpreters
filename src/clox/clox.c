@@ -20,6 +20,8 @@ int main (int argc, const char** argv) {
     chunk_add_code(&chunk, OP_CONSTANT, 123);
     chunk_add_code(&chunk, twelve, 123);
     
+    chunk_add_code(&chunk, OP_NEGATE, 123);
+
     chunk_add_code(&chunk, OP_RETURN, 123);
 
     // disassemble_chunk(&chunk, "test");
