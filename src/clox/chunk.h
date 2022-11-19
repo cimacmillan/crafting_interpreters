@@ -12,7 +12,7 @@ DYNAMIC_ARRAY_H(int)
 typedef enum {
     OP_RETURN, // Return from function
     OP_CONSTANT, // Load constant
-} OpCode;
+} lox_op_code;
 
 typedef struct {
     uint8_t_array bytecode;

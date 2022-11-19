@@ -18,6 +18,7 @@ set(sources
     debug.c
     memory.c
     value.c
+    vm.c
 )
 
 # add the executable
