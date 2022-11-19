@@ -2,6 +2,7 @@
 #include "chunk.h"
 #include "debug.h"
 #include "value.h"
+#include "compiler.h"
 
 #define DEBUG_PRINT
 
@@ -70,7 +71,6 @@ lox_vm_result lox_vm_run(lox_chunk *chunk) {
 
 
 lox_vm_result interpret(char* source) {
-    printf("%s\n", source);
-    (void)source;
+    compile(source);
     return LOX_VM_SUCCESS;
 }

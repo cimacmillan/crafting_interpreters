@@ -19,6 +19,8 @@ set(sources
     memory.c
     value.c
     vm.c
+    compiler.c
+    scanner.c
 )
 
 # add the executable
