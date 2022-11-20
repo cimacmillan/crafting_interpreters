@@ -21,7 +21,7 @@ lox_vm vm;
 void lox_vm_init();
 void lox_vm_free();
 lox_vm_result interpret(char* source);
-lox_vm_result lox_vm_run(lox_chunk *chunk);
+lox_vm_result lox_vm_run();
 
 #endif
 

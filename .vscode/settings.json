@@ -95,7 +95,9 @@
         "memory.h": "c",
         "value.h": "c",
         "token.h": "c",
-        "compiler.h": "c"
+        "compiler.h": "c",
+        "__availability": "c",
+        "scanner.h": "c"
     },
     "cmake.configureOnOpen": false
 }

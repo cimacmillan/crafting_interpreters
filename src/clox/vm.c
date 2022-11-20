@@ -16,9 +16,9 @@ void lox_vm_free() {
     lox_value_array_free(&vm.stack);
 }
 
-lox_vm_result lox_vm_run(lox_chunk *chunk) {
+lox_vm_result lox_vm_run() {
 #define READ_BYTE() (*vm.ip++)
-#define READ_CONSTANT() (chunk->constants.code[READ_BYTE()])
+#define READ_CONSTANT() (vm.chunk->constants.code[READ_BYTE()])
 #define STACK_PUSH(value) (lox_value_array_add(&vm.stack, value))
 #define STACK_POP() (lox_value_array_pop(&vm.stack))
 #define MATH_BINARY(op) { \
@@ -28,8 +28,6 @@ lox_vm_result lox_vm_run(lox_chunk *chunk) {
     STACK_PUSH(result); \
     break; \
 }
-
-    vm.ip = chunk->bytecode.code;
     for (;;) {
         #ifdef DEBUG_PRINT
             printf("[stack] ");
@@ -39,7 +37,7 @@ lox_vm_result lox_vm_run(lox_chunk *chunk) {
                 printf(" ]");
             }
             printf("\n");
-            disassemble_instruction(chunk, (int)(vm.ip - chunk->bytecode.code));
+            disassemble_instruction(vm.chunk, (int)(vm.ip - vm.chunk->bytecode.code));
         #endif
         uint8_t instruction = READ_BYTE();
         switch (instruction) {
@@ -72,6 +70,25 @@ lox_vm_result lox_vm_run(lox_chunk *chunk) {
 
 
 lox_vm_result interpret(char* source) {
-    compile(source);
-    return LOX_VM_SUCCESS;
+    lox_chunk chunk;
+    chunk_init(&chunk);
+    bool result = compile(source, &chunk);
+    if (!result) {
+        chunk_free(&chunk);
+        return LOX_VM_ERROR_COMPILATION;
+    }
+
+    disassemble_chunk(&chunk, "compilation result");
+
+    lox_vm_init();
+
+    vm.ip = chunk.bytecode.code;
+    vm.chunk = &chunk;
+
+    lox_vm_result vm_result = lox_vm_run();
+
+    lox_vm_free();
+    chunk_free(&chunk);
+
+    return vm_result;
 }

@@ -6,6 +6,7 @@ void disassemble_chunk(lox_chunk *chunk, const char* name) {
         // Instructions can be of different size
         i = disassemble_instruction(chunk, i);
     }
+    printf("=====================\n");
 }
 
 static int simple_instruction(const char* name, int offset) {
