@@ -67,6 +67,7 @@ lox_vm_result lox_vm_run(lox_chunk *chunk) {
 #undef READ_CONSTANT
 #undef STACK_PUSH
 #undef STACK_POP
+#undef MATH_BINARY
 }
 
 
