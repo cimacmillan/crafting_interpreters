@@ -11,6 +11,7 @@ typedef struct {
 } lox_parser;
 
 lox_parser parser;
+lox_chunk *current_chunk;
 
 static void error_at(lox_token* token, const char* message) {
   fprintf(stderr, "[line %d] Error", token->line);
@@ -44,11 +45,42 @@ static void advance() {
     }
 }
 
-static void expression() {
+static void emit_byte(uint8_t code) {
+    chunk_add_code(current_chunk, code, parser.previous.line);
+}
 
+static void emit_bytes(uint8_t code, uint8_t code2) {
+    emit_byte(code);
+    emit_byte(code2);
+}
+
+static void emit_constant(lox_value value) {
+    int val = chunk_add_constant(current_chunk, value);
+    emit_bytes(OP_CONSTANT, val);
+}
+
+static void number() {
+    lox_value value = strtod(parser.current.start, NULL);
+    emit_constant(value);
+}
+
+static void unary() {
+    lox_token_type previous = parser.previous.type;
+    number();
+
+    if (previous == TOKEN_MINUS) {
+        emit_byte(OP_NEGATE);
+    }
+    return;
+}
+
+static void expression() {
+    advance();
+    unary();
 }
 
 bool compile(char *source, lox_chunk *chunk) {
+    current_chunk = chunk;
     parser.had_error = false;
     scanner_init(source);
     advance();
