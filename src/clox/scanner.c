@@ -52,10 +52,72 @@ static bool match(char a) {
     return false;
 }
 
+static char peek() {
+    return *scanner.current;
+}
+
+static char peek_next() {
+    if (is_at_end()) return '\0';
+    return scanner.current[1];
+}
+
+static void skip_whitespace() {
+    while (true) {
+        char val = peek();
+        switch (val) {
+            case ' ':
+            case '\r':
+            case '\t':
+                advance();
+                break;
+            case '\n':
+                scanner.line++;
+                advance();
+                break;
+            case '/':
+                if (peek_next() == '/') {
+                    while (peek() != '\n' && !is_at_end()) advance();
+                } else {
+                    return;
+                }
+                break;
+            default:
+                return; 
+        }
+    }
+}
+
+static lox_token string() {
+    while(peek() != '"' && !is_at_end()) {
+        if (peek() == '\n') scanner.line++;
+        advance();
+    }
+
+    if (is_at_end()) return error_token("unterminated string");
+
+    advance();
+    return make_token(TOKEN_STRING);
+}
+
+static bool is_digit(char c) {
+    return c >= '0' && c <= '9';
+}
+
+static lox_token number() {
+    while (is_digit(peek())) advance();
+
+    if (peek() == '.' && is_digit(peek_next())) {
+        advance();
+        while (is_digit(peek())) advance();
+    }
+
+    return make_token(TOKEN_NUMBER);
+}
+
 lox_token scanner_token() {
 # define SINGLE_CHAR(ch, token_type) case(ch): return make_token(token_type);
 # define DOUBLE_CHAR(ch_a, ch_b, token_type_a, token_type_b) case(ch_a): return (match(ch_b) ? make_token(token_type_b) : make_token(token_type_a));
-
+    skip_whitespace();
     scanner.start = scanner.current;
 
     if (is_at_end()) {
@@ -63,6 +125,7 @@ lox_token scanner_token() {
     }
 
     char character = advance();
+    if (is_digit(character)) return number();
 
     switch (character) {
         SINGLE_CHAR('(', TOKEN_LEFT_PAREN)
@@ -80,6 +143,8 @@ lox_token scanner_token() {
         DOUBLE_CHAR('=', '=', TOKEN_EQUAL, TOKEN_EQUAL_EQUAL)
         DOUBLE_CHAR('<', '=', TOKEN_LESS, TOKEN_LESS_EQUAL)
         DOUBLE_CHAR('>', '=', TOKEN_GREATER, TOKEN_GREATER_EQUAL)
+        case '"':
+            return string();
     }
 
     return error_token("Unexpected character.");
