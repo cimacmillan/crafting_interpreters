@@ -114,6 +114,51 @@ static lox_token number() {
     return make_token(TOKEN_NUMBER);
 }
 
+static bool is_alpha(char c) {
+    return (
+        (c >= 'a' && c <='z') || 
+        (c >= 'A' && c <= 'Z') ||
+        c == '_'
+    );
+}
+
+static bool check_keyword(const char* keyword) {
+    int length = strlen(keyword);
+    int scanned_length = (int)(scanner.current - scanner.start);
+    if (length != scanned_length) {
+        return false;
+    }
+    bool is_match = memcmp(scanner.start, keyword, length) == 0;
+    return is_match;
+}
+
+static lox_token_type identifier_type() {
+#define MATCH(identifer, type) if (check_keyword(identifer)) return type;
+    MATCH("and", TOKEN_AND);
+    MATCH("class", TOKEN_CLASS);
+    MATCH("else", TOKEN_ELSE);
+    MATCH("if", TOKEN_IF);
+    MATCH("nil", TOKEN_NIL);
+    MATCH("or", TOKEN_OR);
+    MATCH("print", TOKEN_PRINT);
+    MATCH("return", TOKEN_RETURN);
+    MATCH("super", TOKEN_SUPER);
+    MATCH("var", TOKEN_VAR);
+    MATCH("while", TOKEN_WHILE);
+    MATCH("false", TOKEN_FALSE);
+    MATCH("for", TOKEN_FOR);
+    MATCH("fun", TOKEN_FUN);
+    MATCH("this", TOKEN_THIS);
+    MATCH("true", TOKEN_TRUE);
+    return TOKEN_IDENTIFIER;
+#undef MATCH
+}
+
+static lox_token identifier() {
+    while (is_alpha(peek()) || is_digit(peek())) advance();
+    return make_token(identifier_type());
+}
+
 lox_token scanner_token() {
 # define SINGLE_CHAR(ch, token_type) case(ch): return make_token(token_type);
 # define DOUBLE_CHAR(ch_a, ch_b, token_type_a, token_type_b) case(ch_a): return (match(ch_b) ? make_token(token_type_b) : make_token(token_type_a));
@@ -126,6 +171,7 @@ lox_token scanner_token() {
 
     char character = advance();
     if (is_digit(character)) return number();
+    if (is_alpha(character)) return identifier();
 
     switch (character) {
         SINGLE_CHAR('(', TOKEN_LEFT_PAREN)
@@ -149,6 +195,7 @@ lox_token scanner_token() {
 
     return error_token("Unexpected character.");
 #undef SINGLE_CHAR
+#undef DOUBLE_CHAR
 }
 
 
