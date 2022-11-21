@@ -10,8 +10,34 @@ typedef struct {
     bool had_error;
 } lox_parser;
 
+typedef enum {
+  PREC_NONE,
+  PREC_ASSIGNMENT,  // =
+  PREC_OR,          // or
+  PREC_AND,         // and
+  PREC_EQUALITY,    // == !=
+  PREC_COMPARISON,  // < > <= >=
+  PREC_TERM,        // + -
+  PREC_FACTOR,      // * /
+  PREC_UNARY,       // ! -
+  PREC_CALL,        // . ()
+  PREC_PRIMARY
+} lox_precedence;
+
+typedef void (*parse_fn)();
+
+typedef struct {
+  parse_fn prefix;
+  parse_fn infix;
+  lox_precedence precedence;
+} lox_parse_rule;
+
 lox_parser parser;
 lox_chunk *current_chunk;
+
+static lox_parse_rule* get_rule(lox_token_type type);
+static void parse_precedence(lox_precedence precedence);
+static void expression();
 
 static void error_at(lox_token* token, const char* message) {
   fprintf(stderr, "[line %d] Error", token->line);
@@ -26,11 +52,12 @@ static void error_at(lox_token* token, const char* message) {
 
   fprintf(stderr, ": %s\n", message);
   parser.had_error = true;
+  exit(1);
 }
 
-// static void error_at_previous(const char* message) {
-//     error_at(&parser.previous, message);
-// }
+static void error_at_previous(const char* message) {
+    error_at(&parser.previous, message);
+}
 
 static void error_at_current(const char* message) {
     error_at(&parser.current, message);
@@ -42,6 +69,13 @@ static void advance() {
         parser.current = scanner_token();
         if (parser.current.type != TOKEN_ERROR) break;
         error_at_current(parser.current.start);
+    }
+}
+
+static void consume(lox_token_type type, const char* error) {
+    advance();
+    if (parser.previous.type != type) {
+        error_at_previous(error);
     }
 }
 
@@ -60,23 +94,113 @@ static void emit_constant(lox_value value) {
 }
 
 static void number() {
-    lox_value value = strtod(parser.current.start, NULL);
+    lox_value value = strtod(parser.previous.start, NULL);
     emit_constant(value);
 }
 
 static void unary() {
     lox_token_type previous = parser.previous.type;
-    number();
-
+    parse_precedence(PREC_UNARY);
     if (previous == TOKEN_MINUS) {
         emit_byte(OP_NEGATE);
     }
     return;
 }
 
-static void expression() {
+static void grouping() {
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
+}
+
+static void binary() {
+    lox_token_type operator = parser.previous.type;
+    lox_parse_rule* rule = get_rule(operator);
+    // Only if next rule is factor do we parse more of the expression. 
+    // Otherwise we can just add whatever is on the stack to the next full parse.
+    // Eg 1 + 2 * 4 OR 1 + 2 + 3
+    // = 1 + (2 * 4) | (1 + 2) + 3
+    parse_precedence((lox_precedence)(rule->precedence + 1));
+    if (operator == TOKEN_PLUS) {
+        emit_byte(OP_ADD);
+    } else if(operator == TOKEN_MINUS) {
+        emit_byte(OP_SUB);
+    } else if(operator == TOKEN_STAR) {
+        emit_byte(OP_MUL);
+    } else if(operator == TOKEN_SLASH) {
+        emit_byte(OP_DIV);
+    }
+}
+
+lox_parse_rule rules[] = {
+  [TOKEN_LEFT_PAREN]    = {grouping, NULL,   PREC_NONE},
+  [TOKEN_RIGHT_PAREN]   = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_LEFT_BRACE]    = {NULL,     NULL,   PREC_NONE}, 
+  [TOKEN_RIGHT_BRACE]   = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_COMMA]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_DOT]           = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_MINUS]         = {unary,    binary, PREC_TERM},
+  [TOKEN_PLUS]          = {NULL,     binary, PREC_TERM},
+  [TOKEN_SEMICOLON]     = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_SLASH]         = {NULL,     binary, PREC_FACTOR},
+  [TOKEN_STAR]          = {NULL,     binary, PREC_FACTOR},
+  [TOKEN_BANG]          = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_BANG_EQUAL]    = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_EQUAL]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_EQUAL_EQUAL]   = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_GREATER]       = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_GREATER_EQUAL] = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_LESS]          = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_LESS_EQUAL]    = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_IDENTIFIER]    = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_STRING]        = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_NUMBER]        = {number,   NULL,   PREC_NONE},
+  [TOKEN_AND]           = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_CLASS]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_ELSE]          = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_FALSE]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_FOR]           = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_FUN]           = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_IF]            = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_NIL]           = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_OR]            = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_PRINT]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_RETURN]        = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_SUPER]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_THIS]          = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_TRUE]          = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_VAR]           = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_WHILE]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_ERROR]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_EOF]           = {NULL,     NULL,   PREC_NONE},
+};
+
+static lox_parse_rule* get_rule(lox_token_type type) {
+  return &rules[type];
+}
+
+static void parse_precedence(lox_precedence precedence) {
+    (void)precedence;
+    // Consume the first token
+    // | 1 + 2 => 1 | + 2
     advance();
-    unary();
+    lox_parse_rule *rule = get_rule(parser.previous.type);
+    if (rule == NULL) {
+        error_at_previous("No parse rule for token");
+    }
+    // (1) is parsed as number()
+    rule->prefix();
+    while(precedence <= get_rule(parser.current.type)->precedence) {
+        advance();
+        rule = get_rule(parser.previous.type);
+        if (rule == NULL) {
+            error_at_previous("No parse rule for token");
+        }
+        rule->infix();
+    }
+}
+
+static void expression() {
+    parse_precedence(PREC_ASSIGNMENT);
 }
 
 bool compile(char *source, lox_chunk *chunk) {
