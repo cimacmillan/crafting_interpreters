@@ -55,6 +55,18 @@ lox_vm_result lox_vm_run() {
                 STACK_PUSH(val);
                 break;
             }
+            case OP_TRUE: {
+                STACK_PUSH(TO_BOOL(true));
+                break;
+            }
+            case OP_FALSE: {
+                STACK_PUSH(TO_BOOL(false));
+                break;
+            }
+            case OP_NIL: {
+                STACK_PUSH(TO_NIL);
+                break;
+            }
             case OP_NEGATE: {
                 lox_value val = STACK_POP();
                 STACK_PUSH(TO_NUMBER(-AS_NUMBER(val)));  

@@ -41,7 +41,9 @@ DYNAMIC_ARRAY_H(char)
 #define AS_BOOL(val) (val.as.boolean)
 #define AS_STRING(val) (((lox_heap_object_string)val.as.obj)->chars)
 
-#define TO_NUMBER(val) ((lox_value){LOX_VALUE_TYPE_NUMBER, {.number=val}})
+#define TO_NUMBER(val) ((lox_value){ LOX_VALUE_TYPE_NUMBER, {.number=val} })
+#define TO_BOOL(val) ((lox_value){ LOX_VALUE_TYPE_BOOL, {.boolean=val} })
+#define TO_NIL ((lox_value){ LOX_VALUE_TYPE_NIL, {.number=0} })
 
 void lox_value_print(lox_value value);
 
