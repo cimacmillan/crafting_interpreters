@@ -123,6 +123,8 @@ static void unary() {
     parse_precedence(PREC_UNARY);
     if (previous == TOKEN_MINUS) {
         emit_byte(OP_NEGATE);
+    } else if (previous == TOKEN_BANG) {
+        emit_byte(OP_NOT);
     }
     return;
 }
@@ -163,7 +165,7 @@ lox_parse_rule rules[] = {
   [TOKEN_SEMICOLON]     = {NULL,     NULL,   PREC_NONE},
   [TOKEN_SLASH]         = {NULL,     binary, PREC_FACTOR},
   [TOKEN_STAR]          = {NULL,     binary, PREC_FACTOR},
-  [TOKEN_BANG]          = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_BANG]          = {unary,     NULL,   PREC_NONE},
   [TOKEN_BANG_EQUAL]    = {NULL,     NULL,   PREC_NONE},
   [TOKEN_EQUAL]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_EQUAL_EQUAL]   = {NULL,     NULL,   PREC_NONE},
@@ -207,6 +209,9 @@ static void parse_precedence(lox_precedence precedence) {
     if (rule == NULL) {
         error_at_previous("No parse rule for token");
     }
+    if (rule->prefix == NULL) {
+        error_at_previous("No prefix rule for token");
+    }
     // (1) is parsed as number()
     rule->prefix();
     while(precedence <= get_rule(parser.current.type)->precedence) {
@@ -214,6 +219,9 @@ static void parse_precedence(lox_precedence precedence) {
         rule = get_rule(parser.previous.type);
         if (rule == NULL) {
             error_at_previous("No parse rule for token");
+        }
+        if (rule->infix == NULL) {
+            error_at_previous("No infix rule for token");
         }
         rule->infix();
     }

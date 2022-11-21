@@ -49,6 +49,7 @@ int disassemble_instruction(lox_chunk *chunk, int offset) {
         SIMPLE_CASE(OP_TRUE)
         SIMPLE_CASE(OP_FALSE)
         SIMPLE_CASE(OP_NIL)
+        SIMPLE_CASE(OP_NOT)
         case OP_CONSTANT:
             return constant_instruction("OP_CONSTANT", chunk, offset);
         default:

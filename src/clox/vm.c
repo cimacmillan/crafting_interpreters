@@ -7,7 +7,7 @@
 #define DEBUG_PRINT
 
 void runtime_error(const char* message) {
-    fprintf(stderr, "%s\n", message);
+    fprintf(stderr, "Runtime Error: %s\n", message);
     exit(1);
 }
 
@@ -19,6 +19,14 @@ void lox_vm_init() {
 
 void lox_vm_free() {
     lox_value_array_free(&vm.stack);
+}
+
+static lox_value peek(int distance) {
+    return vm.stack.code[vm.stack.size - 1 - distance];
+}
+
+static bool isFalsey(lox_value value) {
+    return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
 }
 
 lox_vm_result lox_vm_run() {
@@ -68,6 +76,9 @@ lox_vm_result lox_vm_run() {
                 break;
             }
             case OP_NEGATE: {
+                if (!IS_NUMBER(peek(0))) {
+                    runtime_error("can only negate a number");
+                }
                 lox_value val = STACK_POP();
                 STACK_PUSH(TO_NUMBER(-AS_NUMBER(val)));  
                 break; 
@@ -76,6 +87,14 @@ lox_vm_result lox_vm_run() {
             case OP_SUB: MATH_BINARY(-)
             case OP_MUL: MATH_BINARY(*)
             case OP_DIV: MATH_BINARY(/)
+            case OP_NOT: {
+                lox_value val = STACK_POP();
+                STACK_PUSH(TO_BOOL(isFalsey(val)));  
+                break;
+            }
+            default:
+                runtime_error("vm does not recognise this opcode");
+                break;
         }
     }
     return LOX_VM_SUCCESS;

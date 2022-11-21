@@ -18,7 +18,8 @@ typedef enum {
     OP_DIV, // Div top 2 stack values, push
     OP_TRUE,
     OP_FALSE,
-    OP_NIL
+    OP_NIL,
+    OP_NOT 
 } lox_op_code;
 
 typedef struct {
