@@ -6,6 +6,11 @@
 
 #define DEBUG_PRINT
 
+void runtime_error(const char* message) {
+    fprintf(stderr, "%s\n", message);
+    exit(1);
+}
+
 void lox_vm_init() {
     vm.chunk = NULL;
     vm.ip = NULL;
@@ -24,7 +29,8 @@ lox_vm_result lox_vm_run() {
 #define MATH_BINARY(op) { \
     lox_value b = STACK_POP(); \
     lox_value a = STACK_POP(); \
-    lox_value result = a op b; \
+    if (!IS_NUMBER(a) || !IS_NUMBER(b)) runtime_error("operand can only be used on number types"); \
+    lox_value result = TO_NUMBER(AS_NUMBER(a) op AS_NUMBER(b)); \
     STACK_PUSH(result); \
     break; \
 }
@@ -51,7 +57,7 @@ lox_vm_result lox_vm_run() {
             }
             case OP_NEGATE: {
                 lox_value val = STACK_POP();
-                STACK_PUSH(-val);  
+                STACK_PUSH(TO_NUMBER(-AS_NUMBER(val)));  
                 break; 
             }
             case OP_ADD: MATH_BINARY(+)

@@ -94,7 +94,7 @@ static void emit_constant(lox_value value) {
 }
 
 static void number() {
-    lox_value value = strtod(parser.previous.start, NULL);
+    lox_value value = TO_NUMBER(strtod(parser.previous.start, NULL));
     emit_constant(value);
 }
 
