@@ -25,8 +25,23 @@ static lox_value peek(int distance) {
     return vm.stack.code[vm.stack.size - 1 - distance];
 }
 
-static bool isFalsey(lox_value value) {
+static bool is_falsey(lox_value value) {
     return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
+}
+
+static bool is_equal(lox_value a, lox_value b) {
+    if (a.type != b.type) return false;
+    switch (a.type) {
+        case LOX_VALUE_TYPE_BOOL:
+            return AS_BOOL(a) == AS_BOOL(b);
+        case LOX_VALUE_TYPE_NIL:
+            return true;
+        case LOX_VALUE_TYPE_NUMBER:
+            return AS_NUMBER(a) == AS_NUMBER(b);
+        default:
+            return false;
+    }
+    return false;
 }
 
 lox_vm_result lox_vm_run() {
@@ -34,11 +49,11 @@ lox_vm_result lox_vm_run() {
 #define READ_CONSTANT() (vm.chunk->constants.code[READ_BYTE()])
 #define STACK_PUSH(value) (lox_value_array_add(&vm.stack, value))
 #define STACK_POP() (lox_value_array_pop(&vm.stack))
-#define MATH_BINARY(op) { \
+#define MATH_BINARY(value_type, op) { \
     lox_value b = STACK_POP(); \
     lox_value a = STACK_POP(); \
     if (!IS_NUMBER(a) || !IS_NUMBER(b)) runtime_error("operand can only be used on number types"); \
-    lox_value result = TO_NUMBER(AS_NUMBER(a) op AS_NUMBER(b)); \
+    lox_value result = value_type(AS_NUMBER(a) op AS_NUMBER(b)); \
     STACK_PUSH(result); \
     break; \
 }
@@ -83,15 +98,23 @@ lox_vm_result lox_vm_run() {
                 STACK_PUSH(TO_NUMBER(-AS_NUMBER(val)));  
                 break; 
             }
-            case OP_ADD: MATH_BINARY(+)
-            case OP_SUB: MATH_BINARY(-)
-            case OP_MUL: MATH_BINARY(*)
-            case OP_DIV: MATH_BINARY(/)
+            case OP_ADD: MATH_BINARY(TO_NUMBER, +)
+            case OP_SUB: MATH_BINARY(TO_NUMBER, -)
+            case OP_MUL: MATH_BINARY(TO_NUMBER, *)
+            case OP_DIV: MATH_BINARY(TO_NUMBER, /)
             case OP_NOT: {
                 lox_value val = STACK_POP();
-                STACK_PUSH(TO_BOOL(isFalsey(val)));  
+                STACK_PUSH(TO_BOOL(is_falsey(val)));  
                 break;
             }
+            case OP_EQUAL: {
+                lox_value a = STACK_POP();
+                lox_value b = STACK_POP();
+                STACK_PUSH(TO_BOOL(is_equal(a, b)));  
+                break;
+            }
+            case OP_LESS: MATH_BINARY(TO_BOOL, <)
+            case OP_GREATER: MATH_BINARY(TO_BOOL, >)
             default:
                 runtime_error("vm does not recognise this opcode");
                 break;
