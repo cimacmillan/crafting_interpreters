@@ -97,7 +97,8 @@
         "token.h": "c",
         "compiler.h": "c",
         "__availability": "c",
-        "scanner.h": "c"
+        "scanner.h": "c",
+        "vm.h": "c"
     },
     "cmake.configureOnOpen": false
 }

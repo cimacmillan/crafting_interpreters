@@ -93,6 +93,12 @@ static void emit_constant(lox_value value) {
     emit_bytes(OP_CONSTANT, val);
 }
 
+static void string() {
+    lox_token token = parser.previous;
+    lox_value value = TO_OBJ((lox_heap_object*)new_lox_string((char*)token.start + 1, token.length - 2));
+    emit_constant(value);
+}
+
 static void literal() {
     switch (parser.previous.type) {
         case TOKEN_NUMBER: {
@@ -186,7 +192,7 @@ lox_parse_rule rules[] = {
   [TOKEN_LESS]          = {NULL,     binary,   PREC_COMPARISON},
   [TOKEN_LESS_EQUAL]    = {NULL,     binary,   PREC_COMPARISON},
   [TOKEN_IDENTIFIER]    = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_STRING]        = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_STRING]        = {string,     NULL,   PREC_NONE},
   [TOKEN_NUMBER]        = {literal,   NULL,   PREC_NONE},
   [TOKEN_AND]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_CLASS]         = {NULL,     NULL,   PREC_NONE},

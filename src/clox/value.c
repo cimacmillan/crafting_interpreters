@@ -1,19 +1,9 @@
 #include "value.h"
 #include "memory.h"
+#include "vm.h"
 
 DYNAMIC_ARRAY_IMPL(lox_value)
 DYNAMIC_ARRAY_IMPL(char)
-
-typedef struct {
-    lox_heap_object_type type;
-    struct lox_heap_object* next;
-} lox_heap_object;
-
-typedef struct {
-    lox_heap_object_type type;
-    lox_heap_object* next;
-    char_array chars;
-} lox_heap_object_string;
 
 void lox_value_print(lox_value value) {
     if (IS_NUMBER(value)) {
@@ -22,5 +12,42 @@ void lox_value_print(lox_value value) {
         printf(AS_BOOL(value) ? "true" : "false");
     } else if (IS_NIL(value)) {
         printf("nil");
+    } else if (IS_STRING(value)) {
+        printf("%s", AS_CSTRING(value));
+    }
+}
+
+struct lox_heap_object_string* new_lox_string(char* from, int length) {
+    lox_heap_object_string *obj = malloc(sizeof(lox_heap_object_string));
+    obj->type = LOX_HEAP_OBJECT_TYPE_STRING;
+    obj->next = NULL;
+    char_array_init(&obj->chars);
+    for (int i = 0; i < length; i++) {
+        char_array_add(&obj->chars, from[i]);
+    }
+    return obj;
+}
+
+struct lox_heap_object_string* copy_lox_string(lox_heap_object_string* from) {
+    lox_heap_object_string *obj = malloc(sizeof(lox_heap_object_string));
+    obj->type = LOX_HEAP_OBJECT_TYPE_STRING;
+    obj->next = NULL;
+    char_array_init(&obj->chars);
+    for (int i = 0; i < from->chars.size; i++) {
+        char_array_add(&obj->chars, from->chars.code[i]);
+    }
+    return obj;
+}
+
+void free_obj_string(lox_heap_object_string *str) {
+    char_array_free(&str->chars);
+    free(str);
+}
+
+void free_obj(lox_heap_object *obj) {
+    switch (obj->type) {
+        case LOX_HEAP_OBJECT_TYPE_STRING:
+            free_obj_string((lox_heap_object_string*)obj);
+        break;
     }
 }

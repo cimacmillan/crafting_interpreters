@@ -6,6 +6,8 @@
 
 #define DEBUG_PRINT
 
+lox_vm vm;
+
 void runtime_error(const char* message) {
     fprintf(stderr, "Runtime Error: %s\n", message);
     exit(1);
@@ -14,19 +16,47 @@ void runtime_error(const char* message) {
 void lox_vm_init() {
     vm.chunk = NULL;
     vm.ip = NULL;
+    vm.object_head = NULL;
     lox_value_array_init(&vm.stack);
 }
 
 void lox_vm_free() {
     lox_value_array_free(&vm.stack);
+    lox_heap_object *obj = vm.object_head;
+    while(obj) {
+        lox_heap_object *next = obj->next;
+        free_obj(obj);
+        obj = next;
+    }
 }
 
 static lox_value peek(int distance) {
     return vm.stack.code[vm.stack.size - 1 - distance];
 }
 
+static void on_lox_object_allocation(lox_heap_object *obj) {
+    obj->next = vm.object_head;
+    vm.object_head = obj;
+}
+
 static bool is_falsey(lox_value value) {
     return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
+}
+
+static bool is_heap_obj_equal(lox_heap_object *a, lox_heap_object *b) {
+    if (a->type != b->type) return false;
+    switch (a->type) {
+        case LOX_HEAP_OBJECT_TYPE_STRING: {
+            lox_heap_object_string *a_str = (lox_heap_object_string*)a;
+            lox_heap_object_string *b_str = (lox_heap_object_string*)b;
+            if (a_str->chars.size != b_str->chars.size) return false;
+            for (int i = 0; i < a_str->chars.size; i++) {
+                if (a_str->chars.code[i] != b_str->chars.code[i]) return false;
+            }
+            return true;
+        }
+    }
+    return false;
 }
 
 static bool is_equal(lox_value a, lox_value b) {
@@ -38,6 +68,8 @@ static bool is_equal(lox_value a, lox_value b) {
             return true;
         case LOX_VALUE_TYPE_NUMBER:
             return AS_NUMBER(a) == AS_NUMBER(b);
+        case LOX_VALUE_TYPE_HEAP_OBJ: 
+            return is_heap_obj_equal(AS_OBJ(a), AS_OBJ(b));
         default:
             return false;
     }
@@ -98,7 +130,26 @@ lox_vm_result lox_vm_run() {
                 STACK_PUSH(TO_NUMBER(-AS_NUMBER(val)));  
                 break; 
             }
-            case OP_ADD: MATH_BINARY(TO_NUMBER, +)
+            case OP_ADD: { 
+                lox_value b = STACK_POP(); 
+                lox_value a = STACK_POP(); 
+                if (IS_STRING(a) && IS_STRING(b)) {
+                    lox_heap_object_string *str = copy_lox_string(AS_STRING(a));
+                    on_lox_object_allocation((lox_heap_object*)str);
+                    lox_heap_object_string *concat = AS_STRING(b);
+                    for (int i = 0; i < concat->chars.size; i++) {
+                        char_array_add(&str->chars, concat->chars.code[i]);
+                    }
+                    lox_value result = TO_OBJ((lox_heap_object*)str);
+                    STACK_PUSH(result);
+                } else if (IS_NUMBER(a) && IS_NUMBER(b)){
+                    lox_value result = TO_NUMBER(AS_NUMBER(a) + AS_NUMBER(b)); 
+                    STACK_PUSH(result);
+                } else {
+                    runtime_error("+ operand can only be used on number or string types");
+                }
+                break;
+            }
             case OP_SUB: MATH_BINARY(TO_NUMBER, -)
             case OP_MUL: MATH_BINARY(TO_NUMBER, *)
             case OP_DIV: MATH_BINARY(TO_NUMBER, /)
