@@ -3,7 +3,7 @@
 LINKED_LIST_IMPL(lox_hashmap_entry)
 DYNAMIC_ARRAY_IMPL(lox_hashmap_entry_linked_list)
 
-static int HASHMAP_INITIAL_SIZE = 2;
+static int HASHMAP_INITIAL_SIZE = 128;
 static float HASHMAP_USAGE_TO_RESIZE = 0.5f;
 
 static uint32_t get_hash(char_array key) {
