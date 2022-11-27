@@ -39,17 +39,22 @@ void lox_hashmap_delete(lox_hashmap *map, char_array key) {
 }
 
 bool lox_hashmap_contains(lox_hashmap *map, char_array key) {
-    (void)map;
-    (void)key;
+    uint32_t index = get_hash(key) % map->table.size;
+    lox_hashmap_entry_linked_list *entry_list = map->table.code[index].next;
+    while (entry_list != NULL) {
+        if (char_array_is_equal(entry_list->value.key, key)) return true;
+        entry_list = entry_list->next;
+    }
     return false;
 }
 
 lox_value* lox_hashmap_get(lox_hashmap *map, char_array key) {
-    (void)map;
-    (void)key;
-    printf("get: ");
-    char_array_print(key);
-    printf("\n");
+    uint32_t index = get_hash(key) % map->table.size;
+    lox_hashmap_entry_linked_list *entry_list = map->table.code[index].next;
+    while (entry_list != NULL) {
+        if (char_array_is_equal(entry_list->value.key, key)) return &entry_list->value.value;
+        entry_list = entry_list->next;
+    }
     return NULL;
 }
 

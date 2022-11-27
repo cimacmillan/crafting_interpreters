@@ -23,6 +23,14 @@ void char_array_print(char_array array) {
     }
 }
 
+bool char_array_is_equal(char_array a, char_array b) {
+    if (a.size != b.size) return false;
+    for (int i = 0; i < a.size; i++) {
+        if (a.code[i] != b.code[i]) return false;
+    }
+    return true;
+}
+
 struct lox_heap_object_string* new_lox_string(char* from, int length) {
     lox_heap_object_string *obj = malloc(sizeof(lox_heap_object_string));
     obj->type = LOX_HEAP_OBJECT_TYPE_STRING;

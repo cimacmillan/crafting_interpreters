@@ -67,5 +67,7 @@ struct lox_heap_object_string* copy_lox_string(lox_heap_object_string* from);
 void lox_value_print(lox_value value);
 void free_obj(lox_heap_object *obj);
 void char_array_print(char_array array);
+bool char_array_is_equal(char_array a, char_array b);
+
 
 #endif
