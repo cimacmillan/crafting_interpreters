@@ -27,6 +27,7 @@ void lox_hashmap_insert(lox_hashmap *map, char_array key, lox_value value);
 void lox_hashmap_delete(lox_hashmap *map, char_array key);
 bool lox_hashmap_contains(lox_hashmap *map, char_array key);
 lox_value*lox_hashmap_get(lox_hashmap *map, char_array key);
+void lox_hashmap_print(lox_hashmap *map);
 
 
 
