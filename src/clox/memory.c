@@ -15,3 +15,4 @@ void* reallocate(void* pointer, size_t before, size_t after) {
 
     return result;
 }
+

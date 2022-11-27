@@ -17,6 +17,12 @@ void lox_value_print(lox_value value) {
     }
 }
 
+void char_array_print(char_array array) {
+    for (int i = 0; i < array.size; i++) {
+        printf("%c", array.code[i]);
+    }
+}
+
 struct lox_heap_object_string* new_lox_string(char* from, int length) {
     lox_heap_object_string *obj = malloc(sizeof(lox_heap_object_string));
     obj->type = LOX_HEAP_OBJECT_TYPE_STRING;

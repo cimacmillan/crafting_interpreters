@@ -3,12 +3,14 @@
 
 #include "common.h"
 #include "chunk.h"
+#include "hashmap.h"
 
 typedef struct {
     lox_chunk *chunk;
     uint8_t *ip;
     lox_value_array stack;
     lox_heap_object *object_head;
+    lox_hashmap intern_strings;
 } lox_vm;
 
 typedef enum {

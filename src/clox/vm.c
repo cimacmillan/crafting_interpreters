@@ -18,6 +18,7 @@ void lox_vm_init() {
     vm.ip = NULL;
     vm.object_head = NULL;
     lox_value_array_init(&vm.stack);
+    lox_hashmap_init(&vm.intern_strings);
 }
 
 void lox_vm_free() {
@@ -74,6 +75,20 @@ static bool is_equal(lox_value a, lox_value b) {
             return false;
     }
     return false;
+}
+
+static lox_value get_merged_string(lox_heap_object_string *a, lox_heap_object_string *b) {
+    char_array concat;
+    char_array_merge(&concat, &a->chars, &b->chars);
+    lox_value *intern_str = lox_hashmap_get(&vm.intern_strings, concat);
+    if (intern_str != NULL) {
+        return *intern_str;
+    }
+    lox_heap_object_string *str = new_lox_string(concat.code, concat.size);
+    on_lox_object_allocation((lox_heap_object*)str);
+    lox_value result = TO_OBJ((lox_heap_object*)str);
+    lox_hashmap_insert(&vm.intern_strings, concat, result);
+    return result;
 }
 
 lox_vm_result lox_vm_run() {
@@ -134,13 +149,7 @@ lox_vm_result lox_vm_run() {
                 lox_value b = STACK_POP(); 
                 lox_value a = STACK_POP(); 
                 if (IS_STRING(a) && IS_STRING(b)) {
-                    lox_heap_object_string *str = copy_lox_string(AS_STRING(a));
-                    on_lox_object_allocation((lox_heap_object*)str);
-                    lox_heap_object_string *concat = AS_STRING(b);
-                    for (int i = 0; i < concat->chars.size; i++) {
-                        char_array_add(&str->chars, concat->chars.code[i]);
-                    }
-                    lox_value result = TO_OBJ((lox_heap_object*)str);
+                    lox_value result = get_merged_string(AS_STRING(a), AS_STRING(b));
                     STACK_PUSH(result);
                 } else if (IS_NUMBER(a) && IS_NUMBER(b)){
                     lox_value result = TO_NUMBER(AS_NUMBER(a) + AS_NUMBER(b)); 

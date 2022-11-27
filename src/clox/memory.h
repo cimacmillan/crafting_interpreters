@@ -13,7 +13,9 @@
     void type##_array_init(type##_array *array); \
     void type##_array_add(type##_array *array, type code); \
     type type##_array_pop(type##_array *array); \
-    void type##_array_free(type##_array *array); 
+    void type##_array_free(type##_array *array); \
+    void type##_array_resize(type##_array *array, int size); \
+    void type##_array_merge(type##_array *merged, type##_array *a, type##_array *b); \
 
 #define DYNAMIC_ARRAY_IMPL(type) \
     void type##_array_init(type##_array *array) { \
@@ -40,7 +42,20 @@
         ARRAY_FREE(array->code, type, old_capacity); \
         array->capacity = 0; \
         array->size = 0; \
-    }
+    } \
+    void type##_array_resize(type##_array *array, int size) { \
+        int old_capacity = array->capacity; \
+        array->capacity = size; \
+        array->code = ARRAY_GROW(array->code, type, old_capacity, array->capacity); \
+        array->size = size; \
+    } \
+    void type##_array_merge(type##_array *merged, type##_array *a, type##_array *b) { \
+        type##_array_init(merged); \
+        type##_array_resize(merged, a->size + b->size); \
+        for (int i = 0; i < a->size; i++) { merged->code[i] = a->code[i]; } \
+        for (int i = 0; i < b->size; i++) { merged->code[i + a->size] = b->code[i]; } \
+    } 
+
 
 #define ARRAY_CAPACITY_GROW(capacity) \
     ((capacity) < 8 ? 8 : (capacity) * 2)
@@ -68,7 +83,7 @@ void* reallocate(void* pointer, size_t before, size_t after);
     void type##_linked_list_init(type##_linked_list *array) { \
         array->next = NULL; \
     } \
-    void type##_linked_list_add(type##_array *array, type value) { \
+    void type##_linked_list_add(type##_linked_list *array, type value) { \
         if (array->next) { \
             type##_linked_list_add(array->next, value); \
             return; \
@@ -77,7 +92,7 @@ void* reallocate(void* pointer, size_t before, size_t after);
         type##_linked_list_init(array->next); \
         array->next->value = value; \
     } \
-    void type##_linked_list_free(type##_array *array) { \
+    void type##_linked_list_free(type##_linked_list *array) { \
         if (array->next) { \
             type##_linked_list_free(array->next); \
         } \

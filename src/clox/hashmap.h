@@ -23,10 +23,10 @@ struct lox_hashmap {
 typedef struct lox_hashmap lox_hashmap;
 
 void lox_hashmap_init(lox_hashmap *map);
-void lox_hashmap_insert(lox_hashmap *map);
-void lox_hashmap_delete(lox_hashmap *map);
-bool lox_hashmap_contains(lox_hashmap *map);
-lox_value* lox_hashmap_get(lox_hashmap *map);
+void lox_hashmap_insert(lox_hashmap *map, char_array key, lox_value value);
+void lox_hashmap_delete(lox_hashmap *map, char_array key);
+bool lox_hashmap_contains(lox_hashmap *map, char_array key);
+lox_value*lox_hashmap_get(lox_hashmap *map, char_array key);
 
 
 
