@@ -19,6 +19,7 @@ typedef lox_hashmap_entry_linked_list_array lox_hashmap_table;
 
 struct lox_hashmap {
     lox_hashmap_table table;
+    int usage;
 };
 
 typedef struct lox_hashmap lox_hashmap;

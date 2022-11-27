@@ -13,7 +13,7 @@ void lox_value_print(lox_value value) {
     } else if (IS_NIL(value)) {
         printf("nil");
     } else if (IS_STRING(value)) {
-        printf("%s", AS_CSTRING(value));
+        char_array_print(AS_STRING(value)->chars);
     }
 }
 
