@@ -53,4 +53,36 @@
 
 void* reallocate(void* pointer, size_t before, size_t after);
 
+#define LINKED_LIST_H(type) \
+    struct type##_linked_list { \
+            type value; \
+            struct type##_linked_list *next; \
+    }; \
+    typedef struct type##_linked_list type##_linked_list; \
+    void type##_linked_list_init(type##_linked_list *array); \
+    void type##_linked_list_add(type##_linked_list *array, type value); \
+    void type##_linked_list_free(type##_linked_list *array); 
+
+
+#define LINKED_LIST_IMPL(type) \
+    void type##_linked_list_init(type##_linked_list *array) { \
+        array->next = NULL; \
+    } \
+    void type##_linked_list_add(type##_array *array, type value) { \
+        if (array->next) { \
+            type##_linked_list_add(array->next, value); \
+            return; \
+        } \
+        array->next = malloc(sizeof(type##_linked_list)); \
+        type##_linked_list_init(array->next); \
+        array->next->value = value; \
+    } \
+    void type##_linked_list_free(type##_array *array) { \
+        if (array->next) { \
+            type##_linked_list_free(array->next); \
+        } \
+        free(array->next); \
+        \
+    }
+
 #endif

@@ -21,6 +21,7 @@ set(sources
     vm.c
     compiler.c
     scanner.c
+    hashmap.c
 )
 
 # add the executable
