@@ -20,17 +20,11 @@ void lox_hashmap_init(lox_hashmap *map) {
 }
 
 void lox_hashmap_insert(lox_hashmap *map, char_array key, lox_value value) {
-    (void)map;
-    (void)key;
-    (void)value;
-    printf("insert: ");
-    char_array_print(key);
-    printf("\n");
-    uint32_t index = get_hash(key) % map->table.size;
-    lox_hashmap_entry entry = { key, value };
+    uint32_t hash = get_hash(key);
+    uint32_t index = hash % map->table.size;
+    lox_hashmap_entry entry = { key, value, hash };
     lox_hashmap_entry_linked_list *entry_list = &map->table.code[index];
     lox_hashmap_entry_linked_list_add(entry_list, entry);
-    lox_hashmap_print(map);
 }
 
 void lox_hashmap_delete(lox_hashmap *map, char_array key) {

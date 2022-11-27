@@ -7,6 +7,7 @@
 struct lox_hashmap_entry {
     char_array key;
     lox_value value;
+    uint32_t hash;
 };
 
 typedef struct lox_hashmap_entry lox_hashmap_entry;
