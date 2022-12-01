@@ -51,6 +51,14 @@ void lox_hashmap_insert(lox_hashmap *map, char_array key, lox_value value) {
     lox_hashmap_entry_linked_list *entry_list = &map->table.code[index];
     if (entry_list->next == NULL) {
         map->usage++;
+    } else {
+        while (entry_list->next != NULL) {
+            if (char_array_is_equal(entry_list->next->value.key, key)) {
+                entry_list->next->value.value = value;
+                return;
+            }
+            entry_list = entry_list->next;
+        }
     }
     lox_hashmap_entry_linked_list_add(entry_list, entry);
     float size = (float)map->table.size;

@@ -183,6 +183,22 @@ static void binary() {
     }
 }
 
+static int identifier_constant() {
+    lox_heap_object_string *str = new_lox_string((char*)parser.previous.start, parser.previous.length);
+    return chunk_add_constant(current_chunk, TO_OBJ((lox_heap_object*)str));
+}
+
+static void variable() {
+    int value = identifier_constant();
+
+    if (match(TOKEN_EQUAL)) {
+        expression();
+        emit_bytes(OP_SET_GLOBAL, value);
+    } else {
+        emit_bytes(OP_GET_GLOBAL, value);
+    }
+}
+
 lox_parse_rule rules[] = {
   [TOKEN_LEFT_PAREN]    = {grouping, NULL,   PREC_NONE},
   [TOKEN_RIGHT_PAREN]   = {NULL,     NULL,   PREC_NONE},
@@ -203,7 +219,7 @@ lox_parse_rule rules[] = {
   [TOKEN_GREATER_EQUAL] = {NULL,     binary,   PREC_COMPARISON},
   [TOKEN_LESS]          = {NULL,     binary,   PREC_COMPARISON},
   [TOKEN_LESS_EQUAL]    = {NULL,     binary,   PREC_COMPARISON},
-  [TOKEN_IDENTIFIER]    = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_IDENTIFIER]    = {variable,     NULL,   PREC_NONE},
   [TOKEN_STRING]        = {string,     NULL,   PREC_NONE},
   [TOKEN_NUMBER]        = {literal,   NULL,   PREC_NONE},
   [TOKEN_AND]           = {NULL,     NULL,   PREC_NONE},
@@ -281,8 +297,24 @@ static void statement() {
     }
 }
 
+static void var_declaration() {
+    consume(TOKEN_IDENTIFIER, "expected identifier");
+    int constant_index = identifier_constant();
+    if (match(TOKEN_EQUAL)) {
+        expression();
+    } else {
+        emit_byte(OP_NIL);
+    }
+    consume(TOKEN_SEMICOLON, "expected semicolon at end of variable declaration");
+    emit_bytes(OP_DEFINE_VARIABLE, constant_index);
+}
+
 static void declaration() {
-    statement();
+    if (match(TOKEN_VAR)) {
+        var_declaration();
+    } else {
+        statement();
+    }
 }
 
 static void program() {

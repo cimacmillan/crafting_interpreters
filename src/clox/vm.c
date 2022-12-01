@@ -19,6 +19,7 @@ void lox_vm_init() {
     vm.object_head = NULL;
     lox_value_array_init(&vm.stack);
     lox_hashmap_init(&vm.intern_strings);
+    lox_hashmap_init(&vm.globals);
 }
 
 void lox_vm_free() {
@@ -185,7 +186,36 @@ lox_vm_result lox_vm_run() {
                 STACK_POP();
                 break;
             }
+            case OP_DEFINE_VARIABLE: {
+                lox_value var_name = READ_CONSTANT();
+                lox_value value = STACK_POP();
+                lox_hashmap_insert(&vm.globals, AS_STRING(var_name)->chars, value);
+                lox_hashmap_print(&vm.globals);
+                break;
+            }
+            case OP_GET_GLOBAL: {
+                lox_value var_name = READ_CONSTANT();
+                lox_value *value = lox_hashmap_get(&vm.globals, AS_STRING(var_name)->chars);
+                if (value == NULL) {
+                    lox_value_print(var_name);
+                    runtime_error("no variable with this name");
+                }
+                STACK_PUSH(*value);
+                break;
+            }
+            case OP_SET_GLOBAL: {
+                lox_value var_name = READ_CONSTANT();
+                lox_value value = STACK_POP();
+                if (!lox_hashmap_contains(&vm.globals, AS_STRING(var_name)->chars)) {
+                    lox_value_print(var_name);
+                    runtime_error("undefined variable. define it first with var");
+                }
+                lox_hashmap_insert(&vm.globals, AS_STRING(var_name)->chars, value);
+                lox_hashmap_print(&vm.globals);
+                break;
+            }
             default:
+                printf("%d - \n", instruction);
                 runtime_error("vm does not recognise this opcode");
                 break;
         }

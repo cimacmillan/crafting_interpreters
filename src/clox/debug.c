@@ -57,6 +57,12 @@ int disassemble_instruction(lox_chunk *chunk, int offset) {
         SIMPLE_CASE(OP_POP)
         case OP_CONSTANT:
             return constant_instruction("OP_CONSTANT", chunk, offset);
+        case OP_DEFINE_VARIABLE:
+            return constant_instruction("OP_DEFINE_VARIABLE", chunk, offset);
+        case OP_GET_GLOBAL:
+            return constant_instruction("OP_GET_GLOBAL", chunk, offset);
+        case OP_SET_GLOBAL:
+            return constant_instruction("OP_SET_GLOBAL", chunk, offset);
         default:
             printf("Unknown opcode %d\n", code);
             return offset + 1;
