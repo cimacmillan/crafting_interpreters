@@ -175,6 +175,16 @@ lox_vm_result lox_vm_run() {
             }
             case OP_LESS: MATH_BINARY(TO_BOOL, <)
             case OP_GREATER: MATH_BINARY(TO_BOOL, >)
+            case OP_PRINT: {
+                lox_value a = STACK_POP();
+                lox_value_print(a);
+                printf("\n");
+                break;
+            }
+            case OP_POP: {
+                STACK_POP();
+                break;
+            }
             default:
                 runtime_error("vm does not recognise this opcode");
                 break;

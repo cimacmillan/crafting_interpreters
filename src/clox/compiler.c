@@ -72,6 +72,18 @@ static void advance() {
     }
 }
 
+static bool check(lox_token_type type) {
+    return parser.current.type == type;
+}
+
+static bool match(lox_token_type type) {
+    if (check(type)) {
+        advance();
+        return true;
+    }
+    return false;
+}
+
 static void consume(lox_token_type type, const char* error) {
     advance();
     if (parser.previous.type != type) {
@@ -249,12 +261,42 @@ static void expression() {
     parse_precedence(PREC_ASSIGNMENT);
 }
 
+static void expression_statement() {
+    expression();
+    consume(TOKEN_SEMICOLON, "expected semicolon at end of expression");
+    emit_byte(OP_POP);
+}
+
+static void print_statement() {
+    expression();
+    consume(TOKEN_SEMICOLON, "expected semicolon at end of print");
+    emit_byte(OP_PRINT);
+}
+
+static void statement() {
+    if (match(TOKEN_PRINT)) {
+        print_statement();
+    } else {
+        expression_statement();
+    }
+}
+
+static void declaration() {
+    statement();
+}
+
+static void program() {
+    while (!match(TOKEN_EOF)) {
+        declaration();
+    }
+}
+
 bool compile(char *source, lox_chunk *chunk) {
     current_chunk = chunk;
     parser.had_error = false;
     scanner_init(source);
     advance();
-    expression();
+    program();
     chunk_add_code(chunk, OP_RETURN, 0);
     return !parser.had_error;
 }
