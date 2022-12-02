@@ -8,4 +8,5 @@ set(CMAKE_BUILD_TYPE Debug)
 
 add_subdirectory(src/cpplox)
 add_subdirectory(src/clox)
+add_subdirectory(src/advent)
 
