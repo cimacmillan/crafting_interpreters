@@ -13,10 +13,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../)
 
 
 set(sources 
-    1.cpp
-)
-set(sources 
-    2.cpp
+    3.cpp
 )
 
 # add the executable

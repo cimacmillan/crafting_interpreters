@@ -75,7 +75,7 @@ int get_score(Hand a, Hand desired) {
     return play_score + outcome_score;
 }
 
-int main() {
+int main_2() {
     auto input = readFile("src/advent/2.txt");
     vector<string> lines = split(std::move(input), "\n");
     int score = 0;
