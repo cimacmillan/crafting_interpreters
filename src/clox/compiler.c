@@ -24,7 +24,7 @@ typedef enum {
   PREC_PRIMARY
 } lox_precedence;
 
-typedef void (*parse_fn)();
+typedef void (*parse_fn)(bool can_assign);
 
 typedef struct {
   parse_fn prefix;
@@ -105,13 +105,15 @@ static void emit_constant(lox_value value) {
     emit_bytes(OP_CONSTANT, val);
 }
 
-static void string() {
+static void string(bool can_assign) {
+    (void)can_assign;
     lox_token token = parser.previous;
     lox_value value = TO_OBJ((lox_heap_object*)new_lox_string((char*)token.start + 1, token.length - 2));
     emit_constant(value);
 }
 
-static void literal() {
+static void literal(bool can_assign) {
+    (void)can_assign;
     switch (parser.previous.type) {
         case TOKEN_NUMBER: {
             lox_value value = TO_NUMBER(strtod(parser.previous.start, NULL));
@@ -136,7 +138,8 @@ static void literal() {
     }
 }
 
-static void unary() {
+static void unary(bool can_assign) {
+    (void)can_assign;
     lox_token_type previous = parser.previous.type;
     parse_precedence(PREC_UNARY);
     if (previous == TOKEN_MINUS) {
@@ -147,12 +150,14 @@ static void unary() {
     return;
 }
 
-static void grouping() {
+static void grouping(bool can_assign) {
+    (void)can_assign;
     expression();
     consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
 }
 
-static void binary() {
+static void binary(bool can_assign) {
+    (void)can_assign;
     lox_token_type operator = parser.previous.type;
     lox_parse_rule* rule = get_rule(operator);
     // Only if next rule is factor do we parse more of the expression. 
@@ -188,8 +193,12 @@ static int identifier_constant() {
     return chunk_add_constant(current_chunk, TO_OBJ((lox_heap_object*)str));
 }
 
-static void variable() {
+static void variable(bool can_assign) {
     int value = identifier_constant();
+
+    if (!can_assign && match(TOKEN_EQUAL)) {
+        error_at_previous("Cannot assign to anything other than variable");
+    }
 
     if (match(TOKEN_EQUAL)) {
         expression();
@@ -258,8 +267,9 @@ static void parse_precedence(lox_precedence precedence) {
     if (rule->prefix == NULL) {
         error_at_previous("No prefix rule for token");
     }
+    bool can_assign = precedence <= PREC_ASSIGNMENT;
     // (1) is parsed as number()
-    rule->prefix();
+    rule->prefix(can_assign);
     while(precedence <= get_rule(parser.current.type)->precedence) {
         advance();
         rule = get_rule(parser.previous.type);
@@ -269,7 +279,7 @@ static void parse_precedence(lox_precedence precedence) {
         if (rule->infix == NULL) {
             error_at_previous("No infix rule for token");
         }
-        rule->infix();
+        rule->infix(can_assign);
     }
 }
 
