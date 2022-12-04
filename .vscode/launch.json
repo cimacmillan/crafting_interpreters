@@ -7,9 +7,17 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Launch",
+            "name": "clox",
             "program": "${workspaceFolder}/build/clox",
             "args": ["${workspaceFolder}/example.lox"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "advent",
+            "program": "${workspaceFolder}/build/advent",
+            "args": [],
             "cwd": "${workspaceFolder}"
         }
     ]
