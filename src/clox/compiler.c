@@ -4,10 +4,23 @@
 #include "scanner.h"
 #include "chunk.h"
 
+#define LOCAL_MAX 255
+
+struct lox_local {
+    lox_token token;
+    int depth;
+};
+
+typedef struct lox_local lox_local;
+
 typedef struct {
     lox_token previous;
     lox_token current;
     bool had_error;
+
+    int local_depth;
+    int local_count;
+    lox_local locals[LOCAL_MAX];
 } lox_parser;
 
 typedef enum {
@@ -35,9 +48,15 @@ typedef struct {
 lox_parser parser;
 lox_chunk *current_chunk;
 
+void init_parser() {
+    parser.local_count = 0;
+    parser.local_depth = 0;
+}
+
 static lox_parse_rule* get_rule(lox_token_type type);
 static void parse_precedence(lox_precedence precedence);
 static void expression();
+static void declaration();
 
 static void error_at(lox_token* token, const char* message) {
   fprintf(stderr, "[line %d] Error", token->line);
@@ -188,13 +207,36 @@ static void binary(bool can_assign) {
     }
 }
 
+static bool identifiers_equal(lox_token a, lox_token b) {
+    if (a.length != b.length) return false;
+    return memcmp(a.start, b.start, a.length) == 0;
+}
+
+static int resolve_local(lox_token token) {
+    for (int i = parser.local_count - 1; i >= 0; i--) {
+        if (identifiers_equal(token, parser.locals[i].token)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 static int identifier_constant() {
+
     lox_heap_object_string *str = new_lox_string((char*)parser.previous.start, parser.previous.length);
     return chunk_add_constant(current_chunk, TO_OBJ((lox_heap_object*)str));
 }
 
 static void variable(bool can_assign) {
-    int value = identifier_constant();
+    int arg = resolve_local(parser.previous);
+    int setOp = OP_SET_LOCAL;
+    int getOp = OP_GET_LOCAL;
+    // It's a global
+    if (arg == -1) {
+        arg = identifier_constant();
+        setOp = OP_SET_GLOBAL;
+        getOp = OP_GET_GLOBAL;
+    }
 
     if (!can_assign && match(TOKEN_EQUAL)) {
         error_at_previous("Cannot assign to anything other than variable");
@@ -202,9 +244,9 @@ static void variable(bool can_assign) {
 
     if (match(TOKEN_EQUAL)) {
         expression();
-        emit_bytes(OP_SET_GLOBAL, value);
+        emit_bytes(setOp, arg);
     } else {
-        emit_bytes(OP_GET_GLOBAL, value);
+        emit_bytes(getOp, arg);
     }
 }
 
@@ -307,21 +349,80 @@ static void statement() {
     }
 }
 
-static void var_declaration() {
+static void add_local(lox_token token) {
+    parser.locals[parser.local_count] = (lox_local){
+        .depth = parser.local_depth,
+        .token = token
+    };
+    parser.local_count++;
+}
+
+static void declare_local_var() {
+    // Dont keep track of global vars
+    if (parser.local_depth == 0) {
+        return;
+    }
+
+    add_local(parser.previous);
+}
+
+static int declare_var() {
     consume(TOKEN_IDENTIFIER, "expected identifier");
+    declare_local_var();
+    if (parser.local_depth != 0) {
+        return 0;
+    }
     int constant_index = identifier_constant();
+    return constant_index;
+}
+
+static void var_declaration() {
+    int constant_index = declare_var();
     if (match(TOKEN_EQUAL)) {
         expression();
     } else {
         emit_byte(OP_NIL);
     }
     consume(TOKEN_SEMICOLON, "expected semicolon at end of variable declaration");
-    emit_bytes(OP_DEFINE_VARIABLE, constant_index);
+    
+    // We only define globals in the global map, otherwise we can skip it because it's read from the stack instead
+    if (parser.local_depth == 0) {
+        emit_bytes(OP_DEFINE_GLOBAL, constant_index);
+    }
+}
+
+static void begin_scope() {
+    parser.local_depth++;
+}
+
+static void end_scope() {
+    for (int i = parser.local_count - 1; i >= 0; i--) {
+        if (parser.locals[i].depth < parser.local_depth) break;
+        parser.local_count--;
+        emit_byte(OP_POP);
+    }
+    
+    parser.local_depth--;
+
+}
+
+static void block_declaration() {
+    begin_scope();
+    while (!match(TOKEN_EOF) && !match(TOKEN_RIGHT_BRACE)) {
+        declaration();
+    }
+    end_scope();
+
+    if (parser.previous.type == TOKEN_EOF) {
+        error_at_previous("Unexpected end of file when should have got right brace");
+    }
 }
 
 static void declaration() {
     if (match(TOKEN_VAR)) {
         var_declaration();
+    } else if (match(TOKEN_LEFT_BRACE)) {
+        block_declaration();
     } else {
         statement();
     }
@@ -334,6 +435,7 @@ static void program() {
 }
 
 bool compile(char *source, lox_chunk *chunk) {
+    init_parser();
     current_chunk = chunk;
     parser.had_error = false;
     scanner_init(source);

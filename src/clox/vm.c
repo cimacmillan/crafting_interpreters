@@ -186,7 +186,7 @@ lox_vm_result lox_vm_run() {
                 STACK_POP();
                 break;
             }
-            case OP_DEFINE_VARIABLE: {
+            case OP_DEFINE_GLOBAL: {
                 lox_value var_name = READ_CONSTANT();
                 lox_value value = STACK_POP();
                 lox_hashmap_insert(&vm.globals, AS_STRING(var_name)->chars, value);
@@ -212,6 +212,16 @@ lox_vm_result lox_vm_run() {
                 }
                 lox_hashmap_insert(&vm.globals, AS_STRING(var_name)->chars, value);
                 lox_hashmap_print(&vm.globals);
+                break;
+            }
+            case OP_GET_LOCAL: {
+                uint8_t slot = READ_BYTE();
+                STACK_PUSH(vm.stack.code[slot]);
+                break;
+            }
+            case OP_SET_LOCAL: {
+                uint8_t slot = READ_BYTE();
+                vm.stack.code[slot] = peek(0);
                 break;
             }
             default:
