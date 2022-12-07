@@ -341,9 +341,38 @@ static void print_statement() {
     emit_byte(OP_PRINT);
 }
 
+static void begin_scope() {
+    parser.local_depth++;
+}
+
+static void end_scope() {
+    for (int i = parser.local_count - 1; i >= 0; i--) {
+        if (parser.locals[i].depth < parser.local_depth) break;
+        parser.local_count--;
+        emit_byte(OP_POP);
+    }
+    
+    parser.local_depth--;
+
+}
+
+static void block_statement() {
+    begin_scope();
+    while (!match(TOKEN_EOF) && !match(TOKEN_RIGHT_BRACE)) {
+        declaration();
+    }
+    end_scope();
+
+    if (parser.previous.type == TOKEN_EOF) {
+        error_at_previous("Unexpected end of file when should have got right brace");
+    }
+}
+
 static void statement() {
     if (match(TOKEN_PRINT)) {
         print_statement();
+    }else if (match(TOKEN_LEFT_BRACE)) {
+        block_statement();
     } else {
         expression_statement();
     }
@@ -391,38 +420,33 @@ static void var_declaration() {
     }
 }
 
-static void begin_scope() {
-    parser.local_depth++;
+static int emit_jump(lox_op_code op) {
+    emit_byte(op);
+    emit_byte(0xFF);
+    emit_byte(0xFF);
+    return current_chunk->bytecode.size - 2;
 }
 
-static void end_scope() {
-    for (int i = parser.local_count - 1; i >= 0; i--) {
-        if (parser.locals[i].depth < parser.local_depth) break;
-        parser.local_count--;
-        emit_byte(OP_POP);
-    }
-    
-    parser.local_depth--;
-
+static void patch_jump(int location) {
+    int jump = current_chunk->bytecode.size - location - 2;
+    current_chunk->bytecode.code[location] = (jump >> 8) & 0xFF;
+    current_chunk->bytecode.code[location + 1] = jump & 0xFF;
 }
 
-static void block_declaration() {
-    begin_scope();
-    while (!match(TOKEN_EOF) && !match(TOKEN_RIGHT_BRACE)) {
-        declaration();
-    }
-    end_scope();
-
-    if (parser.previous.type == TOKEN_EOF) {
-        error_at_previous("Unexpected end of file when should have got right brace");
-    }
+static void if_declaration() {
+    consume(TOKEN_LEFT_PAREN, "expected opening brace on if statement");
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "expected closing brace on if statement");
+    int jump = emit_jump(OP_JUMP_IF_FALSE);
+    statement();
+    patch_jump(jump);
 }
 
 static void declaration() {
     if (match(TOKEN_VAR)) {
         var_declaration();
-    } else if (match(TOKEN_LEFT_BRACE)) {
-        block_declaration();
+    } else if (match(TOKEN_IF)) {
+        if_declaration();
     } else {
         statement();
     }

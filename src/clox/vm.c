@@ -94,6 +94,8 @@ static lox_value get_merged_string(lox_heap_object_string *a, lox_heap_object_st
 
 lox_vm_result lox_vm_run() {
 #define READ_BYTE() (*vm.ip++)
+#define READ_SHORT() \
+    (vm.ip += 2, (uint16_t)((vm.ip[-2] << 8) | vm.ip[-1]))
 #define READ_CONSTANT() (vm.chunk->constants.code[READ_BYTE()])
 #define STACK_PUSH(value) (lox_value_array_add(&vm.stack, value))
 #define STACK_POP() (lox_value_array_pop(&vm.stack))
@@ -222,6 +224,14 @@ lox_vm_result lox_vm_run() {
             case OP_SET_LOCAL: {
                 uint8_t slot = READ_BYTE();
                 vm.stack.code[slot] = peek(0);
+                break;
+            }
+            case OP_JUMP_IF_FALSE: {
+                lox_value value = STACK_POP();
+                uint16_t jump = READ_SHORT();
+                if (is_falsey(value)) {
+                    vm.ip += jump;
+                }
                 break;
             }
             default:

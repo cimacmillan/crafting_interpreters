@@ -1,5 +1,7 @@
 var x = "hello";
+var y = true;
+if (y == false) 
 {
-    var x = x;
-    print x;
-}
+    print "world";
+} 
+print "hello";
