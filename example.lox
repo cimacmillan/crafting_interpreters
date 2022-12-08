@@ -1,13 +1,2 @@
-var y = false;
-if (y == false) 
-{
-    print "world";
-} else {
-    print "hello";
-}
-
-if (y == true) {
-    print "world";
-} else {
-    print "hello";
-}
+var y = true or false;
+print y;

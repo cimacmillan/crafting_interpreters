@@ -57,6 +57,8 @@ static lox_parse_rule* get_rule(lox_token_type type);
 static void parse_precedence(lox_precedence precedence);
 static void expression();
 static void declaration();
+static int emit_jump(lox_op_code op);
+static void patch_jump(int location);
 
 static void error_at(lox_token* token, const char* message) {
   fprintf(stderr, "[line %d] Error", token->line);
@@ -250,6 +252,24 @@ static void variable(bool can_assign) {
     }
 }
 
+static void and_op(bool can_assign) {
+    (void)can_assign;
+    int jump = emit_jump(OP_JUMP_IF_FALSE);
+    emit_byte(OP_POP);
+    parse_precedence(PREC_AND);
+    patch_jump(jump);
+}
+
+static void or_op(bool can_assign) {
+    (void)can_assign;
+    int false_jump = emit_jump(OP_JUMP_IF_FALSE);
+    int true_jump = emit_jump(OP_JUMP);
+    patch_jump(false_jump);
+    emit_byte(OP_POP);
+    parse_precedence(PREC_OR);
+    patch_jump(true_jump);
+}
+
 lox_parse_rule rules[] = {
   [TOKEN_LEFT_PAREN]    = {grouping, NULL,   PREC_NONE},
   [TOKEN_RIGHT_PAREN]   = {NULL,     NULL,   PREC_NONE},
@@ -273,7 +293,7 @@ lox_parse_rule rules[] = {
   [TOKEN_IDENTIFIER]    = {variable,     NULL,   PREC_NONE},
   [TOKEN_STRING]        = {string,     NULL,   PREC_NONE},
   [TOKEN_NUMBER]        = {literal,   NULL,   PREC_NONE},
-  [TOKEN_AND]           = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_AND]           = {NULL,     and_op,   PREC_AND},
   [TOKEN_CLASS]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ELSE]          = {NULL,     NULL,   PREC_NONE},
   [TOKEN_FALSE]         = {literal,     NULL,   PREC_NONE},
@@ -281,7 +301,7 @@ lox_parse_rule rules[] = {
   [TOKEN_FUN]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_IF]            = {NULL,     NULL,   PREC_NONE},
   [TOKEN_NIL]           = {literal,     NULL,   PREC_NONE},
-  [TOKEN_OR]            = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_OR]            = {NULL,     or_op,   PREC_OR},
   [TOKEN_PRINT]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_RETURN]        = {NULL,     NULL,   PREC_NONE},
   [TOKEN_SUPER]         = {NULL,     NULL,   PREC_NONE},
