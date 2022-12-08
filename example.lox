@@ -1,7 +1,13 @@
-var x = "hello";
-var y = true;
+var y = false;
 if (y == false) 
 {
     print "world";
-} 
-print "hello";
+} else {
+    print "hello";
+}
+
+if (y == true) {
+    print "world";
+} else {
+    print "hello";
+}

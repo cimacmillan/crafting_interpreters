@@ -227,11 +227,16 @@ lox_vm_result lox_vm_run() {
                 break;
             }
             case OP_JUMP_IF_FALSE: {
-                lox_value value = STACK_POP();
+                lox_value value = peek(0);
                 uint16_t jump = READ_SHORT();
                 if (is_falsey(value)) {
                     vm.ip += jump;
                 }
+                break;
+            }
+            case OP_JUMP: {
+                uint16_t jump = READ_SHORT();
+                vm.ip += jump;
                 break;
             }
             default:
