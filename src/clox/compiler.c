@@ -453,6 +453,13 @@ static void patch_jump(int location) {
     current_chunk->bytecode.code[location + 1] = jump & 0xFF;
 }
 
+static void emit_loop(int pos) {
+    emit_byte(OP_LOOP);
+    int offset = current_chunk->bytecode.size - pos + 2;
+    emit_byte((offset >> 8) & 0xFF);
+    emit_byte(offset & 0xFF);
+}
+
 static void if_declaration() {
     consume(TOKEN_LEFT_PAREN, "expected opening brace on if statement");
     expression();
@@ -469,11 +476,26 @@ static void if_declaration() {
     patch_jump(jump_over_else);
 }
 
+static void while_declaration() {
+    int loop_point = current_chunk->bytecode.size;
+    consume(TOKEN_LEFT_PAREN, "expected opening brace for while");
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "expected closing brace for while");
+    int skip = emit_jump(OP_JUMP_IF_FALSE);
+    emit_byte(OP_POP);
+    statement();
+    emit_loop(loop_point);
+    patch_jump(skip);
+    emit_byte(OP_POP);
+}
+
 static void declaration() {
     if (match(TOKEN_VAR)) {
         var_declaration();
     } else if (match(TOKEN_IF)) {
         if_declaration();
+    } else if (match(TOKEN_WHILE)) {
+        while_declaration();
     } else {
         statement();
     }

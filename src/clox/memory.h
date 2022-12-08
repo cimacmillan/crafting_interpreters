@@ -33,6 +33,7 @@
         array->size++; \
     } \
     type type##_array_pop(type##_array *array) { \
+        if (array->size == 0) printf("!popping from empty stack\n"); \
         array->code[array->size]; \
         array->size--; \
         return array->code[array->size]; \

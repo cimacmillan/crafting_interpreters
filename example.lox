@@ -1,2 +1,6 @@
-var y = true or false;
-print y;
+
+var x = 0;
+while (x < 5) {
+    print "hello";
+    x = x + 1;
+}

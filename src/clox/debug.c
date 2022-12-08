@@ -39,6 +39,15 @@ static int short_arg_instruction(const char* name, lox_chunk *chunk, int offset)
     return offset + 3;
 }
 
+static int loop_arg_instruction(const char* name, lox_chunk *chunk, int offset) {
+    uint16_t jump = ((chunk->bytecode.code[offset + 1] << 8) + chunk->bytecode.code[offset + 2]);
+    uint16_t address = offset - jump + 3;
+    // -16 makes that much space so the numbers are then alligned
+    printf("%-16s -> %04d", name, address);
+    printf("\n");
+    return offset + 3;
+}
+
 int disassemble_instruction(lox_chunk *chunk, int offset) {
 #define SIMPLE_CASE(X)  \
     case X: \
@@ -87,6 +96,8 @@ int disassemble_instruction(lox_chunk *chunk, int offset) {
             return short_arg_instruction("OP_JUMP", chunk, offset);
         case OP_JUMP_IF_FALSE:
             return short_arg_instruction("OP_JUMP_IF_FALSE", chunk, offset);
+        case OP_LOOP:
+            return loop_arg_instruction("OP_LOOP", chunk, offset);
         default:
             printf("Unknown opcode %d\n", code);
             return offset + 1;

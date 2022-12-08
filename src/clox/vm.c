@@ -207,7 +207,7 @@ lox_vm_result lox_vm_run() {
             }
             case OP_SET_GLOBAL: {
                 lox_value var_name = READ_CONSTANT();
-                lox_value value = STACK_POP();
+                lox_value value = peek(0);
                 if (!lox_hashmap_contains(&vm.globals, AS_STRING(var_name)->chars)) {
                     lox_value_print(var_name);
                     runtime_error("undefined variable. define it first with var");
@@ -237,6 +237,11 @@ lox_vm_result lox_vm_run() {
             case OP_JUMP: {
                 uint16_t jump = READ_SHORT();
                 vm.ip += jump;
+                break;
+            }
+            case OP_LOOP: {
+                uint16_t jump = READ_SHORT();
+                vm.ip -= jump;
                 break;
             }
             default:
