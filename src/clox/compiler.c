@@ -438,9 +438,11 @@ static void if_declaration() {
     expression();
     consume(TOKEN_RIGHT_PAREN, "expected closing brace on if statement");
     int jump = emit_jump(OP_JUMP_IF_FALSE);
+    emit_byte(OP_POP);
     statement();
     int jump_over_else = emit_jump(OP_JUMP);
     patch_jump(jump);
+    emit_byte(OP_POP);
     if (match(TOKEN_ELSE)) {
         statement();
     }
