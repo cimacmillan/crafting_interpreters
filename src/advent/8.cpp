@@ -65,9 +65,57 @@ int get_height(int *grid, int x, int y, int grid_width) {
     return grid[get_index(x, y, grid_width)];
 }
 
-void fire_ray(int *grid, bool *vis_grid, int grid_width, int start_x, int start_y, int d_x, int d_y) {
+void fire_ray(int *grid, bool *vis_grid, int grid_width, int grid_height, int start_x, int start_y, int d_x, int d_y) {
     int pos_x = start_x;
     int pos_y = start_y;
+    int tree_height = -1;
+
+    while (true) {
+        int index = get_index(pos_x, pos_y, grid_width);
+        int test_height = grid[index];
+
+        if (test_height > tree_height) {
+            vis_grid[index] = true;
+            tree_height = test_height;
+        }
+
+        if (pos_x == 0 && d_x < 0) break;
+        if (pos_y == 0 && d_y < 0) break;
+        if (pos_x == grid_width - 1 && d_x > 0) break;
+        if (pos_y == grid_height - 1 && d_y > 0) break;
+
+        pos_x += d_x;
+        pos_y += d_y;
+    }
+}
+
+// Fires a ray from the start height
+// Return the number of trees travelled before being blocked
+int fire_distance_ray(int *grid, int grid_width, int grid_height, int start_x, int start_y, int d_x, int d_y, int start_height) {
+    int pos_x = start_x + d_x;
+    int pos_y = start_y + d_y;
+    int distance = 0;
+
+    if (pos_x < 0 || pos_y < 0 || pos_x >= grid_width || pos_y >= grid_height) 
+        return 0;
+
+    while (true) {
+        int index = get_index(pos_x, pos_y, grid_width);
+        int test_height = grid[index];
+
+        distance++;
+
+        if (test_height >= start_height) break;
+        if (pos_x == 0 && d_x < 0) break;
+        if (pos_y == 0 && d_y < 0) break;
+        if (pos_x == grid_width - 1 && d_x > 0) break;
+        if (pos_y == grid_height - 1 && d_y > 0) break;
+
+        pos_x += d_x;
+        pos_y += d_y;
+    }
+
+    return distance;
 }
 
 int main() {
@@ -97,12 +145,12 @@ int main() {
     }
 
     for (int i = 0; i < width; i++) {
-        fire_ray(tree_grid, vis_grid, width, i, 0, 0, 1);
-        fire_ray(tree_grid, vis_grid, width, i, height - 1, 0, -1);
+        fire_ray(tree_grid, vis_grid, width, height, i, 0, 0, 1);
+        fire_ray(tree_grid, vis_grid, width, height, i, height - 1, 0, -1);
     }
      for (int i = 0; i < height; i++) {
-        fire_ray(tree_grid, vis_grid, width, 0, i, 1, 0);
-        fire_ray(tree_grid, vis_grid, width, width - 1, i, -1, 0);
+        fire_ray(tree_grid, vis_grid, width, height, 0, i, 1, 0);
+        fire_ray(tree_grid, vis_grid, width, height, width - 1, i, -1, 0);
     }
 
     int count = 0;
@@ -116,5 +164,20 @@ int main() {
     }
 
     cout << count << endl;
-    
+
+    int max = 0;
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            int index = get_index(x, y, width);
+            int test_height = tree_grid[index];
+            int score = 1;
+            score *= fire_distance_ray(tree_grid, width, height, x, y, 0, 1, test_height);
+            score *= fire_distance_ray(tree_grid, width, height, x, y, 0, -1, test_height);
+            score *= fire_distance_ray(tree_grid, width, height, x, y, 1, 0, test_height);
+            score *= fire_distance_ray(tree_grid, width, height, x, y, -1, 0, test_height);
+            max = score > max ? score : max;
+        }
+    }
+
+    cout << max << endl;
 }
