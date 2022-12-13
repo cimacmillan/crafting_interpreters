@@ -1,18 +1,18 @@
 
-fun fib(a) {
-    if (a < 2) {
-        return 1;
+fun test(a) {
+    print a;
+    if (1 == 1) {
+        var a = 20;
+        print a;
     }
-    return fib(a - 1) + fib(a - 2);
-}  
 
-var before = clock();
+    fun broken() {
+        print "test";
+    }
 
-fib(22);
+    return broken;
+}
 
-var after = clock();
+var result = test(10);
 
-print "calculation took ";
-print (after - before);
-print " milliseconds";
-
+result();

@@ -5,7 +5,7 @@
 #include "compiler.h"
 #include <time.h>
 
-// #define DEBUG_PRINT
+#define DEBUG_PRINT
 
 lox_vm vm;
 
