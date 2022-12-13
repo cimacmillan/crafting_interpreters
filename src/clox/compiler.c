@@ -533,6 +533,53 @@ static void for_declaration() {
     end_scope();
 }
 
+static int argument_list() {
+    int arity = 0;
+    while(!match(TOKEN_RIGHT_PAREN) && !match(TOKEN_EOF)) {
+        declare_var();
+        arity ++;
+
+        if (!check(TOKEN_RIGHT_PAREN)) {
+            consume(TOKEN_COMMA, "expected comma between arguments");
+        }
+    }
+
+    if (parser.previous.type == TOKEN_EOF) {
+        error_at_previous("got EOF when was expected end of arguments list");
+    }
+
+    return arity;
+}
+
+static void function_declaration() {
+    int constant_index = declare_var();
+    char_array name;
+    char_array_init(&name);
+    for (int i = 0; i < parser.previous.length; i++) {
+        char_array_add(&name, parser.previous.start[i]);
+    } 
+
+    begin_scope();
+    consume(TOKEN_LEFT_PAREN, "expected left parenthesis");
+    argument_list();
+    
+    consume(TOKEN_LEFT_BRACE, "expected left brace at beginning of function");
+
+    lox_heap_object_function *func = new_lox_function(name);
+    lox_chunk *previous = current_chunk;
+    current_chunk = &func->chunk;
+    block_statement();
+    end_scope();
+    current_chunk = previous;
+
+    emit_constant(TO_OBJ((lox_heap_object*)func));
+
+    // We only define globals in the global map, otherwise we can skip it because it's read from the stack instead
+    if (parser.local_depth == 0) {
+        emit_bytes(OP_DEFINE_GLOBAL, constant_index);
+    }
+}
+
 static void declaration() {
     if (match(TOKEN_VAR)) {
         var_declaration();
@@ -542,6 +589,8 @@ static void declaration() {
         while_declaration();
     } else if (match(TOKEN_FOR)) {
         for_declaration();
+    } else if (match(TOKEN_FUN)) {
+        function_declaration();
     } else {
         statement();
     }

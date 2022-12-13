@@ -57,6 +57,9 @@ static bool is_heap_obj_equal(lox_heap_object *a, lox_heap_object *b) {
             }
             return true;
         }
+        case LOX_HEAP_OBJECT_TYPE_FUNCTION: {
+            return a == b;
+        }
     }
     return false;
 }
@@ -268,7 +271,9 @@ lox_vm_result interpret(char* source) {
         return LOX_VM_ERROR_COMPILATION;
     }
 
-    disassemble_chunk(&chunk, "compilation result");
+    char_array comp_result = char_array_from_const_char("compilation result");
+
+    disassemble_chunk(&chunk, comp_result);
 
     lox_vm_init();
 

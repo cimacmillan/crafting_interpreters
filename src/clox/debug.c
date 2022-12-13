@@ -1,12 +1,21 @@
 #include "debug.h"
 
-void disassemble_chunk(lox_chunk *chunk, const char* name) {
-    printf("=== %s ===\n", name);
+void disassemble_chunk(lox_chunk *chunk, char_array name) {
+    printf("=== ");
+    char_array_print(name);
+    printf("===\n");
     for (int i = 0; i < chunk->bytecode.size;) {
         // Instructions can be of different size
         i = disassemble_instruction(chunk, i);
     }
     printf("=====================\n");
+    for (int i = 0; i < chunk->constants.size; i++) {
+        lox_value constant = chunk->constants.code[i];
+        if (IS_FUNCTION(constant)) {
+            lox_heap_object_function *func = AS_FUNCTION(constant);
+            disassemble_chunk(&func->chunk, func->name);
+        }
+    }
 }
 
 static int simple_instruction(const char* name, int offset) {

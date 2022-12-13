@@ -14,7 +14,21 @@ void lox_value_print(lox_value value) {
         printf("nil");
     } else if (IS_STRING(value)) {
         char_array_print(AS_STRING(value)->chars);
+    } else if (IS_FUNCTION(value)) {
+        printf("<fn ");
+        char_array_print(AS_FUNCTION(value)->name);
+        printf(">");
     }
+}
+
+char_array char_array_from_const_char(const char *val) {
+    int length = strlen(val);
+    char_array result;
+    char_array_init(&result);
+    for (int i = 0; i < length; i++) {
+        char_array_add(&result, val[i]);
+    }
+    return result;
 }
 
 void char_array_print(char_array array) {
@@ -58,10 +72,28 @@ void free_obj_string(lox_heap_object_string *str) {
     free(str);
 }
 
+lox_heap_object_function* new_lox_function(char_array name) {
+    lox_heap_object_function *obj = malloc(sizeof(lox_heap_object_function));
+    obj->type = LOX_HEAP_OBJECT_TYPE_FUNCTION;
+    obj->next = NULL;
+    obj->arity = 0;
+    obj->name = name;
+    chunk_init(&obj->chunk);
+    return obj;
+}
+
+void free_obj_func(lox_heap_object_function *func) {
+    chunk_free(&func->chunk);
+    free(func);;
+}
+
 void free_obj(lox_heap_object *obj) {
     switch (obj->type) {
         case LOX_HEAP_OBJECT_TYPE_STRING:
             free_obj_string((lox_heap_object_string*)obj);
+        break;
+        case LOX_HEAP_OBJECT_TYPE_FUNCTION:
+            free_obj_func((lox_heap_object_function*)obj);
         break;
     }
 }
