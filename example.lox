@@ -1,9 +1,10 @@
 
-fun test(a, b) {
-    print "test";
-    print b;
-    print a;
+fun sum(a, b) {
+    if (a == 10) {
+        return 10;
+    }
+    return a + b;
 }
 
-test(10, 20);
+print sum(10, 20);
 

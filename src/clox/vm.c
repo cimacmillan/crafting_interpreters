@@ -144,7 +144,17 @@ lox_vm_result lox_vm_run() {
         uint8_t instruction = READ_BYTE();
         switch (instruction) {
             case OP_RETURN: {
-                return LOX_VM_SUCCESS;
+                if (vm.call_frame == 0) {
+                    return LOX_VM_SUCCESS;
+                }
+                lox_value value = STACK_POP();
+                int stack_offset = vm.call_frames[vm.call_frame].stack_offset;
+                for (int i = vm.stack.size; i >= stack_offset; i--) {
+                    STACK_POP();
+                }
+                STACK_PUSH(value);
+                vm.call_frame--;
+                break;
             }
             case OP_CONSTANT: {
                 lox_value val = READ_CONSTANT();

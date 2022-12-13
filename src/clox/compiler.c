@@ -406,11 +406,23 @@ static void block_statement() {
     }
 }
 
+static void return_statement() {
+    if (match(TOKEN_SEMICOLON)) {
+        emit_bytes(OP_NIL, OP_RETURN);
+    } else {
+        expression();
+        consume(TOKEN_SEMICOLON, "Expected semicolon after return statement");
+        emit_byte(OP_RETURN);
+    }
+}
+
 static void statement() {
     if (match(TOKEN_PRINT)) {
         print_statement();
-    }else if (match(TOKEN_LEFT_BRACE)) {
+    } else if (match(TOKEN_LEFT_BRACE)) {
         block_statement();
+    } else if (match(TOKEN_RETURN)) {
+        return_statement();
     } else {
         expression_statement();
     }
@@ -588,7 +600,7 @@ static void function_declaration() {
     lox_chunk *previous = current_chunk;
     current_chunk = &func->chunk;
     block_statement();
-    emit_byte(OP_RETURN);
+    emit_bytes(OP_NIL, OP_RETURN);
     end_scope();
     current_chunk = previous;
 
