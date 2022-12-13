@@ -32,7 +32,7 @@ void lox_vm_free() {
 }
 
 static lox_value peek(int distance) {
-    return vm.stack.code[vm.stack.size - 1 - distance];
+    return vm.stack.code[vm.stack.size - 1 - distance + vm.call_frames[vm.call_frame].stack_offset];
 }
 
 static void on_lox_object_allocation(lox_heap_object *obj) {
@@ -95,12 +95,16 @@ static lox_value get_merged_string(lox_heap_object_string *a, lox_heap_object_st
 }
 
 static void call(lox_value value, int arg_c) {
-    (void)arg_c;
     if (IS_FUNCTION(value)) {
         lox_heap_object_function *func = AS_FUNCTION(value);
+        if (func->arity != arg_c) {
+            runtime_error("unexpected number of function arguments");
+        }
+
         vm.call_frame++;
         vm.call_frames[vm.call_frame].ip = func->chunk.bytecode.code;
         vm.call_frames[vm.call_frame].chunk = &func->chunk;
+        vm.call_frames[vm.call_frame].stack_offset = vm.stack.size - arg_c;
         return;
     }
 
@@ -237,7 +241,7 @@ lox_vm_result lox_vm_run() {
             }
             case OP_GET_LOCAL: {
                 uint8_t slot = READ_BYTE();
-                STACK_PUSH(vm.stack.code[slot]);
+                STACK_PUSH(vm.stack.code[slot + vm.call_frames[vm.call_frame].stack_offset]);
                 break;
             }
             case OP_SET_LOCAL: {
@@ -265,7 +269,7 @@ lox_vm_result lox_vm_run() {
             }
             case OP_CALL: {
                 uint8_t args = READ_BYTE();
-                lox_value value = STACK_POP();
+                lox_value value = peek(args);
                 call(value, args);
                 break;
             }
@@ -302,6 +306,7 @@ lox_vm_result interpret(char* source) {
     vm.call_frame = 0;
     vm.call_frames[0].ip = chunk.bytecode.code;
     vm.call_frames[0].chunk = &chunk;
+    vm.call_frames[0].stack_offset = 0;
 
     lox_vm_result vm_result = lox_vm_run();
 

@@ -1,7 +1,9 @@
 
-fun test() {
+fun test(a, b) {
     print "test";
+    print b;
+    print a;
 }
 
-test();
+test(10, 20);
 

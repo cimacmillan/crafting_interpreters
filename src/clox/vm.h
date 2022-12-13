@@ -10,6 +10,7 @@
 struct lox_vm_call_frame {
     lox_chunk *chunk;
     uint8_t *ip;
+    int stack_offset;
 };
 typedef struct lox_vm_call_frame lox_vm_call_frame;
 

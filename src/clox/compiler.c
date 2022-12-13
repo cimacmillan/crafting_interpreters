@@ -579,11 +579,12 @@ static void function_declaration() {
 
     begin_scope();
     consume(TOKEN_LEFT_PAREN, "expected left parenthesis");
-    argument_list();
+    int arity = argument_list();
     
     consume(TOKEN_LEFT_BRACE, "expected left brace at beginning of function");
 
     lox_heap_object_function *func = new_lox_function(name);
+    func->arity = arity;
     lox_chunk *previous = current_chunk;
     current_chunk = &func->chunk;
     block_statement();
