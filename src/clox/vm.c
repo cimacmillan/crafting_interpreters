@@ -3,14 +3,31 @@
 #include "debug.h"
 #include "value.h"
 #include "compiler.h"
+#include <time.h>
 
 // #define DEBUG_PRINT
 
 lox_vm vm;
 
+#define STACK_PUSH(value) (lox_value_array_add(&vm.stack, value))
+#define STACK_POP() (lox_value_array_pop(&vm.stack))
+
 void runtime_error(const char* message) {
     fprintf(stderr, "Runtime Error: %s\n", message);
     exit(1);
+}
+
+static lox_value clock_native(int argCount, lox_value* args) {
+    (void)argCount; (void)args;
+    return TO_NUMBER((double)clock() / CLOCKS_PER_SEC * 1000);
+}
+
+static void define_native(const char* name, lox_native_fun function) {
+  STACK_PUSH(TO_OBJ((lox_heap_object*)new_lox_string((char *)name, (int)strlen(name))));
+  STACK_PUSH(TO_OBJ((lox_heap_object*)new_lox_native_function(function)));
+  lox_hashmap_insert(&vm.globals, AS_STRING(vm.stack.code[0])->chars, vm.stack.code[1]);
+  STACK_POP();
+  STACK_POP();
 }
 
 void lox_vm_init() {
@@ -19,6 +36,8 @@ void lox_vm_init() {
     lox_value_array_init(&vm.stack);
     lox_hashmap_init(&vm.intern_strings);
     lox_hashmap_init(&vm.globals);
+
+    define_native("clock", clock_native);
 }
 
 void lox_vm_free() {
@@ -57,6 +76,9 @@ static bool is_heap_obj_equal(lox_heap_object *a, lox_heap_object *b) {
             return true;
         }
         case LOX_HEAP_OBJECT_TYPE_FUNCTION: {
+            return a == b;
+        }
+        case LOX_HEAP_OBJECT_TYPE_NATIVE_FUNCTION: {
             return a == b;
         }
     }
@@ -106,6 +128,14 @@ static void call(lox_value value, int arg_c) {
         vm.call_frames[vm.call_frame].chunk = &func->chunk;
         vm.call_frames[vm.call_frame].stack_offset = vm.stack.size - arg_c;
         return;
+    } else if (IS_NATIVE_FUNCTION(value)) {
+        lox_heap_object_native_function *native = AS_NATIVE_FUNCTION(value);
+        lox_value result = native->func(arg_c, vm.stack.code - arg_c);
+        for (int i = 0; i < arg_c + 1; i++) {
+            STACK_POP();
+        }
+        STACK_PUSH(result);
+        return;
     }
 
     lox_value_print(value);
@@ -120,8 +150,6 @@ lox_vm_result lox_vm_run() {
 #define READ_SHORT() \
     (IP() += 2, (uint16_t)((IP()[-2] << 8) | IP()[-1]))
 #define READ_CONSTANT() (CHUNK()->constants.code[READ_BYTE()])
-#define STACK_PUSH(value) (lox_value_array_add(&vm.stack, value))
-#define STACK_POP() (lox_value_array_pop(&vm.stack))
 #define MATH_BINARY(value_type, op) { \
     lox_value b = STACK_POP(); \
     lox_value a = STACK_POP(); \

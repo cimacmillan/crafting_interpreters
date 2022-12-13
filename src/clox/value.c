@@ -18,6 +18,8 @@ void lox_value_print(lox_value value) {
         printf("<fn ");
         char_array_print(AS_FUNCTION(value)->name);
         printf(">");
+    } else if (IS_NATIVE_FUNCTION(value)) {
+        printf("<native fn>");
     }
 }
 
@@ -82,6 +84,14 @@ lox_heap_object_function* new_lox_function(char_array name) {
     return obj;
 }
 
+lox_heap_object_native_function* new_lox_native_function(lox_native_fun fun) {
+    lox_heap_object_native_function *obj = malloc(sizeof(lox_heap_object_native_function));
+    obj->type = LOX_HEAP_OBJECT_TYPE_NATIVE_FUNCTION;
+    obj->next = NULL;
+    obj->func = fun;
+    return obj;
+}
+
 void free_obj_func(lox_heap_object_function *func) {
     chunk_free(&func->chunk);
     free(func);;
@@ -94,6 +104,9 @@ void free_obj(lox_heap_object *obj) {
         break;
         case LOX_HEAP_OBJECT_TYPE_FUNCTION:
             free_obj_func((lox_heap_object_function*)obj);
+        break;
+        case LOX_HEAP_OBJECT_TYPE_NATIVE_FUNCTION:
+            free(obj);
         break;
     }
 }

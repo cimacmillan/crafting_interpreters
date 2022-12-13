@@ -61,7 +61,8 @@ typedef struct {
 
 typedef enum {
     LOX_HEAP_OBJECT_TYPE_STRING,
-    LOX_HEAP_OBJECT_TYPE_FUNCTION
+    LOX_HEAP_OBJECT_TYPE_FUNCTION,
+    LOX_HEAP_OBJECT_TYPE_NATIVE_FUNCTION,
 } lox_heap_object_type;
 
 struct lox_heap_object {
@@ -89,6 +90,15 @@ struct lox_heap_object_function {
 
 typedef struct lox_heap_object_function lox_heap_object_function;
 
+typedef lox_value (*lox_native_fun)(int argCount, lox_value* args);
+
+struct lox_heap_object_native_function {
+    lox_heap_object_type type;
+    struct lox_heap_object* next;
+    lox_native_fun func;
+};
+
+typedef struct lox_heap_object_native_function lox_heap_object_native_function;
 
 // Is the lox value type of type
 #define IS_NUMBER(val) (val.type == LOX_VALUE_TYPE_NUMBER)
@@ -96,6 +106,7 @@ typedef struct lox_heap_object_function lox_heap_object_function;
 #define IS_NIL(val) (val.type == LOX_VALUE_TYPE_NIL)
 #define IS_STRING(val) (val.type == LOX_VALUE_TYPE_HEAP_OBJ && val.as.obj->type == LOX_HEAP_OBJECT_TYPE_STRING)
 #define IS_FUNCTION(val) (val.type == LOX_VALUE_TYPE_HEAP_OBJ && val.as.obj->type == LOX_HEAP_OBJECT_TYPE_FUNCTION)
+#define IS_NATIVE_FUNCTION(val) (val.type == LOX_VALUE_TYPE_HEAP_OBJ && val.as.obj->type == LOX_HEAP_OBJECT_TYPE_NATIVE_FUNCTION)
 
 // Extract the c value from the lox value type
 #define AS_NUMBER(val) (val.as.number)
@@ -104,6 +115,7 @@ typedef struct lox_heap_object_function lox_heap_object_function;
 #define AS_STRING(val) (((struct lox_heap_object_string *)val.as.obj))
 #define AS_CSTRING(val) (((struct lox_heap_object_string *)val.as.obj)->chars.code)
 #define AS_FUNCTION(val) ((struct lox_heap_object_function *)val.as.obj)
+#define AS_NATIVE_FUNCTION(val) ((struct lox_heap_object_native_function *)val.as.obj)
 
 #define TO_NUMBER(val) ((lox_value){ LOX_VALUE_TYPE_NUMBER, {.number=val} })
 #define TO_BOOL(val) ((lox_value){ LOX_VALUE_TYPE_BOOL, {.boolean=val} })
@@ -119,6 +131,7 @@ void char_array_print(char_array array);
 bool char_array_is_equal(char_array a, char_array b);
 
 lox_heap_object_function* new_lox_function();
+lox_heap_object_native_function* new_lox_native_function(lox_native_fun fun);
 
 
 #endif

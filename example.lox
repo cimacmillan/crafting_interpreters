@@ -1,5 +1,4 @@
 
-
 fun fib(a) {
     if (a < 2) {
         return 1;
@@ -7,7 +6,13 @@ fun fib(a) {
     return fib(a - 1) + fib(a - 2);
 }  
 
-for (var i = 0; i < 23; i = i + 1) {
-    print fib(i);
-}
+var before = clock();
+
+fib(22);
+
+var after = clock();
+
+print "calculation took ";
+print (after - before);
+print " milliseconds";
 
