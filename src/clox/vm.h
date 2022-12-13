@@ -5,13 +5,22 @@
 #include "chunk.h"
 #include "hashmap.h"
 
-struct lox_vm {
+#define LOX_VM_CALL_FRAME_MAX 256
+
+struct lox_vm_call_frame {
     lox_chunk *chunk;
     uint8_t *ip;
+};
+typedef struct lox_vm_call_frame lox_vm_call_frame;
+
+
+struct lox_vm {
     lox_value_array stack;
     lox_heap_object *object_head;
     lox_hashmap intern_strings;
     lox_hashmap globals;
+    lox_vm_call_frame call_frames[LOX_VM_CALL_FRAME_MAX];
+    int call_frame;
 };
 typedef struct lox_vm lox_vm;
 

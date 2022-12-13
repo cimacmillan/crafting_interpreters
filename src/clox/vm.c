@@ -14,8 +14,7 @@ void runtime_error(const char* message) {
 }
 
 void lox_vm_init() {
-    vm.chunk = NULL;
-    vm.ip = NULL;
+    vm.call_frame = 0;
     vm.object_head = NULL;
     lox_value_array_init(&vm.stack);
     lox_hashmap_init(&vm.intern_strings);
@@ -95,11 +94,28 @@ static lox_value get_merged_string(lox_heap_object_string *a, lox_heap_object_st
     return result;
 }
 
+static void call(lox_value value, int arg_c) {
+    (void)arg_c;
+    if (IS_FUNCTION(value)) {
+        lox_heap_object_function *func = AS_FUNCTION(value);
+        vm.call_frame++;
+        vm.call_frames[vm.call_frame].ip = func->chunk.bytecode.code;
+        vm.call_frames[vm.call_frame].chunk = &func->chunk;
+        return;
+    }
+
+    lox_value_print(value);
+    runtime_error("cannot call this lox value");
+}
+
 lox_vm_result lox_vm_run() {
-#define READ_BYTE() (*vm.ip++)
+#define FRAME() (&vm.call_frames[vm.call_frame])
+#define CHUNK() (FRAME()->chunk)
+#define IP() (FRAME()->ip)
+#define READ_BYTE() (*(FRAME()->ip++))
 #define READ_SHORT() \
-    (vm.ip += 2, (uint16_t)((vm.ip[-2] << 8) | vm.ip[-1]))
-#define READ_CONSTANT() (vm.chunk->constants.code[READ_BYTE()])
+    (IP() += 2, (uint16_t)((IP()[-2] << 8) | IP()[-1]))
+#define READ_CONSTANT() (CHUNK()->constants.code[READ_BYTE()])
 #define STACK_PUSH(value) (lox_value_array_add(&vm.stack, value))
 #define STACK_POP() (lox_value_array_pop(&vm.stack))
 #define MATH_BINARY(value_type, op) { \
@@ -119,7 +135,7 @@ lox_vm_result lox_vm_run() {
                 printf(" ]");
             }
             printf("\n");
-            disassemble_instruction(vm.chunk, (int)(vm.ip - vm.chunk->bytecode.code));
+            disassemble_instruction(CHUNK(), (int)(IP() - CHUNK()->bytecode.code));
         #endif
         uint8_t instruction = READ_BYTE();
         switch (instruction) {
@@ -233,18 +249,24 @@ lox_vm_result lox_vm_run() {
                 lox_value value = peek(0);
                 uint16_t jump = READ_SHORT();
                 if (is_falsey(value)) {
-                    vm.ip += jump;
+                    IP() += jump;
                 }
                 break;
             }
             case OP_JUMP: {
                 uint16_t jump = READ_SHORT();
-                vm.ip += jump;
+                IP() += jump;
                 break;
             }
             case OP_LOOP: {
                 uint16_t jump = READ_SHORT();
-                vm.ip -= jump;
+                IP() -= jump;
+                break;
+            }
+            case OP_CALL: {
+                uint8_t args = READ_BYTE();
+                lox_value value = STACK_POP();
+                call(value, args);
                 break;
             }
             default:
@@ -277,8 +299,9 @@ lox_vm_result interpret(char* source) {
 
     lox_vm_init();
 
-    vm.ip = chunk.bytecode.code;
-    vm.chunk = &chunk;
+    vm.call_frame = 0;
+    vm.call_frames[0].ip = chunk.bytecode.code;
+    vm.call_frames[0].chunk = &chunk;
 
     lox_vm_result vm_result = lox_vm_run();
 

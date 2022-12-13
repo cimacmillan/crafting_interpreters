@@ -587,6 +587,7 @@ static void function_declaration() {
     lox_chunk *previous = current_chunk;
     current_chunk = &func->chunk;
     block_statement();
+    emit_byte(OP_RETURN);
     end_scope();
     current_chunk = previous;
 
