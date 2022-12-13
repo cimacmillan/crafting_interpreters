@@ -270,8 +270,26 @@ static void or_op(bool can_assign) {
     patch_jump(true_jump);
 }
 
+static uint8_t call_argument_list() {
+    uint8_t arg_c = 0;
+    if (!check(TOKEN_RIGHT_PAREN)) {
+        do {
+            expression();
+            arg_c++;
+        } while (match(TOKEN_COMMA));
+    }
+    consume(TOKEN_RIGHT_PAREN, "expected right parenthesis in function call");
+    return arg_c;
+}
+
+static void func_call(bool can_assign) {
+    (void)can_assign;
+    uint8_t arg_count = call_argument_list();
+    emit_bytes(OP_CALL, arg_count);
+}
+
 lox_parse_rule rules[] = {
-  [TOKEN_LEFT_PAREN]    = {grouping, NULL,   PREC_NONE},
+  [TOKEN_LEFT_PAREN]    = {grouping, func_call,   PREC_CALL},
   [TOKEN_RIGHT_PAREN]   = {NULL,     NULL,   PREC_NONE},
   [TOKEN_LEFT_BRACE]    = {NULL,     NULL,   PREC_NONE}, 
   [TOKEN_RIGHT_BRACE]   = {NULL,     NULL,   PREC_NONE},

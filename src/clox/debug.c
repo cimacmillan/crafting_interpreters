@@ -35,7 +35,7 @@ static int constant_instruction(const char* name, lox_chunk *chunk, int offset) 
 static int byte_arg_instruction(const char* name, lox_chunk *chunk, int offset) {
     uint8_t constant_address = chunk->bytecode.code[offset + 1];
     // -16 makes that much space so the numbers are then alligned
-    printf("%-16s stack[%04d]", name, constant_address);
+    printf("%-16s %04d", name, constant_address);
     printf("\n");
     return offset + 2;
 }
@@ -107,6 +107,8 @@ int disassemble_instruction(lox_chunk *chunk, int offset) {
             return short_arg_instruction("OP_JUMP_IF_FALSE", chunk, offset);
         case OP_LOOP:
             return loop_arg_instruction("OP_LOOP", chunk, offset);
+        case OP_CALL:
+            return byte_arg_instruction("OP_CALL", chunk, offset);
         default:
             printf("Unknown opcode %d\n", code);
             return offset + 1;
