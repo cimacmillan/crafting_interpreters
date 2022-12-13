@@ -4,7 +4,7 @@
 #include "value.h"
 #include "compiler.h"
 
-#define DEBUG_PRINT
+// #define DEBUG_PRINT
 
 lox_vm vm;
 
@@ -32,7 +32,7 @@ void lox_vm_free() {
 }
 
 static lox_value peek(int distance) {
-    return vm.stack.code[vm.stack.size - 1 - distance + vm.call_frames[vm.call_frame].stack_offset];
+    return vm.stack.code[vm.stack.size - 1 - distance];
 }
 
 static void on_lox_object_allocation(lox_heap_object *obj) {
@@ -225,7 +225,9 @@ lox_vm_result lox_vm_run() {
                 lox_value var_name = READ_CONSTANT();
                 lox_value value = STACK_POP();
                 lox_hashmap_insert(&vm.globals, AS_STRING(var_name)->chars, value);
+#ifdef DEBUG_PRINT
                 lox_hashmap_print(&vm.globals);
+#endif
                 break;
             }
             case OP_GET_GLOBAL: {
@@ -246,7 +248,9 @@ lox_vm_result lox_vm_run() {
                     runtime_error("undefined variable. define it first with var");
                 }
                 lox_hashmap_insert(&vm.globals, AS_STRING(var_name)->chars, value);
+#ifdef DEBUG_PRINT
                 lox_hashmap_print(&vm.globals);
+#endif
                 break;
             }
             case OP_GET_LOCAL: {
