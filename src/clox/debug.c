@@ -109,6 +109,14 @@ int disassemble_instruction(lox_chunk *chunk, int offset) {
             return loop_arg_instruction("OP_LOOP", chunk, offset);
         case OP_CALL:
             return byte_arg_instruction("OP_CALL", chunk, offset);
+        case OP_CLOSURE: {
+            offset++;
+            uint8_t constant = chunk->bytecode.code[offset++];
+            printf("%-16s %4d ", "OP_CLOSURE", constant);
+            lox_value_print(chunk->constants.code[constant]);
+            printf("\n");
+            return offset;
+        }
         default:
             printf("Unknown opcode %d\n", code);
             return offset + 1;

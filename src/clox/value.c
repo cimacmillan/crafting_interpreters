@@ -20,6 +20,10 @@ void lox_value_print(lox_value value) {
         printf(">");
     } else if (IS_NATIVE_FUNCTION(value)) {
         printf("<native fn>");
+    } else if (IS_CLOSURE(value)) {
+        printf("<closure ");
+        lox_value_print(TO_OBJ(AS_CLOSURE(value)->func));
+        printf(">");
     }
 }
 
@@ -92,6 +96,15 @@ lox_heap_object_native_function* new_lox_native_function(lox_native_fun fun) {
     return obj;
 }
 
+lox_heap_object_closure* new_lox_closure(lox_heap_object_function* func) {
+    lox_heap_object_closure *closure = malloc(sizeof(lox_heap_object_closure));
+    closure->type = LOX_HEAP_OBJECT_TYPE_CLOSURE;
+    closure->next = NULL;
+    closure->func = func;
+    return closure;
+}
+
+
 void free_obj_func(lox_heap_object_function *func) {
     chunk_free(&func->chunk);
     free(func);;
@@ -106,6 +119,9 @@ void free_obj(lox_heap_object *obj) {
             free_obj_func((lox_heap_object_function*)obj);
         break;
         case LOX_HEAP_OBJECT_TYPE_NATIVE_FUNCTION:
+            free(obj);
+        break;
+        case LOX_HEAP_OBJECT_TYPE_CLOSURE:
             free(obj);
         break;
     }

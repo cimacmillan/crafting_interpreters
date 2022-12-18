@@ -1,0 +1,43 @@
+
+class Animal {
+    fun init() {
+        this.sound = "Animal noise";
+    }
+
+    fun make_noise() {
+        print this.sound;
+    }
+}
+
+class Dog < Animal {
+    fun init() {
+        this.sound = "Bark";
+    }
+}
+
+class Cat < Animal {
+    fun init() {
+        this.sound = "Meow";
+    }
+}
+
+var dog = Dog();
+var cat = Cat();
+
+dog.make_noise();
+cat.make_noise();
+
+fun fib(a) {
+    if (a < 2) {
+        return 1;
+    }
+    return fib(a - 1) + fib(a - 2);
+}  
+
+var before = clock();
+
+fib(22);
+
+var after = clock();
+
+prints("calculation took ", after - before, " milliseconds");

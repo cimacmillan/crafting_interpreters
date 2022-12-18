@@ -1,1 +1,1 @@
-calculation took 804 milliseconds
+calculation took 755 milliseconds

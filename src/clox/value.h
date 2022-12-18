@@ -50,7 +50,10 @@ typedef enum {
     OP_JUMP_IF_FALSE,
     OP_JUMP,
     OP_LOOP,
-    OP_CALL
+    OP_CALL,
+    OP_CLOSURE,
+    OP_GET_UPVALUE,
+    OP_SET_UPVALUE,
 } lox_op_code;
 
 typedef struct {
@@ -63,6 +66,7 @@ typedef enum {
     LOX_HEAP_OBJECT_TYPE_STRING,
     LOX_HEAP_OBJECT_TYPE_FUNCTION,
     LOX_HEAP_OBJECT_TYPE_NATIVE_FUNCTION,
+    LOX_HEAP_OBJECT_TYPE_CLOSURE,
 } lox_heap_object_type;
 
 struct lox_heap_object {
@@ -100,6 +104,14 @@ struct lox_heap_object_native_function {
 
 typedef struct lox_heap_object_native_function lox_heap_object_native_function;
 
+struct lox_heap_object_closure {
+    lox_heap_object_type type;
+    struct lox_heap_object* next;
+    lox_heap_object_function* func;
+};
+
+typedef struct lox_heap_object_closure lox_heap_object_closure;
+
 // Is the lox value type of type
 #define IS_NUMBER(val) (val.type == LOX_VALUE_TYPE_NUMBER)
 #define IS_BOOL(val) (val.type == LOX_VALUE_TYPE_BOOL)
@@ -107,6 +119,7 @@ typedef struct lox_heap_object_native_function lox_heap_object_native_function;
 #define IS_STRING(val) (val.type == LOX_VALUE_TYPE_HEAP_OBJ && val.as.obj->type == LOX_HEAP_OBJECT_TYPE_STRING)
 #define IS_FUNCTION(val) (val.type == LOX_VALUE_TYPE_HEAP_OBJ && val.as.obj->type == LOX_HEAP_OBJECT_TYPE_FUNCTION)
 #define IS_NATIVE_FUNCTION(val) (val.type == LOX_VALUE_TYPE_HEAP_OBJ && val.as.obj->type == LOX_HEAP_OBJECT_TYPE_NATIVE_FUNCTION)
+#define IS_CLOSURE(val) (val.type == LOX_VALUE_TYPE_HEAP_OBJ && val.as.obj->type == LOX_HEAP_OBJECT_TYPE_CLOSURE)
 
 // Extract the c value from the lox value type
 #define AS_NUMBER(val) (val.as.number)
@@ -116,11 +129,13 @@ typedef struct lox_heap_object_native_function lox_heap_object_native_function;
 #define AS_CSTRING(val) (((struct lox_heap_object_string *)val.as.obj)->chars.code)
 #define AS_FUNCTION(val) ((struct lox_heap_object_function *)val.as.obj)
 #define AS_NATIVE_FUNCTION(val) ((struct lox_heap_object_native_function *)val.as.obj)
+#define AS_CLOSURE(val) ((struct lox_heap_object_closure *)val.as.obj)
+
 
 #define TO_NUMBER(val) ((lox_value){ LOX_VALUE_TYPE_NUMBER, {.number=val} })
 #define TO_BOOL(val) ((lox_value){ LOX_VALUE_TYPE_BOOL, {.boolean=val} })
 #define TO_NIL ((lox_value){ LOX_VALUE_TYPE_NIL, {.number=0} })
-#define TO_OBJ(val) ((lox_value){ LOX_VALUE_TYPE_HEAP_OBJ, {.obj=val} })
+#define TO_OBJ(val) ((lox_value){ LOX_VALUE_TYPE_HEAP_OBJ, {.obj=(lox_heap_object*)val} })
 
 struct lox_heap_object_string* new_lox_string(char* from, int length);
 struct lox_heap_object_string* copy_lox_string(lox_heap_object_string* from);
@@ -132,6 +147,6 @@ bool char_array_is_equal(char_array a, char_array b);
 
 lox_heap_object_function* new_lox_function();
 lox_heap_object_native_function* new_lox_native_function(lox_native_fun fun);
-
+lox_heap_object_closure* new_lox_closure(lox_heap_object_function* func);
 
 #endif

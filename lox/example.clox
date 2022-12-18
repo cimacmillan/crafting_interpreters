@@ -1,0 +1,14 @@
+fun fib(a) {
+    if (a < 2) {
+        return 1;
+    }
+    return fib(a - 1) + fib(a - 2);
+}  
+
+var before = clock();
+
+fib(22);
+
+var after = clock();
+
+print "calculation took "; print after - before; print " milliseconds";

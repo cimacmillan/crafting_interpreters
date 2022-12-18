@@ -229,15 +229,27 @@ static int identifier_constant() {
     return chunk_add_constant(current_chunk, TO_OBJ((lox_heap_object*)str));
 }
 
+static int resolve_upvalue(lox_token token) {
+    (void)token;
+    return -1;
+}
+
 static void variable(bool can_assign) {
     int arg = resolve_local(parser.previous);
-    int setOp = OP_SET_LOCAL;
-    int getOp = OP_GET_LOCAL;
+    int setOp = -1;
+    int getOp = -1;
     // It's a global
     if (arg == -1) {
         arg = identifier_constant();
         setOp = OP_SET_GLOBAL;
         getOp = OP_GET_GLOBAL;
+    } else if ((arg = resolve_upvalue(parser.previous)) != -1) {
+        setOp = OP_SET_UPVALUE;
+        getOp = OP_GET_UPVALUE;
+    } else {
+        arg = resolve_local(parser.previous);
+        setOp = OP_SET_LOCAL;
+        getOp = OP_GET_LOCAL;
     }
 
     if (!can_assign && match(TOKEN_EQUAL)) {
@@ -604,7 +616,7 @@ static void function_declaration() {
     end_scope();
     current_chunk = previous;
 
-    emit_constant(TO_OBJ((lox_heap_object*)func));
+    emit_bytes(OP_CLOSURE, chunk_add_constant(current_chunk, TO_OBJ(func)));
 
     // We only define globals in the global map, otherwise we can skip it because it's read from the stack instead
     if (parser.local_depth == 0) {

@@ -5,7 +5,7 @@
 #include "compiler.h"
 #include <time.h>
 
-#define DEBUG_PRINT
+// #define DEBUG_PRINT
 
 lox_vm vm;
 
@@ -81,6 +81,9 @@ static bool is_heap_obj_equal(lox_heap_object *a, lox_heap_object *b) {
         case LOX_HEAP_OBJECT_TYPE_NATIVE_FUNCTION: {
             return a == b;
         }
+        case LOX_HEAP_OBJECT_TYPE_CLOSURE: {
+            return a == b;
+        }
     }
     return false;
 }
@@ -117,8 +120,9 @@ static lox_value get_merged_string(lox_heap_object_string *a, lox_heap_object_st
 }
 
 static void call(lox_value value, int arg_c) {
-    if (IS_FUNCTION(value)) {
-        lox_heap_object_function *func = AS_FUNCTION(value);
+    if (IS_CLOSURE(value)) {
+        lox_heap_object_closure *closure = AS_CLOSURE(value);
+        lox_heap_object_function *func = closure->func;
         if (func->arity != arg_c) {
             runtime_error("unexpected number of function arguments");
         }
@@ -313,6 +317,12 @@ lox_vm_result lox_vm_run() {
                 uint8_t args = READ_BYTE();
                 lox_value value = peek(args);
                 call(value, args);
+                break;
+            }
+            case OP_CLOSURE: {
+                lox_heap_object_function *func = AS_FUNCTION(READ_CONSTANT());
+                lox_heap_object_closure *closure = new_lox_closure(func);
+                STACK_PUSH(TO_OBJ(closure));
                 break;
             }
             default:
