@@ -1,6 +1,6 @@
 ### About
 
-These are my implementations for the Crafting Interpreters Lox tree-walk interpreter and bytecode compiler.
+These are my implementations for the [Crafting Interpreters](https://craftinginterpreters.com/) Lox tree-walk interpreter and bytecode compiler.
 
 ### Setup
 
